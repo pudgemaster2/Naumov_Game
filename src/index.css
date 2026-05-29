@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-gold-300: #f3e5ab;
+  --color-gold-400: #e5c158;
+  --color-gold-500: #c5a028;
+  --color-gold-600: #9e7d11;
+  --color-gold-700: #785e05;
+
+  --color-obsidian-950: #050507;
+  --color-obsidian-900: #0c0c10;
+  --color-obsidian-800: #16161e;
+  --color-obsidian-700: #22222d;
+  --color-obsidian-600: #313140;
+
+  --font-gothic: "Cinzel", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-shake: shake 0.5s ease-in-out;
+  --animate-fade-in: fadeIn 0.3s ease-out forwards;
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px rgba(197, 160, 40, 0.2), 0 0 10px rgba(197, 160, 40, 0.1);
+    }
+    to {
+      box-shadow: 0 0 15px rgba(197, 160, 40, 0.4), 0 0 25px rgba(197, 160, 40, 0.2);
+    }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Custom base styles */
+html, body {
+  background-color: var(--color-obsidian-950);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-gothic);
+}
+
+/* Custom Scrollbar for Retro Log */
+.rpg-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.rpg-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-obsidian-950);
+  border-left: 1px solid var(--color-obsidian-800);
+}
+.rpg-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-gold-700);
+  border-radius: 3px;
+}
+.rpg-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-500);
+}
+
+/* Gothic styled components */
+.gothic-panel {
+  background: linear-gradient(135deg, var(--color-obsidian-900) 0%, var(--color-obsidian-800) 100%);
+  border: 1px solid var(--color-gold-700);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.gothic-panel-gold {
+  background: linear-gradient(135deg, var(--color-obsidian-900) 0%, var(--color-obsidian-800) 100%);
+  border: 2px solid var(--color-gold-500);
+  box-shadow: 0 0 15px rgba(197, 160, 40, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.gold-text-shimmer {
+  background: linear-gradient(to right, var(--color-gold-300) 0%, var(--color-gold-500) 50%, var(--color-gold-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.gothic-btn {
+  font-family: var(--font-gothic);
+  background: linear-gradient(180deg, var(--color-gold-600) 0%, var(--color-gold-700) 100%);
+  border: 1px solid var(--color-gold-500);
+  color: var(--color-obsidian-950);
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.gothic-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--color-gold-400) 0%, var(--color-gold-600) 100%);
+  box-shadow: 0 0 10px rgba(197, 160, 40, 0.5);
+  transform: translateY(-1px);
+}
+
+.gothic-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.gothic-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gothic-btn-secondary {
+  font-family: var(--font-gothic);
+  background: rgba(22, 22, 30, 0.8);
+  border: 1px solid var(--color-gold-700);
+  color: var(--color-gold-400);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.gothic-btn-secondary:hover:not(:disabled) {
+  border-color: var(--color-gold-400);
+  color: var(--color-gold-300);
+  background: rgba(34, 34, 45, 0.9);
+  box-shadow: 0 0 8px rgba(197, 160, 40, 0.2);
+}
+
+.gothic-input {
+  background: var(--color-obsidian-950);
+  border: 1px solid var(--color-obsidian-600);
+  color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+}
+
+.gothic-input:focus {
+  outline: none;
+  border-color: var(--color-gold-500);
+  box-shadow: 0 0 5px rgba(197, 160, 40, 0.3);
+}
+
+.pixel-grid {
+  background-size: 4px 4px;
+  background-image: linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
+}
