@@ -24,6 +24,7 @@ function App() {
     startCombat,
     submitTurn,
     exitCombat,
+    updateCharacter,
   } = useGameState();
 
   const handleSelectChoice = (type: 'attack' | 'defense', zone: any) => {
@@ -75,6 +76,7 @@ function App() {
             player={player} 
             onStartCombat={startCombat} 
             onLogout={logout} 
+            onUpdatePlayer={updateCharacter}
           />
         )}
         

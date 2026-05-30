@@ -7,6 +7,14 @@ export interface CharacterStats {
   intellect: number;
 }
 
+export interface AvatarSettings {
+  gender: 'male' | 'female';
+  hairColor: string;
+  skinColor: string;
+  outfitColor: string;
+  faceStyle: number;
+}
+
 export interface Character {
   name: string;
   classType: CharacterClass;
@@ -18,6 +26,15 @@ export interface Character {
   maxHp: number;
   wins: number;
   losses: number;
+  avatarSettings?: AvatarSettings;
+  upgrades?: Record<string, number>;
+  activeBuff?: {
+    name: string;
+    type: 'strength' | 'agility' | 'endurance' | 'intellect';
+    value: number;
+    fightsLeft: number;
+  };
+  lastDailyClaim?: string;
 }
 
 export type CombatZone = 'head' | 'chest' | 'stomach' | 'legs';

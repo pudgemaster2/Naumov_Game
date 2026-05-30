@@ -177,6 +177,14 @@ export const useGameState = () => {
     ]);
   };
 
+  const getEffectiveStat = (char: Character, statKey: 'strength' | 'agility' | 'endurance' | 'intellect') => {
+    let val = char.stats[statKey];
+    if (char.activeBuff && char.activeBuff.type === statKey && char.activeBuff.fightsLeft > 0) {
+      val += char.activeBuff.value;
+    }
+    return val;
+  };
+
   const submitTurn = async () => {
     if (!player || !bot || !playerChoices.attack || !playerChoices.defense || !user) return;
 
@@ -204,17 +212,20 @@ export const useGameState = () => {
     if (playerAttacksZone === botBlocksZone) {
       addLog('block', `🛡️ ${player.name} атаковал в ${zoneNames[playerAttacksZone]}, но ${bot.name} заблокировал удар!`);
     } else {
-      const botDodgeChance = bot.stats.agility * 1.0;
+      const botDodgeChance = getEffectiveStat(bot, 'agility') * 1.0;
       const isDodged = Math.random() * 100 < botDodgeChance;
 
       if (isDodged) {
         addLog('dodge', `💨 ${player.name} пытался ударить в ${zoneNames[playerAttacksZone]}, но ловкий ${bot.name} увернулся!`);
       } else {
-        const isCrit = Math.random() * 100 < (player.stats.agility * 1.5);
+        const playerAgility = getEffectiveStat(player, 'agility');
+        const isCrit = Math.random() * 100 < (playerAgility * 1.5);
         const baseDamage = Math.floor(Math.random() * 5) + 5;
+        const playerIntellect = getEffectiveStat(player, 'intellect');
+        const playerStrength = getEffectiveStat(player, 'strength');
         const modifier = player.classType === 'mage' 
-          ? player.stats.intellect * 1.0 
-          : player.stats.strength * 0.8;
+          ? playerIntellect * 1.0 
+          : playerStrength * 0.8;
         
         let damage = Math.round(baseDamage + modifier);
         if (isCrit) damage *= 2;
@@ -236,17 +247,20 @@ export const useGameState = () => {
     if (botAttacksZone === playerBlocksZone) {
       addLog('block', `🛡️ ${bot.name} атаковал в ${zoneNames[botAttacksZone]}, но вы заблокировали удар!`);
     } else {
-      const playerDodgeChance = player.stats.agility * 1.0;
+      const playerDodgeChance = getEffectiveStat(player, 'agility') * 1.0;
       const isDodged = Math.random() * 100 < playerDodgeChance;
 
       if (isDodged) {
         addLog('dodge', `💨 ${bot.name} целился в ${zoneNames[botAttacksZone]}, но вы ловко увернулись!`);
       } else {
-        const isCrit = Math.random() * 100 < (bot.stats.agility * 1.5);
+        const botAgility = getEffectiveStat(bot, 'agility');
+        const isCrit = Math.random() * 100 < (botAgility * 1.5);
         const baseDamage = Math.floor(Math.random() * 5) + 5;
+        const botIntellect = getEffectiveStat(bot, 'intellect');
+        const botStrength = getEffectiveStat(bot, 'strength');
         const modifier = bot.classType === 'mage' 
-          ? bot.stats.intellect * 1.0 
-          : bot.stats.strength * 0.8;
+          ? botIntellect * 1.0 
+          : botStrength * 0.8;
         
         let damage = Math.round(baseDamage + modifier);
         if (isCrit) damage *= 2;
@@ -312,6 +326,17 @@ export const useGameState = () => {
 
       const nextMaxHp = nextStats.endurance * 10;
 
+      // Decrement active buff fights left if present
+      let nextBuff = player.activeBuff;
+      if (nextBuff && nextBuff.fightsLeft > 0) {
+        const nextFights = nextBuff.fightsLeft - 1;
+        if (nextFights <= 0) {
+          nextBuff = undefined;
+        } else {
+          nextBuff = { ...nextBuff, fightsLeft: nextFights };
+        }
+      }
+
       const updatedPlayer: Character = {
         ...player,
         level: nextLevel,
@@ -322,6 +347,7 @@ export const useGameState = () => {
         currentHp: nextMaxHp, // Heals player to full
         wins: player.wins + addWin,
         losses: player.losses + addLoss,
+        activeBuff: nextBuff,
       };
 
       setPlayer(updatedPlayer);
@@ -357,6 +383,12 @@ export const useGameState = () => {
     setScreen('hub');
   };
 
+  const updateCharacter = async (updatedPlayer: Character) => {
+    if (!user) return;
+    setPlayer(updatedPlayer);
+    await db.saveCharacter(user.uid, updatedPlayer);
+  };
+
   return {
     screen,
     setScreen,
@@ -376,5 +408,6 @@ export const useGameState = () => {
     startCombat,
     submitTurn,
     exitCombat,
+    updateCharacter,
   };
 };
