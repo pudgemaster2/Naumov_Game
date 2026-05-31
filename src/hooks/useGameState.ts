@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { CLASS_TEMPLATES } from '../types';
+import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import type { 
   Character, 
+  CharacterRace,
   CharacterClass, 
   CombatZone, 
   CombatLogEntry, 
@@ -65,10 +66,24 @@ export const useGameState = () => {
         const character = await db.loadCharacter(session.uid);
         if (character) {
           // Class migration for backwards compatibility
-          if (character.classType === 'barbarian' as any) {
-            character.classType = 'orc';
-          } else if (character.classType === 'archer' as any) {
-            character.classType = 'elf';
+          if (!character.race) {
+            const oldClass = character.classType as string;
+            if (oldClass === 'elf') {
+              character.race = 'elf';
+              character.classType = 'archer';
+            } else if (oldClass === 'mage') {
+              character.race = 'human';
+              character.classType = 'mage';
+            } else if (oldClass === 'orc' || oldClass === 'barbarian') {
+              character.race = 'orc';
+              character.classType = 'warrior';
+            } else if (oldClass === 'gnome') {
+              character.race = 'gnome';
+              character.classType = 'warrior';
+            } else {
+              character.race = 'human';
+              character.classType = 'warrior';
+            }
           }
 
           if (!character.inventory) {
@@ -161,20 +176,33 @@ export const useGameState = () => {
     setScreen('auth');
   };
 
-  const selectCharacterClass = async (classType: CharacterClass, name: string) => {
+  const selectCharacterClass = async (race: CharacterRace, classType: CharacterClass, name: string) => {
     if (!user) return;
 
-    const template = CLASS_TEMPLATES[classType];
-    const maxHp = template.stats.endurance * 10;
-    const maxMana = template.stats.intellect * 10;
+    const raceTemplate = RACE_TEMPLATES[race];
+    const classTemplate = CLASS_TEMPLATES[classType];
+    
+    const baseStats = raceTemplate.baseStats;
+    const modifiers = classTemplate.statModifiers;
+    
+    const stats = {
+      strength: baseStats.strength + modifiers.strength,
+      agility: baseStats.agility + modifiers.agility,
+      endurance: baseStats.endurance + modifiers.endurance,
+      intellect: baseStats.intellect + modifiers.intellect,
+    };
+    
+    const maxHp = stats.endurance * 10;
+    const maxMana = stats.intellect * 10;
     
     const newPlayer: Character = {
       name: name.trim() || `Игрок_${Math.floor(Math.random() * 1000)}`,
+      race,
       classType,
       level: 1,
       experience: 0,
       gold: 0,
-      stats: { ...template.stats },
+      stats,
       currentHp: maxHp,
       maxHp: maxHp,
       currentMana: maxMana,
@@ -198,27 +226,36 @@ export const useGameState = () => {
     setPotionsUsed(0);
     setActiveScrolls({ atk: false, def: false, dodge: false, crit: false });
 
-    // Generate random bot class
-    const classes: CharacterClass[] = ['elf', 'mage', 'orc', 'gnome'];
+    // Generate random bot combination of race and class
+    const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
+    const classes: CharacterClass[] = ['warrior', 'archer', 'mage'];
+    
+    const botRace = races[Math.floor(Math.random() * races.length)];
     const botClass = classes[Math.floor(Math.random() * classes.length)];
-    const template = CLASS_TEMPLATES[botClass];
+    
+    const raceTemplate = RACE_TEMPLATES[botRace];
+    const classTemplate = CLASS_TEMPLATES[botClass];
     
     const botNames = ['Грязный Гарри', 'Безумный Джо', 'Свирепый Орк', 'Теневой Убийца', 'Старый Гэндальф', 'Адепт Хаоса'];
     const botName = botNames[Math.floor(Math.random() * botNames.length)];
 
-    // Bot stats match the level of the player slightly
+    // Base stats matching combination
+    const baseStats = raceTemplate.baseStats;
+    const modifiers = classTemplate.statModifiers;
+    
     const levelDiff = player.level - 1;
     const adjustedStats = {
-      strength: template.stats.strength + levelDiff,
-      agility: template.stats.agility + levelDiff,
-      endurance: template.stats.endurance + levelDiff,
-      intellect: template.stats.intellect + levelDiff,
+      strength: baseStats.strength + modifiers.strength + levelDiff,
+      agility: baseStats.agility + modifiers.agility + levelDiff,
+      endurance: baseStats.endurance + modifiers.endurance + levelDiff,
+      intellect: baseStats.intellect + modifiers.intellect + levelDiff,
     };
     const adjustedMaxHp = adjustedStats.endurance * 10;
     const adjustedMaxMana = adjustedStats.intellect * 10;
 
     const generatedBot: Character = {
       name: botName,
+      race: botRace,
       classType: botClass,
       level: player.level,
       experience: 0,
@@ -242,7 +279,7 @@ export const useGameState = () => {
         id: 'start',
         timestamp,
         type: 'system',
-        message: `Бой начался! Вы бросили вызов бойцу ${generatedBot.name} (${template.title}) [ур. ${generatedBot.level}].`,
+        message: `Бой начался! Вы бросили вызов бойцу ${generatedBot.name} (${raceTemplate.title} ${classTemplate.title}) [ур. ${generatedBot.level}].`,
       }
     ]);
 
@@ -436,9 +473,16 @@ export const useGameState = () => {
         const playerIntellect = getEffectiveStat(player, 'intellect');
         const playerStrength = getEffectiveStat(player, 'strength');
         
-        let modifier = isPlayerMageSpell
-          ? playerIntellect * 1.0 
-          : playerStrength * 0.8;
+        let modifier = 0;
+        if (player.classType === 'mage') {
+          modifier = isPlayerMageSpell
+            ? playerIntellect * 1.1
+            : playerStrength * 0.6;
+        } else if (player.classType === 'warrior') {
+          modifier = playerStrength * 1.0;
+        } else if (player.classType === 'archer') {
+          modifier = playerAgility * 0.9 + playerStrength * 0.3;
+        }
         
         let damage = Math.round(baseDamage + modifier);
         
@@ -454,8 +498,10 @@ export const useGameState = () => {
         let logPrefix = '';
         if (player.classType === 'mage') {
           logPrefix = isPlayerMageSpell ? '🔮 [Заклинание] ' : '⚔️ [Посох - Мана пуста] ';
+        } else if (player.classType === 'archer') {
+          logPrefix = '🏹 [Выстрел] ';
         } else {
-          logPrefix = '⚔️ ';
+          logPrefix = '⚔️ [Удар] ';
         }
 
         if (isCrit) {
@@ -489,9 +535,16 @@ export const useGameState = () => {
         const botIntellect = getEffectiveStat(bot, 'intellect');
         const botStrength = getEffectiveStat(bot, 'strength');
         
-        let modifier = isBotMageSpell
-          ? botIntellect * 1.0 
-          : botStrength * 0.8;
+        let modifier = 0;
+        if (bot.classType === 'mage') {
+          modifier = isBotMageSpell
+            ? botIntellect * 1.1
+            : botStrength * 0.6;
+        } else if (bot.classType === 'warrior') {
+          modifier = botStrength * 1.0;
+        } else if (bot.classType === 'archer') {
+          modifier = botAgility * 0.9 + botStrength * 0.3;
+        }
         
         let damage = Math.round(baseDamage + modifier);
         
@@ -507,8 +560,10 @@ export const useGameState = () => {
         let logPrefix = '';
         if (bot.classType === 'mage') {
           logPrefix = isBotMageSpell ? '🔮 [Заклинание] ' : '⚔️ [Посох - Мана пуста] ';
+        } else if (bot.classType === 'archer') {
+          logPrefix = '🏹 [Выстрел] ';
         } else {
-          logPrefix = '⚔️ ';
+          logPrefix = '⚔️ [Удар] ';
         }
 
         if (isCrit) {

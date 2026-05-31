@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Character } from '../types';
-import { CLASS_TEMPLATES } from '../types';
+import { CLASS_TEMPLATES, RACE_TEMPLATES } from '../types';
 import { TownMap } from '../components/TownMap';
 import { MyHouseView } from '../components/MyHouseView';
 import { ForgeView } from '../components/ForgeView';
@@ -13,11 +13,7 @@ import { StatTable } from '../components/StatTable';
 import { Button } from '../components/ui/Button';
 import { GeneralChat } from '../components/GeneralChat';
 import { Swords, Award, LogOut, Compass, Sparkles, Heart } from 'lucide-react';
-
-import elfImg from '../assets/ELF.jpg';
-import gnomeImg from '../assets/GNOME.jpg';
-import mageImg from '../assets/MAGE.jpg';
-import orcImg from '../assets/ORC.jpg';
+import { getPortrait } from '../utils/portraitHelper';
 
 interface HubScreenProps {
   player: Character;
@@ -39,15 +35,7 @@ type SubLocation =
   | 'post'
   | 'upper_tier';
 
-const getPortrait = (cType: string) => {
-  switch (cType) {
-    case 'elf': return elfImg;
-    case 'gnome': return gnomeImg;
-    case 'mage': return mageImg;
-    case 'orc': return orcImg;
-    default: return elfImg;
-  }
-};
+// getPortrait is now imported from portraitHelper
 
 export const HubScreen: React.FC<HubScreenProps> = ({
   player,
@@ -269,8 +257,8 @@ export const HubScreen: React.FC<HubScreenProps> = ({
         <div className="flex items-center gap-6 w-full md:w-auto">
           <div className="bg-obsidian-950 border border-gold-500/50 shadow-md w-20 h-24 overflow-hidden rounded flex-shrink-0">
             <img 
-              src={getPortrait(player.classType)} 
-              alt={player.classType} 
+              src={getPortrait(player.race, player.classType)} 
+              alt={`${player.race} ${player.classType}`} 
               className="w-full h-full object-cover" 
             />
           </div>
@@ -281,8 +269,8 @@ export const HubScreen: React.FC<HubScreenProps> = ({
                 Уровень {player.level}
               </span>
             </div>
-            <p className="text-base text-gold-400 font-gothic tracking-wider font-semibold uppercase">
-              {CLASS_TEMPLATES[player.classType].title}
+            <p className="text-sm md:text-base text-gold-400 font-gothic tracking-wider font-semibold uppercase">
+              Раса: {RACE_TEMPLATES[player.race]?.title || player.race} | Класс: {CLASS_TEMPLATES[player.classType]?.title || player.classType}
             </p>
           </div>
         </div>

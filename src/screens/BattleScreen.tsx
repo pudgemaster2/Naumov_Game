@@ -339,7 +339,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
       {/* Battle Log (bottom third) */}
       <div className="w-full">
-        <CombatLog logs={combatLogs} />
+        <CombatLog logs={combatLogs} playerName={player.name} botName={bot.name} />
       </div>
 
       {/* Game Over Modal Overlay */}
