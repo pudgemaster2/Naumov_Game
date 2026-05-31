@@ -1,4 +1,5 @@
-export type CharacterClass = 'elf' | 'mage' | 'orc' | 'gnome';
+export type CharacterRace = 'human' | 'elf' | 'gnome' | 'orc';
+export type CharacterClass = 'warrior' | 'archer' | 'mage';
 
 export interface CharacterStats {
   strength: number;
@@ -48,6 +49,7 @@ export interface Equipment {
 
 export interface Character {
   name: string;
+  race: CharacterRace;
   classType: CharacterClass;
   level: number;
   experience: number;
@@ -84,57 +86,65 @@ export interface CombatLogEntry {
 
 export type ScreenState = 'auth' | 'char_select' | 'hub' | 'battle';
 
-export interface ClassTemplate {
-  name: string;
+export interface RaceTemplate {
+  key: CharacterRace;
   title: string;
   description: string;
-  stats: CharacterStats;
+  baseStats: CharacterStats;
 }
 
-export const CLASS_TEMPLATES: Record<CharacterClass, ClassTemplate> = {
+export interface ClassTemplate {
+  key: CharacterClass;
+  title: string;
+  description: string;
+  statModifiers: CharacterStats;
+}
+
+export const RACE_TEMPLATES: Record<CharacterRace, RaceTemplate> = {
+  human: {
+    key: 'human',
+    title: 'Человек',
+    description: 'Универсальная раса. Сбалансированные характеристики позволяют одинаково успешно развивать любой боевой путь.',
+    baseStats: { strength: 8, agility: 8, endurance: 8, intellect: 8 }
+  },
   elf: {
-    name: 'elf',
+    key: 'elf',
     title: 'Эльф',
-    description: 'Быстрый и проворный боец. Высокая ловкость позволяет часто уворачиваться от ударов противника и наносить критические попадания.',
-    stats: {
-      strength: 8,
-      agility: 18,
-      endurance: 10,
-      intellect: 6,
-    },
-  },
-  mage: {
-    name: 'mage',
-    title: 'Маг',
-    description: 'Мастер заклинаний. Наносит сокрушительный магический урон, расходуя ману, но уязвим физически.',
-    stats: {
-      strength: 4,
-      agility: 8,
-      endurance: 8,
-      intellect: 20,
-    },
-  },
-  orc: {
-    name: 'orc',
-    title: 'Орк',
-    description: 'Могучий воин. Обладает огромной физической силой и большим запасом здоровья. Удары медленные, но очень тяжелые.',
-    stats: {
-      strength: 15,
-      agility: 5,
-      endurance: 16,
-      intellect: 4,
-    },
+    description: 'Грациозные жители лесов. Обладают врожденной ловкостью и координацией, что делает их непревзойденными стрелками и верткими бойцами.',
+    baseStats: { strength: 6, agility: 12, endurance: 8, intellect: 6 }
   },
   gnome: {
-    name: 'gnome',
+    key: 'gnome',
     title: 'Гном',
-    description: 'Крепкий защитник. Чрезвычайно вынослив, имеет сбалансированную силу и высокий базовый запас здоровья.',
-    stats: {
-      strength: 11,
-      agility: 7,
-      endurance: 18,
-      intellect: 6,
-    },
+    description: 'Стойкие обитатели подземелий. Невероятное упорство и толстая кожа дают им огромную выживаемость под тяжелыми ударами.',
+    baseStats: { strength: 9, agility: 5, endurance: 14, intellect: 4 }
   },
+  orc: {
+    key: 'orc',
+    title: 'Орк',
+    description: 'Яростные воины степей. Природа наделила их чудовищной мышечной массой и физической силой, сокрушающей любую защиту.',
+    baseStats: { strength: 12, agility: 4, endurance: 12, intellect: 4 }
+  }
+};
+
+export const CLASS_TEMPLATES: Record<CharacterClass, ClassTemplate> = {
+  warrior: {
+    key: 'warrior',
+    title: 'Воин',
+    description: 'Мастер ближнего боя. Специализируется на сокрушительных ударах оружием ближнего боя и превосходной физической защите.',
+    statModifiers: { strength: 6, agility: 2, endurance: 4, intellect: 0 }
+  },
+  archer: {
+    key: 'archer',
+    title: 'Лучник',
+    description: 'Опасный стрелок. Полагается на молниеносные маневры, увороты и высокоточные критические выстрелы с дистанции.',
+    statModifiers: { strength: 3, agility: 7, endurance: 2, intellect: 0 }
+  },
+  mage: {
+    key: 'mage',
+    title: 'Маг',
+    description: 'Повелитель стихий. Наносит колоссальный урон тайной магией, требующей высокой концентрации маны (MP).',
+    statModifiers: { strength: 0, agility: 2, endurance: 1, intellect: 9 }
+  }
 };
 

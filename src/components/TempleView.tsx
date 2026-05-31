@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Character } from '../types';
-import { CLASS_TEMPLATES } from '../types';
+import { CLASS_TEMPLATES, RACE_TEMPLATES } from '../types';
 import { Button } from './ui/Button';
 import { Heart, Sparkles, RefreshCw, MessageSquare } from 'lucide-react';
 
@@ -95,15 +95,16 @@ export const TempleView: React.FC<TempleViewProps> = ({ player, onSave, onBack }
 
     setIsCasting(true);
     setTimeout(async () => {
-      // Get base class template stats
-      const template = CLASS_TEMPLATES[player.classType];
+      // Get base template stats
+      const raceStats = RACE_TEMPLATES[player.race].baseStats;
+      const classModifiers = CLASS_TEMPLATES[player.classType].statModifiers;
       const levelDiff = player.level - 1;
       
       const resetStats = {
-        strength: template.stats.strength + levelDiff,
-        agility: template.stats.agility + levelDiff,
-        endurance: template.stats.endurance + levelDiff,
-        intellect: template.stats.intellect + levelDiff,
+        strength: raceStats.strength + classModifiers.strength + levelDiff,
+        agility: raceStats.agility + classModifiers.agility + levelDiff,
+        endurance: raceStats.endurance + classModifiers.endurance + levelDiff,
+        intellect: raceStats.intellect + classModifiers.intellect + levelDiff,
       };
 
       const resetMaxHp = resetStats.endurance * 10;

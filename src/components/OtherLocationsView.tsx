@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Character } from '../types';
+import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { Button } from './ui/Button';
 import { Shield, Sparkles, Timer, Target, HelpCircle } from 'lucide-react';
 
@@ -294,7 +295,7 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
               </div>
 
               <div className="flex justify-end font-mono text-xs text-slate-500">
-                Уровень вашего героя: {player.level} | Раса: {player.classType === 'orc' ? 'Орк' : player.classType === 'mage' ? 'Маг' : player.classType === 'elf' ? 'Эльф' : 'Гном'}
+                Уровень вашего героя: {player.level} | Раса: {RACE_TEMPLATES[player.race]?.title || player.race} | Класс: {CLASS_TEMPLATES[player.classType]?.title || player.classType}
               </div>
             </div>
           </div>

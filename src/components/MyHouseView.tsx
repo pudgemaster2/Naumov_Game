@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import type { Character, Item, Equipment, CharacterStats } from '../types';
+import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { Button } from './ui/Button';
 import { Bed, Inbox, Package, User2 } from 'lucide-react';
-
-import elfImg from '../assets/ELF.jpg';
-import gnomeImg from '../assets/GNOME.jpg';
-import mageImg from '../assets/MAGE.jpg';
-import orcImg from '../assets/ORC.jpg';
+import { getPortrait } from '../utils/portraitHelper';
 
 interface MyHouseViewProps {
   player: Character;
@@ -31,15 +28,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
   const todayDateString = new Date().toISOString().split('T')[0];
   const isDailyAvailable = player.lastDailyClaim !== todayDateString;
 
-  const getPortrait = (cType: string) => {
-    switch (cType) {
-      case 'elf': return elfImg;
-      case 'gnome': return gnomeImg;
-      case 'mage': return mageImg;
-      case 'orc': return orcImg;
-      default: return elfImg;
-    }
-  };
+  // getPortrait is now imported from portraitHelper
 
   // Helpers for equipment stats calculation
   const getEquippedStats = (): Record<keyof CharacterStats, number> => {
@@ -547,8 +536,8 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 <div className="flex flex-col items-center">
                   <div className="border border-gold-900/40 rounded-lg overflow-hidden bg-obsidian-950 p-2 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
                     <img 
-                      src={getPortrait(player.classType)} 
-                      alt={player.classType} 
+                      src={getPortrait(player.race, player.classType)} 
+                      alt={`${player.race} ${player.classType}`} 
                       className="w-[320px] h-[460px] object-cover rounded border border-obsidian-800" 
                     />
                   </div>
@@ -572,10 +561,13 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 {renderSlot('ring4', 'Кольцо', 'Кольцо 4')}
               </div>
 
-              <div className="mt-1.5 text-center">
-                <span className="font-gothic text-gold-400 font-bold uppercase tracking-widest text-sm">
+              <div className="mt-1.5 text-center space-y-1">
+                <div className="font-gothic text-gold-400 font-bold uppercase tracking-widest text-sm">
                   {player.name}
-                </span>
+                </div>
+                <div className="text-xs font-mono text-slate-400">
+                  {RACE_TEMPLATES[player.race]?.title || player.race} • {CLASS_TEMPLATES[player.classType]?.title || player.classType}
+                </div>
               </div>
             </div>
           </div>
