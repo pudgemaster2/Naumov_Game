@@ -17,9 +17,9 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyle = "rounded border font-semibold tracking-wider transition-all duration-200 active:scale-95 disabled:pointer-events-none";
   
   const sizeStyles = {
-    sm: "px-3.5 py-1.5 text-xs",
-    md: "px-6 py-2.5 text-sm",
-    lg: "px-8 py-3 text-base"
+    sm: "px-4.5 py-2.5 text-sm",
+    md: "px-8 py-3.5 text-base",
+    lg: "px-10 py-4.5 text-lg"
   };
 
   const variantStyles = {

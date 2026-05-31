@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import type { CombatLogEntry } from '../types';
 import { Terminal, ScrollText } from 'lucide-react';
 
@@ -8,11 +8,6 @@ interface CombatLogProps {
 
 export const CombatLog: React.FC<CombatLogProps> = ({ logs }) => {
   const logEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto scroll to bottom of log when entry is added
-  useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [logs]);
 
   const getLogStyle = (type: string) => {
     switch (type) {
@@ -36,29 +31,29 @@ export const CombatLog: React.FC<CombatLogProps> = ({ logs }) => {
   };
 
   return (
-    <div className="gothic-panel p-4 flex flex-col h-full bg-obsidian-950/90 relative overflow-hidden">
+    <div className="gothic-panel p-6 flex flex-col h-full bg-obsidian-950/90 relative overflow-hidden">
       
       {/* Background overlay */}
       <div className="absolute inset-0 bg-radial-at-t from-obsidian-900 to-obsidian-950 pointer-events-none opacity-40" />
 
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-obsidian-800 pb-3 mb-3 relative z-10">
-        <ScrollText className="w-5 h-5 text-gold-500" />
-        <h4 className="text-sm font-semibold uppercase tracking-wider text-gold-400 font-gothic flex-1">Летопись Боя (Лог)</h4>
-        <Terminal className="w-4 h-4 text-slate-600" />
+      <div className="flex items-center gap-3 border-b border-obsidian-800 pb-3 mb-4 relative z-10">
+        <ScrollText className="w-5.5 h-5.5 text-gold-500" />
+        <h4 className="text-base font-semibold uppercase tracking-wider text-gold-400 font-gothic flex-1">Летопись Боя (Лог)</h4>
+        <Terminal className="w-4.5 h-4.5 text-slate-600" />
       </div>
 
       {/* Scrollable logs area */}
-      <div className="flex-1 overflow-y-auto pr-1 space-y-2 rpg-scrollbar relative z-10 max-h-[220px] md:max-h-[300px]">
+      <div className="flex-1 overflow-y-auto pr-1 space-y-3 rpg-scrollbar relative z-10 max-h-[350px] md:max-h-[450px]">
         {logs.length === 0 ? (
-          <div className="text-center text-slate-600 text-xs py-8 italic">Ожидание начала поединка...</div>
+          <div className="text-center text-slate-600 text-sm py-8 italic">Ожидание начала поединка...</div>
         ) : (
           logs.map((log) => (
             <div
               key={log.id}
-              className={`text-xs font-mono transition-all duration-300 leading-relaxed ${getLogStyle(log.type)}`}
+              className={`text-sm md:text-base font-mono transition-all duration-300 leading-relaxed ${getLogStyle(log.type)}`}
             >
-              <span className="text-[10px] text-slate-600 mr-2">[{log.timestamp}]</span>
+              <span className="text-xs text-slate-600 mr-2">[{log.timestamp}]</span>
               <span>{log.message}</span>
             </div>
           ))

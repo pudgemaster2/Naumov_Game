@@ -1,4 +1,4 @@
-export type CharacterClass = 'barbarian' | 'mage' | 'archer';
+export type CharacterClass = 'elf' | 'mage' | 'orc' | 'gnome';
 
 export interface CharacterStats {
   strength: number;
@@ -7,12 +7,43 @@ export interface CharacterStats {
   intellect: number;
 }
 
-export interface AvatarSettings {
-  gender: 'male' | 'female';
-  hairColor: string;
-  skinColor: string;
-  outfitColor: string;
-  faceStyle: number;
+export interface Item {
+  id: string;
+  name: string;
+  type: 
+    | 'helmet' 
+    | 'armor' 
+    | 'gloves' 
+    | 'boots' 
+    | 'weapon' 
+    | 'shield' 
+    | 'belt' 
+    | 'ring' 
+    | 'spellbook'
+    | 'potion_hp'
+    | 'potion_mp'
+    | 'scroll_atk'
+    | 'scroll_def'
+    | 'scroll_dodge'
+    | 'scroll_crit';
+  stats: Partial<CharacterStats>;
+  description: string;
+  icon: string;
+}
+
+export interface Equipment {
+  helmet?: Item;
+  armor?: Item;
+  gloves?: Item;
+  boots?: Item;
+  weapon?: Item;
+  shield?: Item;
+  belt?: Item;
+  ring1?: Item;
+  ring2?: Item;
+  ring3?: Item;
+  ring4?: Item;
+  spellbook?: Item;
 }
 
 export interface Character {
@@ -24,9 +55,10 @@ export interface Character {
   stats: CharacterStats;
   currentHp: number;
   maxHp: number;
+  currentMana: number;
+  maxMana: number;
   wins: number;
   losses: number;
-  avatarSettings?: AvatarSettings;
   upgrades?: Record<string, number>;
   activeBuff?: {
     name: string;
@@ -35,6 +67,8 @@ export interface Character {
     fightsLeft: number;
   };
   lastDailyClaim?: string;
+  inventory?: Item[];
+  equipment?: Equipment;
 }
 
 export type CombatZone = 'head' | 'chest' | 'stomach' | 'legs';
@@ -58,32 +92,10 @@ export interface ClassTemplate {
 }
 
 export const CLASS_TEMPLATES: Record<CharacterClass, ClassTemplate> = {
-  barbarian: {
-    name: 'barbarian',
-    title: 'Силач (Воин)',
-    description: 'Обладает сокрушительной физической силой и огромным запасом здоровья. Удары медленные, но сокрушительные.',
-    stats: {
-      strength: 14,
-      agility: 6,
-      endurance: 16,
-      intellect: 4,
-    },
-  },
-  mage: {
-    name: 'mage',
-    title: 'Маг',
-    description: 'Мастер тайных искусств. Наносит колоссальный магический урон, но слаб в ближнем бою и уязвим физически.',
-    stats: {
-      strength: 4,
-      agility: 8,
-      endurance: 8,
-      intellect: 20,
-    },
-  },
-  archer: {
-    name: 'archer',
-    title: 'Эльф-лучник',
-    description: 'Невероятно ловок и быстр. Имеет высокий шанс увернуться от вражеских ударов и нанести критический выстрел.',
+  elf: {
+    name: 'elf',
+    title: 'Эльф',
+    description: 'Быстрый и проворный боец. Высокая ловкость позволяет часто уворачиваться от ударов противника и наносить критические попадания.',
     stats: {
       strength: 8,
       agility: 18,
@@ -91,4 +103,38 @@ export const CLASS_TEMPLATES: Record<CharacterClass, ClassTemplate> = {
       intellect: 6,
     },
   },
+  mage: {
+    name: 'mage',
+    title: 'Маг',
+    description: 'Мастер заклинаний. Наносит сокрушительный магический урон, расходуя ману, но уязвим физически.',
+    stats: {
+      strength: 4,
+      agility: 8,
+      endurance: 8,
+      intellect: 20,
+    },
+  },
+  orc: {
+    name: 'orc',
+    title: 'Орк',
+    description: 'Могучий воин. Обладает огромной физической силой и большим запасом здоровья. Удары медленные, но очень тяжелые.',
+    stats: {
+      strength: 15,
+      agility: 5,
+      endurance: 16,
+      intellect: 4,
+    },
+  },
+  gnome: {
+    name: 'gnome',
+    title: 'Гном',
+    description: 'Крепкий защитник. Чрезвычайно вынослив, имеет сбалансированную силу и высокий базовый запас здоровья.',
+    stats: {
+      strength: 11,
+      agility: 7,
+      endurance: 18,
+      intellect: 6,
+    },
+  },
 };
+
