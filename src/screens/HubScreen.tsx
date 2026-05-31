@@ -48,28 +48,10 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   // Transition loading states
   const [isLoading, setIsLoading] = useState(false);
   const [loadingLoc, setLoadingLoc] = useState<SubLocation>('town');
-  const [loadingMessage, setLoadingMessage] = useState('Загрузка...');
 
-  const getLoadingMessage = (loc: SubLocation) => {
-    switch (loc) {
-      case 'my_house': return 'Вход в палаты...';
-      case 'forge': return 'Путь в Кузницу Пламени...';
-      case 'tavern': return 'Заходим в Таверну...';
-      case 'temple': return 'Подходим к Храму Воды...';
-      case 'market': return 'Выходим на Торговую площадь...';
-      case 'arena': return 'Путь на Арену Гладиаторов...';
-      case 'gates': return 'Подходим к Главным вратам...';
-      case 'siege': return 'Осмотр оборонительных орудий...';
-      case 'post': return 'Идем на Оборонительный пост...';
-      case 'upper_tier': return 'Поднимаемся на Верхний Ярус...';
-      case 'town': return 'Возвращение на площадь...';
-      default: return 'Загрузка...';
-    }
-  };
 
   const handleNavigateTo = (targetLoc: SubLocation) => {
     setLoadingLoc(targetLoc);
-    setLoadingMessage(getLoadingMessage(targetLoc));
     setIsLoading(true);
   };
 
@@ -244,7 +226,6 @@ export const HubScreen: React.FC<HubScreenProps> = ({
       {/* Loading Screen Overlay */}
       {isLoading && (
         <LoadingScreen 
-          message={loadingMessage} 
           onComplete={handleLoadingComplete} 
         />
       )}
