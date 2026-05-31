@@ -27,12 +27,12 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <div className="flex justify-between text-xs font-mono mb-1 text-slate-300">
+        <div className="flex justify-between text-sm font-bold font-mono mb-1.5 text-slate-350">
           <span>{label}</span>
           <span>{value} / {max}</span>
         </div>
       )}
-      <div className="h-5 w-full bg-obsidian-950 border border-obsidian-700 rounded overflow-hidden p-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
+      <div className="h-7 w-full bg-obsidian-950 border border-obsidian-700 rounded overflow-hidden p-[2.5px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
         <div
           className={`h-full rounded-sm transition-all duration-300 ease-out ${barColors[color]}`}
           style={{ width: `${percentage}%` }}

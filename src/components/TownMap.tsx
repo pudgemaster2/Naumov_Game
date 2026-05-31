@@ -17,7 +17,7 @@ interface TownLocationData {
   key: TownLocationKey;
   name: string;
   description: string;
-  points: string;
+  style: { top: string; left: string };
 }
 
 const TOWN_LOCATIONS: TownLocationData[] = [
@@ -25,61 +25,61 @@ const TOWN_LOCATIONS: TownLocationData[] = [
     key: 'upper_tier',
     name: 'Верхний Ярус',
     description: 'Веревочные мосты и дома старейшин в кронах священных деревьев.',
-    points: '50,10 950,10 930,200 780,210 500,165 220,210 70,200',
+    style: { top: '7%', left: '50%' }
   },
   {
     key: 'temple',
-    name: 'Храм Воды',
+    name: 'Храм',
     description: 'Величественное святилище у водопада, где эльфы молят о благословении.',
-    points: '440,215 560,215 620,290 560,405 480,410 380,290',
+    style: { top: '25%', left: '54%' }
   },
   {
     key: 'arena',
-    name: 'Арена Гладиаторов',
+    name: 'Арена',
     description: 'Круглая каменная платформа, на которой бойцы доказывают свою силу.',
-    points: '245,360 455,360 455,470 245,470',
+    style: { top: '35%', left: '35%' }
   },
   {
     key: 'market',
-    name: 'Торговая Площадь',
+    name: 'Рынок',
     description: 'Шумный рынок с редкими снадобьями, амулетами и экипировкой.',
-    points: '625,400 775,400 775,560 625,560',
+    style: { top: '38%', left: '77%' }
   },
   {
     key: 'tavern',
-    name: 'Таверна «У Дерева»',
+    name: 'Таверна',
     description: 'Место сбора путешественников. Здесь наливают эль и играют в кости.',
-    points: '815,430 955,430 955,580 815,580',
+    style: { top: '42%', left: '90%' }
   },
   {
     key: 'forge',
-    name: 'Кузница Пламени',
-    description: 'Каменный горн кузнеца. Здесь куются мечи и улучшаются доспехи.',
-    points: '105,520 275,520 275,680 105,680',
+    name: 'Кузница',
+    description: 'Каменный горн кузнеца Торвальда. Здесь куются мечи и доспехи.',
+    style: { top: '53%', left: '24%' }
   },
   {
     key: 'my_house',
     name: 'Мой Дом',
-    description: 'Ваш личный уютный уголок. Здесь можно отдохнуть, открыть сундук и сменить имя/внешность.',
-    points: '575,600 725,600 725,750 575,750',
+    description: 'Ваш личный уютный уголок. Здесь находится кровать, сундук и снаряжение.',
+    style: { top: '58%', left: '68%' }
   },
   {
     key: 'gates',
     name: 'Главные Врата',
-    description: 'Оборонительные врата города. Отсюда воины уходят патрулировать окрестности.',
-    points: '245,760 465,760 465,970 245,970',
+    description: 'Оборонительные врата города. Отсюда воины уходят патрулировать стены.',
+    style: { top: '74%', left: '36%' }
   },
   {
     key: 'siege',
-    name: 'Осадные Орудия',
+    name: 'Катапульта',
     description: 'Мощная баллиста и катапульта для обороны города. Можно сделать выстрел.',
-    points: '675,750 915,750 915,900 675,900',
+    style: { top: '71%', left: '77%' }
   },
   {
     key: 'post',
     name: 'Оборонительный Пост',
     description: 'Башня стражи, где новобранцы тренируются и изучают военное ремесло.',
-    points: '685,880 965,880 965,990 685,990',
+    style: { top: '92%', left: '84%' }
   },
 ];
 
@@ -91,21 +91,21 @@ export const TownMap: React.FC<TownMapProps> = ({ onSelectLocation }) => {
   const [hoveredLoc, setHoveredLoc] = useState<TownLocationData | null>(null);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl mx-auto space-y-4">
+    <div className="flex flex-col items-center w-full max-w-[1100px] mx-auto space-y-4">
       {/* City Banner Header */}
-      <div className="w-full text-center h-20 flex flex-col justify-center bg-obsidian-950/80 border border-gold-900/30 rounded p-4 relative overflow-hidden">
+      <div className="w-full text-center h-28 flex flex-col justify-center bg-obsidian-950/80 border border-gold-900/30 rounded p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-gold-950/10 via-transparent to-gold-950/10" />
         {hoveredLoc ? (
           <div className="animate-fade-in">
-            <h3 className="text-xl font-bold font-gothic tracking-widest text-gold-400">
+            <h3 className="text-2xl md:text-3xl font-bold font-gothic tracking-widest text-gold-400">
               {hoveredLoc.name}
             </h3>
-            <p className="text-xs text-slate-400 font-sans tracking-wide mt-1">
+            <p className="text-sm md:text-base text-slate-400 font-sans tracking-wide mt-1">
               {hoveredLoc.description}
             </p>
           </div>
         ) : (
-          <div className="opacity-60 text-slate-500 font-gothic tracking-widest text-sm uppercase">
+          <div className="opacity-60 text-slate-500 font-gothic tracking-widest text-base uppercase">
             Выберите локацию для перемещения
           </div>
         )}
@@ -120,27 +120,26 @@ export const TownMap: React.FC<TownMapProps> = ({ onSelectLocation }) => {
           className="w-full h-full object-cover select-none pointer-events-none"
         />
 
-        {/* SVG Interactive Overlay */}
-        <svg
-          viewBox="0 0 1000 1000"
-          className="absolute inset-0 w-full h-full z-10"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {TOWN_LOCATIONS.map((loc) => (
-            <polygon
+        {/* Absolute positioned interactive text buttons */}
+        {TOWN_LOCATIONS.map((loc) => {
+          const isHovered = hoveredLoc?.key === loc.key;
+          return (
+            <button
               key={loc.key}
-              points={loc.points}
-              className="fill-transparent stroke-transparent hover:fill-gold-500/10 hover:stroke-gold-400 hover:stroke-[3.5px] transition-all duration-200 cursor-pointer pointer-events-auto filter drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+              onClick={() => onSelectLocation(loc.key)}
               onMouseEnter={() => setHoveredLoc(loc)}
               onMouseLeave={() => setHoveredLoc(null)}
-              onClick={() => onSelectLocation(loc.key)}
-            />
-          ))}
-        </svg>
-      </div>
-
-      <div className="text-center font-mono text-[10px] text-slate-500 max-w-lg">
-        Наведите курсор на интересующее здание города для подсветки контура. Нажмите для перехода.
+              className={`absolute z-10 px-4 py-2.5 -translate-x-1/2 -translate-y-1/2 font-gothic text-xs md:text-sm lg:text-[15px] rounded font-bold tracking-widest uppercase transition-all duration-200 cursor-pointer shadow-lg select-none border ${
+                isHovered
+                  ? 'bg-obsidian-900 text-gold-300 border-gold-400 scale-105 shadow-[0_0_15px_rgba(197,160,40,0.6)]'
+                  : 'bg-obsidian-950/90 text-gold-400/80 border-gold-900/50 hover:bg-obsidian-900 hover:text-gold-300'
+              }`}
+              style={{ top: loc.style.top, left: loc.style.left }}
+            >
+              {loc.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

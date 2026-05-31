@@ -6,11 +6,29 @@ import type {
   CombatZone, 
   CombatLogEntry, 
   ScreenState, 
-  LogEntryType 
+  LogEntryType,
+  Item
 } from '../types';
 import { auth } from '../services/auth';
 import type { UserSession } from '../services/auth';
 import { db } from '../services/db';
+
+const defaultStartingItems: Item[] = [
+  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: '⛑️' },
+  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: '🧤' },
+  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: '🧥' },
+  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: '🥾' },
+  { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
+  { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
+  { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
+  { id: 'potion_mp_1', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
+  { id: 'potion_mp_2', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
+  { id: 'potion_mp_3', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
+  { id: 'scroll_atk_1', name: 'Свиток Ярости', type: 'scroll_atk', stats: {}, description: 'Увеличивает наносимый урон на +10 до конца боя.', icon: '📜' },
+  { id: 'scroll_def_1', name: 'Свиток Каменной Кожи', type: 'scroll_def', stats: {}, description: 'Снижает получаемый урон на 5 до конца боя.', icon: '📜' },
+  { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: '📜' },
+  { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: '📜' }
+];
 
 export const useGameState = () => {
   const [screen, setScreen] = useState<ScreenState>('auth');
@@ -27,6 +45,15 @@ export const useGameState = () => {
   }>({ attack: null, defense: null });
   const [combatWinner, setCombatWinner] = useState<'player' | 'bot' | 'draw' | null>(null);
 
+  // Combat Consumable Tracking States
+  const [potionsUsed, setPotionsUsed] = useState(0);
+  const [activeScrolls, setActiveScrolls] = useState({
+    atk: false,
+    def: false,
+    dodge: false,
+    crit: false,
+  });
+
   // Subscribe to auth state changes
   useEffect(() => {
     setAuthLoading(true);
@@ -37,8 +64,57 @@ export const useGameState = () => {
         // Fetch character for user
         const character = await db.loadCharacter(session.uid);
         if (character) {
+          // Class migration for backwards compatibility
+          if (character.classType === 'barbarian' as any) {
+            character.classType = 'orc';
+          } else if (character.classType === 'archer' as any) {
+            character.classType = 'elf';
+          }
+
+          if (!character.inventory) {
+            character.inventory = [...defaultStartingItems];
+          }
+          if (!character.equipment) {
+            character.equipment = {};
+          }
+
+          // Item icons migration for compatibility with older Windows versions
+          const migrateItems = (items: Item[]) => {
+            return items.map(item => {
+              if (item.type === 'helmet' && item.icon === '🪖') {
+                return { ...item, icon: '⛑️' };
+              }
+              if (item.type === 'armor' && item.icon === '👕') {
+                return { ...item, icon: '🧥' };
+              }
+              return item;
+            });
+          };
+
+          character.inventory = migrateItems(character.inventory);
+          const equipment = character.equipment || {};
+          Object.keys(equipment).forEach((key) => {
+            const k = key as keyof typeof equipment;
+            const eq = equipment[k];
+            if (eq) {
+              if (eq.type === 'helmet' && eq.icon === '🪖') {
+                eq.icon = '⛑️';
+              }
+              if (eq.type === 'armor' && eq.icon === '👕') {
+                eq.icon = '🧥';
+              }
+            }
+          });
+
+          // Set Mana stats if undefined (migration)
+          if (character.maxMana === undefined || character.currentMana === undefined) {
+            character.maxMana = character.stats.intellect * 10;
+            character.currentMana = character.maxMana;
+          }
           setPlayer(character);
           setScreen('hub');
+          // Save migrated character permanently
+          await db.saveCharacter(session.uid, character);
         } else {
           setPlayer(null);
           setScreen('char_select');
@@ -90,6 +166,7 @@ export const useGameState = () => {
 
     const template = CLASS_TEMPLATES[classType];
     const maxHp = template.stats.endurance * 10;
+    const maxMana = template.stats.intellect * 10;
     
     const newPlayer: Character = {
       name: name.trim() || `Игрок_${Math.floor(Math.random() * 1000)}`,
@@ -100,8 +177,12 @@ export const useGameState = () => {
       stats: { ...template.stats },
       currentHp: maxHp,
       maxHp: maxHp,
+      currentMana: maxMana,
+      maxMana: maxMana,
       wins: 0,
       losses: 0,
+      inventory: [...defaultStartingItems],
+      equipment: {},
     };
     
     setPlayer(newPlayer);
@@ -112,12 +193,13 @@ export const useGameState = () => {
   const startCombat = () => {
     if (!player) return;
 
-    // Reset player HP to max for the beginning of combat
-    const activePlayer = { ...player, currentHp: player.maxHp };
-    setPlayer(activePlayer);
+    // Retain player current HP and current Mana (no auto healing!)
+    // Reset combat potions and scrolls tracker
+    setPotionsUsed(0);
+    setActiveScrolls({ atk: false, def: false, dodge: false, crit: false });
 
     // Generate random bot class
-    const classes: CharacterClass[] = ['barbarian', 'mage', 'archer'];
+    const classes: CharacterClass[] = ['elf', 'mage', 'orc', 'gnome'];
     const botClass = classes[Math.floor(Math.random() * classes.length)];
     const template = CLASS_TEMPLATES[botClass];
     
@@ -133,6 +215,7 @@ export const useGameState = () => {
       intellect: template.stats.intellect + levelDiff,
     };
     const adjustedMaxHp = adjustedStats.endurance * 10;
+    const adjustedMaxMana = adjustedStats.intellect * 10;
 
     const generatedBot: Character = {
       name: botName,
@@ -143,6 +226,8 @@ export const useGameState = () => {
       stats: adjustedStats,
       currentHp: adjustedMaxHp,
       maxHp: adjustedMaxHp,
+      currentMana: adjustedMaxMana,
+      maxMana: adjustedMaxMana,
       wins: 0,
       losses: 0,
     };
@@ -164,6 +249,104 @@ export const useGameState = () => {
     setScreen('battle');
   };
 
+  const useCombatPotion = async (type: 'hp' | 'mp') => {
+    if (!player || !user) return;
+    if (potionsUsed >= 3) {
+      addLog('system', '⚠️ Вы не можете выпить более 3 зелий за один бой!');
+      return;
+    }
+
+    const itemType = type === 'hp' ? 'potion_hp' : 'potion_mp';
+    const inventory = [...(player.inventory || [])];
+    const potionIndex = inventory.findIndex(item => item.type === itemType);
+
+    if (potionIndex === -1) {
+      addLog('system', `⚠️ У вас нет ${type === 'hp' ? 'Зелья здоровья' : 'Зелья маны'} в рюкзаке!`);
+      return;
+    }
+
+    // Remove 1 potion
+    inventory.splice(potionIndex, 1);
+
+    let nextHp = player.currentHp;
+    let nextMana = player.currentMana;
+
+    if (type === 'hp') {
+      nextHp = Math.min(player.maxHp, player.currentHp + 50);
+      addLog('system', `🧪 Вы выпили Зелье здоровья и восстановили ${nextHp - player.currentHp} HP.`);
+    } else {
+      nextMana = Math.min(player.maxMana, player.currentMana + 50);
+      addLog('system', `🧪 Вы выпили Зелье маны и восстановили ${nextMana - player.currentMana} MP.`);
+    }
+
+    const updatedPlayer: Character = {
+      ...player,
+      inventory,
+      currentHp: nextHp,
+      currentMana: nextMana
+    };
+
+    setPlayer(updatedPlayer);
+    setPotionsUsed(prev => prev + 1);
+    await db.saveCharacter(user.uid, updatedPlayer);
+  };
+
+  const useCombatScroll = async (type: 'atk' | 'def' | 'dodge' | 'crit') => {
+    if (!player || !user) return;
+    
+    const itemTypeMap: Record<string, string> = {
+      atk: 'scroll_atk',
+      def: 'scroll_def',
+      dodge: 'scroll_dodge',
+      crit: 'scroll_crit'
+    };
+    
+    const itemType = itemTypeMap[type];
+    const inventory = [...(player.inventory || [])];
+    const scrollIndex = inventory.findIndex(item => item.type === itemType);
+
+    if (scrollIndex === -1) {
+      addLog('system', `⚠️ У вас нет подходящего свитка в рюкзаке!`);
+      return;
+    }
+
+    const scrollName = inventory[scrollIndex].name;
+    inventory.splice(scrollIndex, 1);
+
+    setActiveScrolls(prev => ({
+      ...prev,
+      [type]: true
+    }));
+
+    addLog('system', `📜 Вы прочитали свиток: "${scrollName}". Эффект активирован до конца поединка!`);
+
+    const updatedPlayer: Character = {
+      ...player,
+      inventory
+    };
+
+    setPlayer(updatedPlayer);
+    await db.saveCharacter(user.uid, updatedPlayer);
+  };
+
+  const surrenderCombat = async () => {
+    if (!player || !bot || !user) return;
+
+    // Retain current HP in combat when surrendering
+    const nextPlayerHp = player.currentHp;
+    const updatedPlayer: Character = {
+      ...player,
+      losses: player.losses + 1,
+      currentHp: Math.max(1, nextPlayerHp)
+    };
+
+    setPlayer(updatedPlayer);
+    await db.saveCharacter(user.uid, updatedPlayer);
+
+    addLog('defeat', `🏳️ Вы сдались! Боец ${bot.name} одержал победу.`);
+    setCombatWinner('bot');
+  };
+
   const addLog = (type: LogEntryType, message: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setCombatLogs(prev => [
@@ -181,6 +364,13 @@ export const useGameState = () => {
     let val = char.stats[statKey];
     if (char.activeBuff && char.activeBuff.type === statKey && char.activeBuff.fightsLeft > 0) {
       val += char.activeBuff.value;
+    }
+    if (char.equipment) {
+      Object.values(char.equipment).forEach((item) => {
+        if (item && item.stats && item.stats[statKey]) {
+          val += item.stats[statKey]!;
+        }
+      });
     }
     return val;
   };
@@ -205,6 +395,27 @@ export const useGameState = () => {
     let nextPlayerHp = player.currentHp;
     let nextBotHp = bot.currentHp;
 
+    // Mana Math: Mages spend 15 mana to cast spells, otherwise they hit with standard staff scaling on strength
+    let pMana = player.currentMana;
+    let bMana = bot.currentMana === undefined ? bot.stats.intellect * 10 : bot.currentMana;
+    
+    let isPlayerMageSpell = false;
+    let isBotMageSpell = false;
+    
+    if (player.classType === 'mage') {
+      if (pMana >= 15) {
+        pMana -= 15;
+        isPlayerMageSpell = true;
+      }
+    }
+    
+    if (bot.classType === 'mage') {
+      if (bMana >= 15) {
+        bMana -= 15;
+        isBotMageSpell = true;
+      }
+    }
+
     // Resolve Player Attack -> Bot Defense
     const playerAttacksZone = playerChoices.attack;
     const botBlocksZone = botChoices.defense;
@@ -219,23 +430,38 @@ export const useGameState = () => {
         addLog('dodge', `💨 ${player.name} пытался ударить в ${zoneNames[playerAttacksZone]}, но ловкий ${bot.name} увернулся!`);
       } else {
         const playerAgility = getEffectiveStat(player, 'agility');
-        const isCrit = Math.random() * 100 < (playerAgility * 1.5);
+        // Scroll of Crit adds +15% crit chance
+        const isCrit = Math.random() * 100 < (playerAgility * 1.5 + (activeScrolls.crit ? 15 : 0));
         const baseDamage = Math.floor(Math.random() * 5) + 5;
         const playerIntellect = getEffectiveStat(player, 'intellect');
         const playerStrength = getEffectiveStat(player, 'strength');
-        const modifier = player.classType === 'mage' 
+        
+        let modifier = isPlayerMageSpell
           ? playerIntellect * 1.0 
           : playerStrength * 0.8;
         
         let damage = Math.round(baseDamage + modifier);
+        
+        // Scroll of Attack adds +10 to final damage
+        if (activeScrolls.atk) {
+          damage += 10;
+        }
+
         if (isCrit) damage *= 2;
 
         nextBotHp = Math.max(0, nextBotHp - damage);
         
-        if (isCrit) {
-          addLog('crit', `💥 Критический удар! ${player.name} нанес сокрушительный удар по ${bot.name} в ${zoneNames[playerAttacksZone]} на ${damage} урона!`);
+        let logPrefix = '';
+        if (player.classType === 'mage') {
+          logPrefix = isPlayerMageSpell ? '🔮 [Заклинание] ' : '⚔️ [Посох - Мана пуста] ';
         } else {
-          addLog('hit', `⚔️ ${player.name} ударил ${bot.name} в ${zoneNames[playerAttacksZone]} на ${damage} урона.`);
+          logPrefix = '⚔️ ';
+        }
+
+        if (isCrit) {
+          addLog('crit', `💥 Критический удар! ${logPrefix}${player.name} нанес сокрушительный урон по ${bot.name} в ${zoneNames[playerAttacksZone]} на ${damage} урона!`);
+        } else {
+          addLog('hit', `${logPrefix}${player.name} ударил ${bot.name} в ${zoneNames[playerAttacksZone]} на ${damage} урона.`);
         }
       }
     }
@@ -247,7 +473,11 @@ export const useGameState = () => {
     if (botAttacksZone === playerBlocksZone) {
       addLog('block', `🛡️ ${bot.name} атаковал в ${zoneNames[botAttacksZone]}, но вы заблокировали удар!`);
     } else {
-      const playerDodgeChance = getEffectiveStat(player, 'agility') * 1.0;
+      let playerDodgeChance = getEffectiveStat(player, 'agility') * 1.0;
+      // Scroll of Dodge adds +15% dodge rate
+      if (activeScrolls.dodge) {
+        playerDodgeChance += 15;
+      }
       const isDodged = Math.random() * 100 < playerDodgeChance;
 
       if (isDodged) {
@@ -258,19 +488,33 @@ export const useGameState = () => {
         const baseDamage = Math.floor(Math.random() * 5) + 5;
         const botIntellect = getEffectiveStat(bot, 'intellect');
         const botStrength = getEffectiveStat(bot, 'strength');
-        const modifier = bot.classType === 'mage' 
+        
+        let modifier = isBotMageSpell
           ? botIntellect * 1.0 
           : botStrength * 0.8;
         
         let damage = Math.round(baseDamage + modifier);
+        
+        // Scroll of Defense reduces damage taken by 5
+        if (activeScrolls.def) {
+          damage = Math.max(0, damage - 5);
+        }
+
         if (isCrit) damage *= 2;
 
         nextPlayerHp = Math.max(0, nextPlayerHp - damage);
 
-        if (isCrit) {
-          addLog('crit', `🩸 Критический урон! ${bot.name} пробил вашу оборону в ${zoneNames[botAttacksZone]} на ${damage} урона!`);
+        let logPrefix = '';
+        if (bot.classType === 'mage') {
+          logPrefix = isBotMageSpell ? '🔮 [Заклинание] ' : '⚔️ [Посох - Мана пуста] ';
         } else {
-          addLog('hit', `⚔️ ${bot.name} нанес вам удар в ${zoneNames[botAttacksZone]} на ${damage} урона.`);
+          logPrefix = '⚔️ ';
+        }
+
+        if (isCrit) {
+          addLog('crit', `🩸 Критический урон! ${logPrefix}${bot.name} пробил вашу оборону в ${zoneNames[botAttacksZone]} на ${damage} урона!`);
+        } else {
+          addLog('hit', `${logPrefix}${bot.name} нанес вам удар в ${zoneNames[botAttacksZone]} на ${damage} урона.`);
         }
       }
     }
@@ -299,7 +543,7 @@ export const useGameState = () => {
     }
 
     // Set HP status temporarily during combat
-    setBot(prev => prev ? { ...prev, currentHp: nextBotHp } : null);
+    setBot(prev => prev ? { ...prev, currentHp: nextBotHp, currentMana: bMana } : null);
 
     if (winnerOutcome) {
       setCombatWinner(winnerOutcome);
@@ -325,6 +569,7 @@ export const useGameState = () => {
       }
 
       const nextMaxHp = nextStats.endurance * 10;
+      const nextMaxMana = nextStats.intellect * 10;
 
       // Decrement active buff fights left if present
       let nextBuff = player.activeBuff;
@@ -337,6 +582,11 @@ export const useGameState = () => {
         }
       }
 
+      // Restores to full health/mana only on level up, otherwise retains current surviving HP (or 1 HP if dead)
+      const isLevelUp = nextLevel > player.level;
+      const finalHp = isLevelUp ? nextMaxHp : Math.max(1, nextPlayerHp);
+      const finalMana = isLevelUp ? nextMaxMana : pMana;
+
       const updatedPlayer: Character = {
         ...player,
         level: nextLevel,
@@ -344,7 +594,9 @@ export const useGameState = () => {
         gold: player.gold + goldReward,
         stats: nextStats,
         maxHp: nextMaxHp,
-        currentHp: nextMaxHp, // Heals player to full
+        currentHp: finalHp,
+        maxMana: nextMaxMana,
+        currentMana: finalMana,
         wins: player.wins + addWin,
         losses: player.losses + addLoss,
         activeBuff: nextBuff,
@@ -366,19 +618,14 @@ export const useGameState = () => {
       levelUpNotifications.forEach(msg => addLog('system', msg));
 
     } else {
-      setPlayer(prev => prev ? { ...prev, currentHp: nextPlayerHp } : null);
+      setPlayer(prev => prev ? { ...prev, currentHp: nextPlayerHp, currentMana: pMana } : null);
     }
 
     setPlayerChoices({ attack: null, defense: null });
   };
 
   const exitCombat = () => {
-    if (player) {
-      setPlayer({
-        ...player,
-        currentHp: player.maxHp
-      });
-    }
+    // Retain current health and mana levels (no auto healing!)
     setBot(null);
     setScreen('hub');
   };
@@ -409,5 +656,11 @@ export const useGameState = () => {
     submitTurn,
     exitCombat,
     updateCharacter,
+    useCombatPotion,
+    useCombatScroll,
+    surrenderCombat,
+    potionsUsed,
+    activeScrolls
   };
 };
+
