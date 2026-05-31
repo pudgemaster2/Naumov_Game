@@ -293,12 +293,16 @@ export const HubScreen: React.FC<HubScreenProps> = ({
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
               <span>Здоровье (HP)</span>
-              <span className="text-emerald-400 font-bold">{player.currentHp} / {player.maxHp} HP</span>
+              <span className="text-rose-400 font-bold">{player.currentHp} / {player.maxHp} HP</span>
             </div>
             <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
               <div 
-                className="h-full bg-emerald-500 rounded-sm shadow-[0_0_5px_rgba(16,185,129,0.3)] transition-all duration-300" 
-                style={{ width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%` }} 
+                className="h-full rounded-sm transition-all duration-300" 
+                style={{ 
+                  width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%`,
+                  background: 'linear-gradient(to right, #9f1239, #f43f5e)',
+                  boxShadow: '0 0 5px rgba(244, 63, 94, 0.5)'
+                }} 
               />
             </div>
           </div>
@@ -311,8 +315,12 @@ export const HubScreen: React.FC<HubScreenProps> = ({
             </div>
             <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
               <div 
-                className="h-full bg-blue-500 rounded-sm shadow-[0_0_5px_rgba(59,130,246,0.3)] transition-all duration-300" 
-                style={{ width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%` }} 
+                className="h-full rounded-sm transition-all duration-300" 
+                style={{ 
+                  width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%`,
+                  background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
+                  boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)'
+                }} 
               />
             </div>
           </div>
@@ -325,8 +333,12 @@ export const HubScreen: React.FC<HubScreenProps> = ({
             </div>
             <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
               <div 
-                className="h-full bg-amber-500 rounded-sm shadow-[0_0_5px_rgba(245,158,11,0.3)] transition-all duration-300" 
-                style={{ width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%` }} 
+                className="h-full rounded-sm transition-all duration-300" 
+                style={{ 
+                  width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%`,
+                  background: 'linear-gradient(to right, #d97706, #f59e0b)',
+                  boxShadow: '0 0 5px rgba(245, 158, 11, 0.5)'
+                }} 
               />
             </div>
           </div>

@@ -17,11 +17,35 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 }) => {
   const percentage = Math.max(0, Math.min(100, (value / max) * 100));
 
-  const barColors = {
-    green: 'bg-gradient-to-r from-emerald-700 to-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] border-r border-emerald-400',
-    red: 'bg-gradient-to-r from-rose-800 to-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)] border-r border-rose-400',
-    blue: 'bg-gradient-to-r from-blue-700 to-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] border-r border-blue-400',
-    gold: 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)] border-r border-amber-300',
+  const getBarStyles = (c: 'red' | 'green' | 'blue' | 'gold') => {
+    switch (c) {
+      case 'green':
+        return {
+          background: 'linear-gradient(to right, #047857, #10b981)',
+          boxShadow: '0 0 10px rgba(16, 185, 129, 0.5)',
+          borderRight: '1px solid #34d399',
+        };
+      case 'red':
+        return {
+          background: 'linear-gradient(to right, #9f1239, #f43f5e)',
+          boxShadow: '0 0 10px rgba(244, 63, 94, 0.5)',
+          borderRight: '1px solid #fb7185',
+        };
+      case 'blue':
+        return {
+          background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
+          boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
+          borderRight: '1px solid #60a5fa',
+        };
+      case 'gold':
+        return {
+          background: 'linear-gradient(to right, #d97706, #f59e0b)',
+          boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)',
+          borderRight: '1px solid #fcd34d',
+        };
+      default:
+        return {};
+    }
   };
 
   return (
@@ -34,8 +58,11 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       )}
       <div className="h-7 w-full bg-obsidian-950 border border-obsidian-700 rounded overflow-hidden p-[2.5px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
         <div
-          className={`h-full rounded-sm transition-all duration-300 ease-out ${barColors[color]}`}
-          style={{ width: `${percentage}%` }}
+          className="h-full rounded-sm transition-all duration-300 ease-out"
+          style={{ 
+            width: `${percentage}%`,
+            ...getBarStyles(color)
+          }}
         />
       </div>
     </div>

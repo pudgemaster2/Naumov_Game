@@ -89,7 +89,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
       <ProgressBar 
         value={fighter.currentHp} 
         max={fighter.maxHp} 
-        color={isPlayer ? 'green' : 'red'} 
+        color="red" 
         label="ЗДОРОВЬЕ (HP)"
         className="mb-3"
       />
