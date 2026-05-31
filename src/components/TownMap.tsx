@@ -92,25 +92,6 @@ export const TownMap: React.FC<TownMapProps> = ({ onSelectLocation }) => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-[1100px] mx-auto space-y-4">
-      {/* City Banner Header */}
-      <div className="w-full text-center h-28 flex flex-col justify-center bg-obsidian-950/80 border border-gold-900/30 rounded p-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-gold-950/10 via-transparent to-gold-950/10" />
-        {hoveredLoc ? (
-          <div className="animate-fade-in">
-            <h3 className="text-2xl md:text-3xl font-bold font-gothic tracking-widest text-gold-400">
-              {hoveredLoc.name}
-            </h3>
-            <p className="text-sm md:text-base text-slate-400 font-sans tracking-wide mt-1">
-              {hoveredLoc.description}
-            </p>
-          </div>
-        ) : (
-          <div className="opacity-60 text-slate-500 font-gothic tracking-widest text-base uppercase">
-            Выберите локацию для перемещения
-          </div>
-        )}
-      </div>
-
       {/* Town Map Wrapper */}
       <div className="relative w-full aspect-square bg-obsidian-950 border border-gold-600/50 rounded-lg overflow-hidden shadow-2xl">
         {/* Background Map Image */}
