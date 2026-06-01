@@ -369,8 +369,10 @@ export const HubScreen: React.FC<HubScreenProps> = ({
       </div>
 
       {/* Middle Column (Town map / active view) - expanded to fill remaining space */}
-      <div className="flex-grow flex-shrink min-w-0 flex flex-col justify-center items-center h-full overflow-hidden">
-        <div className="w-full h-full overflow-y-auto rpg-scrollbar animate-fade-in flex flex-col justify-center min-h-0">
+      <div className="flex-grow flex-shrink min-w-0 flex flex-col items-center h-full overflow-hidden">
+        <div className={`w-full h-full overflow-y-auto rpg-scrollbar animate-fade-in flex flex-col min-h-0 ${
+          activeSubLoc === 'town' ? 'justify-center' : 'justify-start'
+        }`}>
           {renderActiveView()}
         </div>
       </div>

@@ -382,7 +382,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
           >
             Комната отдыха
           </button>
-          <Button variant="secondary" onClick={onBack} size="md" className="hidden sm:inline-flex">
+          <Button variant="secondary" onClick={onBack} size="md">
             Выйти на улицу
           </Button>
         </div>
