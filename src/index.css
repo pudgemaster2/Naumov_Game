@@ -42,6 +42,11 @@
 
 /* Custom base styles */
 html, body {
+  background-image: url('./assets/Background/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: var(--color-obsidian-950);
   color: #e2e8f0;
   font-family: var(--font-sans);

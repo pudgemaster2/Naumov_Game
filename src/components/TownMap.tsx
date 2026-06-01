@@ -96,56 +96,39 @@ export const TownMap: React.FC<TownMapProps> = ({ onSelectLocation }) => {
   const [hoveredLoc, setHoveredLoc] = useState<TownLocationData | null>(null);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-[1100px] mx-auto space-y-4 select-none">
-      {/* Town Map Wrapper */}
-      <div className="relative w-full aspect-square bg-obsidian-950 border border-gold-600/50 rounded-lg overflow-hidden shadow-2xl">
-        {/* Background Map Image */}
-        <img
-          src={townImage}
-          alt="Town Map"
-          className="w-full h-full object-cover select-none pointer-events-none"
-        />
+    <div className="relative h-full aspect-[1.1/1] max-h-full bg-obsidian-950 border border-gold-600/50 rounded-lg overflow-hidden shadow-2xl mx-auto select-none">
+      {/* Background Map Image */}
+      <img
+        src={townImage}
+        alt="Town Map"
+        className="w-full h-full object-fill select-none pointer-events-none"
+      />
 
-        {/* Absolute positioned interactive transparent hot-zones */}
-        {TOWN_LOCATIONS.map((loc) => {
-          const isHovered = hoveredLoc?.key === loc.key;
-          return (
-            <button
-              key={loc.key}
-              onClick={() => onSelectLocation(loc.key)}
-              onMouseEnter={() => setHoveredLoc(loc)}
-              onMouseLeave={() => setHoveredLoc(null)}
-              className={`absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-md cursor-pointer select-none town-hotzone ${
-                isHovered ? 'scale-[1.03]' : ''
-              }`}
-              style={{
-                top: loc.style.top,
-                left: loc.style.left,
-                width: loc.style.width,
-                height: loc.style.height,
-              }}
-              title={loc.name}
-            >
-              {/* Invisible name for screen readers */}
-              <span className="absolute opacity-0 pointer-events-none">{loc.name}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Description banner */}
-      <div className="w-full p-4 text-center border border-gold-900/20 bg-obsidian-900/60 rounded-lg backdrop-blur-sm min-h-[76px] flex flex-col justify-center">
-        {hoveredLoc ? (
-          <div className="animate-fade-in space-y-1">
-            <h4 className="text-sm font-bold text-gold-400 uppercase tracking-widest font-gothic">{hoveredLoc.name}</h4>
-            <p className="text-xs text-slate-350">{hoveredLoc.description}</p>
-          </div>
-        ) : (
-          <p className="text-xs text-slate-500 italic">
-            Наведите курсор мыши на надписи на карте для перехода в локации
-          </p>
-        )}
-      </div>
+      {/* Absolute positioned interactive transparent hot-zones */}
+      {TOWN_LOCATIONS.map((loc) => {
+        const isHovered = hoveredLoc?.key === loc.key;
+        return (
+          <button
+            key={loc.key}
+            onClick={() => onSelectLocation(loc.key)}
+            onMouseEnter={() => setHoveredLoc(loc)}
+            onMouseLeave={() => setHoveredLoc(null)}
+            className={`absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-md cursor-pointer select-none town-hotzone ${
+              isHovered ? 'scale-[1.03]' : ''
+            }`}
+            style={{
+              top: loc.style.top,
+              left: loc.style.left,
+              width: loc.style.width,
+              height: loc.style.height,
+            }}
+            title={loc.name}
+          >
+            {/* Invisible name for screen readers */}
+            <span className="absolute opacity-0 pointer-events-none">{loc.name}</span>
+          </button>
+        );
+      })}
     </div>
   );
 };

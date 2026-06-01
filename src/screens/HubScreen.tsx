@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Character } from '../types';
 import { CLASS_TEMPLATES, RACE_TEMPLATES } from '../types';
 import { TownMap } from '../components/TownMap';
@@ -20,6 +20,7 @@ interface HubScreenProps {
   onStartCombat: () => void;
   onLogout: () => void;
   onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
+  onChangeCharacter?: () => void;
 }
 
 type SubLocation =
@@ -42,8 +43,26 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   onStartCombat,
   onLogout,
   onUpdatePlayer,
+  onChangeCharacter,
 }) => {
   const [activeSubLoc, setActiveSubLoc] = useState<SubLocation>('town');
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [tempName, setTempName] = useState(player.name);
+
+  // Sync tempName when player updates
+  useEffect(() => {
+    setTempName(player.name);
+  }, [player.name]);
+
+  const handleSaveSettings = async () => {
+    if (!tempName.trim()) return;
+    const updatedPlayer = {
+      ...player,
+      name: tempName.trim(),
+    };
+    await onUpdatePlayer(updatedPlayer);
+    setShowSettingsModal(false);
+  };
   
   // Transition loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -221,7 +240,7 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   const maxMp = player.maxMana !== undefined ? player.maxMana : player.stats.intellect * 10;
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-2 space-y-6">
+    <div className="h-full flex flex-row gap-4 w-full px-4 py-2 select-none overflow-hidden min-h-0 items-stretch">
       
       {/* Loading Screen Overlay */}
       {isLoading && (
@@ -230,144 +249,182 @@ export const HubScreen: React.FC<HubScreenProps> = ({
         />
       )}
 
-      {/* Premium HUD Status Bar */}
-      <div className="gothic-panel p-6 md:p-8 bg-obsidian-900/90 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6 border-gold-900/40 relative overflow-hidden shadow-lg select-none">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-gold-500/5 to-transparent pointer-events-none rounded-full" />
-        
-        {/* Left Section: Portrait and Name */}
-        <div className="flex items-center gap-6 w-full md:w-auto">
-          <div className="bg-obsidian-950 border border-gold-500/50 shadow-md w-20 h-24 overflow-hidden rounded flex-shrink-0">
-            <img 
-              src={getPortrait(player.race, player.classType)} 
-              alt={`${player.race} ${player.classType}`} 
-              className="w-full h-full object-cover" 
-            />
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-3">
-              <h3 className="text-2xl font-bold font-gothic text-slate-100">{player.name}</h3>
-              <span className="text-xs font-mono font-bold bg-gold-900/30 border border-gold-600/30 text-gold-400 px-3 py-1 rounded-full">
-                Уровень {player.level}
+      {/* Left Column: Vertical Character panel */}
+      <div className="w-80 flex-shrink-0 flex flex-col justify-between gothic-panel p-4 bg-obsidian-900/90 rounded-lg border-gold-900/40 relative shadow-lg h-full select-none">
+        {/* Profile + Stats block (grouped to stay close) */}
+        <div className="flex flex-col items-center w-full space-y-6">
+          {/* Profile Block */}
+          <div className="flex flex-col items-center text-center space-y-3.5">
+            <div className="bg-obsidian-950 border border-gold-500/50 shadow-md w-48 h-56 overflow-hidden rounded relative flex-shrink-0">
+              <img 
+                src={getPortrait(player.race, player.classType)} 
+                alt={`${player.race} ${player.classType}`} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center gap-2 leading-none mb-1.5">
+                <span className="text-2xl font-bold font-gothic text-slate-100">{player.name}</span>
+                <span className="text-base font-mono font-bold bg-gold-900/30 border border-gold-600/30 text-gold-400 px-2 py-0.5 rounded">
+                  Ур. {player.level}
+                </span>
+              </div>
+              <span className="text-sm text-gold-400 font-mono tracking-wider font-semibold uppercase block">
+                {RACE_TEMPLATES[player.race]?.title || player.race} | {CLASS_TEMPLATES[player.classType]?.title || player.classType}
               </span>
             </div>
-            <p className="text-sm md:text-base text-gold-400 font-gothic tracking-wider font-semibold uppercase">
-              Раса: {RACE_TEMPLATES[player.race]?.title || player.race} | Класс: {CLASS_TEMPLATES[player.classType]?.title || player.classType}
-            </p>
-          </div>
-        </div>
-
-        {/* Center Section: HP, MP & XP bars */}
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
-          {/* Health points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Здоровье (HP)</span>
-              <span className="text-rose-400 font-bold">{player.currentHp} / {player.maxHp} HP</span>
-            </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%`,
-                  background: 'linear-gradient(to right, #9f1239, #f43f5e)',
-                  boxShadow: '0 0 5px rgba(244, 63, 94, 0.5)'
-                }} 
-              />
-            </div>
           </div>
 
-          {/* Mana points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Мана (MP)</span>
-              <span className="text-sky-400 font-bold">{currentMp} / {maxMp} MP</span>
+          {/* Stats Bars */}
+          <div className="space-y-4 w-full px-2">
+            {/* HP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-400">
+                <span>Здоровье (HP)</span>
+                <span className="text-rose-400 font-bold">{player.currentHp} / {player.maxHp} HP</span>
+              </div>
+              <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[2px] border border-obsidian-850">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%`,
+                    background: 'linear-gradient(to right, #9f1239, #f43f5e)',
+                  }} 
+                />
+              </div>
             </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%`,
-                  background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
-                  boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)'
-                }} 
-              />
-            </div>
-          </div>
 
-          {/* Experience points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Опыт (XP)</span>
-              <span className="text-amber-400 font-bold">{player.experience} / {player.level * 100} XP</span>
+            {/* MP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-400">
+                <span>Мана (MP)</span>
+                <span className="text-sky-400 font-bold">{currentMp} / {maxMp} MP</span>
+              </div>
+              <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[2px] border border-obsidian-850">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%`,
+                    background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
+                  }} 
+                />
+              </div>
             </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%`,
-                  background: 'linear-gradient(to right, #d97706, #f59e0b)',
-                  boxShadow: '0 0 5px rgba(245, 158, 11, 0.5)'
-                }} 
-              />
+
+            {/* XP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-400">
+                <span>Опыт (XP)</span>
+                <span className="text-amber-400 font-bold">{player.experience} / {player.level * 100} XP</span>
+              </div>
+              <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[2px] border border-obsidian-850">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%`,
+                    background: 'linear-gradient(to right, #d97706, #f59e0b)',
+                  }} 
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Right Section: Gold status, Buff indicator & Return/Logout Button */}
-        <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-0 border-obsidian-800/40 pt-4 md:pt-0">
-          {/* Wallet */}
-          <div className="flex items-center gap-2.5">
-            <span className="text-sm font-semibold font-mono text-slate-400">Кошелек:</span>
-            <span className="text-amber-400 font-bold font-mono text-xl md:text-2xl tracking-wide whitespace-nowrap">
-              💰 {player.gold}
-            </span>
-          </div>
-
-          {/* Buff details icon if present */}
-          {player.activeBuff && (
-            <div className="flex items-center gap-1.5 bg-gold-950/20 border border-gold-600/30 px-3 py-1.5 rounded text-xs md:text-sm font-mono text-gold-400 animate-pulse">
-              <Sparkles className="w-4.5 h-4.5" />
-              <span className="uppercase tracking-widest font-bold font-sans">
-                {player.activeBuff.type === 'strength' ? 'СИЛА' : 'ИНТ'} +{player.activeBuff.value} ({player.activeBuff.fightsLeft}б)
+            {/* Wallet */}
+            <div className="flex justify-between items-center border-t border-obsidian-800 pt-3.5 mt-3 flex-shrink-0">
+              <span className="text-base font-mono text-slate-400 uppercase tracking-wider">Кошелек:</span>
+              <span className="text-amber-400 font-bold font-mono text-2xl whitespace-nowrap">
+                💰 {player.gold}
               </span>
             </div>
-          )}
 
-          {/* Nav buttons */}
-          <div className="flex gap-2">
-            {activeSubLoc !== 'town' && (
-              <Button 
-                variant="secondary" 
-                onClick={() => handleNavigateTo('town')} 
-                className="p-3 px-5 text-sm md:text-base flex items-center gap-2"
-                title="Вернуться на карту города"
-              >
-                <Compass className="w-5 h-5" /> <span className="hidden sm:inline">Карта</span>
-              </Button>
+            {/* Buff details icon if present */}
+            {player.activeBuff && (
+              <div className="bg-gold-950/20 border border-gold-600/30 py-1.5 rounded text-sm font-mono text-gold-400 text-center animate-pulse mt-2.5 flex-shrink-0">
+                <span className="font-bold">
+                  {player.activeBuff.type === 'strength' ? 'СИЛА' : 'ИНТ'} +{player.activeBuff.value}
+                </span>
+              </div>
             )}
-            
-            <Button 
-              variant="secondary" 
-              onClick={onLogout} 
-              className="p-3 px-5 text-sm md:text-base flex items-center gap-2 hover:text-rose-400 hover:border-rose-900/50"
-              title="Выйти из игры"
-            >
-              <LogOut className="w-5 h-5" /> <span className="hidden sm:inline">Выйти</span>
-            </Button>
           </div>
         </div>
 
+        {/* Buttons Block */}
+        <div className="space-y-2 border-t border-obsidian-800 pt-3 flex-shrink-0 w-full">
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowSettingsModal(true)}
+            className="w-full py-2.5 text-base flex items-center justify-center gap-1 hover:text-gold-300"
+            title="Настройки персонажа"
+          >
+            Настройки
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={onLogout} 
+            className="w-full py-2.5 text-base flex items-center justify-center gap-1 hover:text-rose-400 hover:border-rose-950"
+            title="Выйти из игры"
+          >
+            <LogOut className="w-4 h-4" /> Выйти
+          </Button>
+        </div>
       </div>
 
-      {/* 2-Column Town Layout: Active View (Left/Center) & General Chat (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        <div className="lg:col-span-3 w-full animate-fade-in">
+      {/* Middle Column (Town map / active view) - expanded to fill remaining space */}
+      <div className="flex-grow flex-shrink min-w-0 flex flex-col justify-center items-center h-full overflow-hidden">
+        <div className="w-full h-full overflow-y-auto rpg-scrollbar animate-fade-in flex flex-col justify-center min-h-0">
           {renderActiveView()}
         </div>
-        <div className="lg:col-span-1 w-full">
-          <GeneralChat playerName={player.name} />
-        </div>
       </div>
+
+      {/* Right Column: General Chat */}
+      <div className="w-80 flex-shrink-0 flex flex-col min-h-0 h-full">
+        <GeneralChat playerName={player.name} />
+      </div>
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian-950/80 backdrop-blur-sm p-4 animate-fade-in select-none">
+          <div className="gothic-panel-gold max-w-md w-full p-8 bg-obsidian-900 shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-lg space-y-6">
+            <h3 className="text-xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
+              ⚙️ НАСТРОЙКИ ГЕРОЯ
+            </h3>
+            <div className="space-y-4">
+              <div className="space-y-1.5 text-left">
+                <label className="text-sm font-mono text-slate-400 block">Имя персонажа</label>
+                <input 
+                  type="text" 
+                  value={tempName} 
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="w-full gothic-input px-4 py-2.5 rounded text-sm focus:ring-1 focus:ring-gold-500"
+                  maxLength={14}
+                />
+              </div>
+
+              {onChangeCharacter && (
+                <div className="pt-3 border-t border-obsidian-800">
+                  <Button 
+                    variant="secondary"
+                    onClick={() => {
+                      setShowSettingsModal(false);
+                      onChangeCharacter();
+                    }}
+                    className="w-full text-sm hover:text-gold-300 py-2.5 border-gold-900/40"
+                  >
+                    Выбор другого персонажа
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={handleSaveSettings} className="flex-1">
+                Сохранить
+              </Button>
+              <Button variant="secondary" onClick={() => setShowSettingsModal(false)} className="flex-1">
+                Закрыть
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

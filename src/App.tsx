@@ -7,6 +7,7 @@ import { BattleScreen } from './screens/BattleScreen';
 function App() {
   const {
     screen,
+    setScreen,
     player,
     bot,
     combatLogs,
@@ -39,21 +40,25 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-slate-100 flex flex-col selection:bg-gold-500 selection:text-obsidian-950">
+    <div className="h-screen max-h-screen overflow-hidden text-slate-100 flex flex-col selection:bg-gold-500 selection:text-obsidian-950">
       {/* Main content body */}
-      <main className="flex-grow flex flex-col justify-center py-6">
+      <main className="flex-grow flex flex-col justify-center py-2 min-h-0 overflow-hidden">
         {screen === 'auth' && (
-          <AuthScreen 
-            onLogin={login} 
-            onRegister={register}
-            loading={authLoading}
-            error={authError}
-            setError={setAuthError}
-          />
+          <div className="overflow-y-auto w-full h-full rpg-scrollbar flex items-center justify-center py-4">
+            <AuthScreen 
+              onLogin={login} 
+              onRegister={register}
+              loading={authLoading}
+              error={authError}
+              setError={setAuthError}
+            />
+          </div>
         )}
         
         {screen === 'char_select' && (
-          <CharSelectScreen onSelectClass={selectCharacterClass} />
+          <div className="overflow-y-auto w-full h-full rpg-scrollbar py-4">
+            <CharSelectScreen onSelectClass={selectCharacterClass} />
+          </div>
         )}
         
         {screen === 'hub' && player && (
@@ -62,25 +67,28 @@ function App() {
             onStartCombat={startCombat} 
             onLogout={logout} 
             onUpdatePlayer={updateCharacter}
+            onChangeCharacter={() => setScreen('char_select')}
           />
         )}
         
         {screen === 'battle' && player && (
-          <BattleScreen
-            player={player}
-            bot={bot}
-            combatLogs={combatLogs}
-            playerChoices={playerChoices}
-            onSelectChoice={handleSelectChoice}
-            onSubmitTurn={submitTurn}
-            combatWinner={combatWinner}
-            onExitCombat={exitCombat}
-            onUsePotion={useCombatPotion}
-            onUseScroll={useCombatScroll}
-            onSurrender={surrenderCombat}
-            potionsUsedCount={potionsUsed}
-            activeScrollsState={activeScrolls}
-          />
+          <div className="overflow-y-auto w-full h-full rpg-scrollbar py-4">
+            <BattleScreen
+              player={player}
+              bot={bot}
+              combatLogs={combatLogs}
+              playerChoices={playerChoices}
+              onSelectChoice={handleSelectChoice}
+              onSubmitTurn={submitTurn}
+              combatWinner={combatWinner}
+              onExitCombat={exitCombat}
+              onUsePotion={useCombatPotion}
+              onUseScroll={useCombatScroll}
+              onSurrender={surrenderCombat}
+              potionsUsedCount={potionsUsed}
+              activeScrollsState={activeScrolls}
+            />
+          </div>
         )}
       </main>
     </div>
