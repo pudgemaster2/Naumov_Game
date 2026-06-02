@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import type { Character } from '../types';
 import { Button } from './ui/Button';
 import { ShoppingBag, Sparkles } from 'lucide-react';
+import { getItemImage } from '../utils/itemHelper';
+
+const getMarketItemImage = (key: string) => {
+  if (key === 'elixir') {
+    return getItemImage('potion_mp');
+  }
+  return getItemImage(key);
+};
 
 interface MarketViewProps {
   player: Character;
@@ -72,12 +80,12 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
     } else {
       // Consumables purchase
       const consumablesMap: Record<string, { name: string; type: any; desc: string; icon: string }> = {
-        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: '🧪' },
-        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: '🧪' },
-        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: '📜' },
-        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: '📜' },
-        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: '📜' },
-        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: '📜' }
+        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: getItemImage('potion_hp') },
+        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: getItemImage('potion_mp') },
+        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: getItemImage('scroll_atk') },
+        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: getItemImage('scroll_def') },
+        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: getItemImage('scroll_dodge') },
+        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: getItemImage('scroll_crit') }
       };
 
       const c = consumablesMap[itemKey];
@@ -184,12 +192,12 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-8 animate-fade-in select-none">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-obsidian-800 pb-5">
+      <div className="flex justify-between items-center border-b border-slate-300 pb-5">
         <div>
-          <h2 className="text-3xl font-bold font-gothic text-gold-400 tracking-widest flex items-center gap-3">
+          <h2 className="text-3xl font-bold font-gothic text-slate-900 tracking-widest flex items-center gap-3">
             🛒 ТОРГОВАЯ ПЛОЩАДЬ
           </h2>
-          <p className="text-sm font-mono text-slate-500 mt-2 uppercase tracking-wider">
+          <p className="text-sm font-mono text-slate-650 mt-2 uppercase tracking-wider">
             Купите диковинки у заморского торговца редкостями Аластора
           </p>
         </div>
@@ -201,29 +209,22 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Merchant Dialogue */}
         <div className="space-y-4">
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg flex flex-col items-center text-center">
-            <div className="w-32 h-32 bg-obsidian-950 border border-gold-600/30 rounded-full flex items-center justify-center text-6xl mb-5 relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)]">
-              👳
-              <div className="absolute -bottom-1 -right-1 bg-gold-600 text-obsidian-950 p-1.5 rounded-full text-xs font-bold">
-                💎
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-bold font-gothic text-slate-200">Купец Аластор</h3>
-            <p className="text-sm text-slate-400 mt-3 italic leading-relaxed">
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg flex flex-col items-center text-center text-slate-800">
+            <h3 className="text-lg font-bold font-gothic text-slate-900">Купец Аластор</h3>
+            <p className="text-sm text-slate-650 mt-3 italic leading-relaxed">
               «Приветствую, почтенный путник! У меня есть амулеты с востока и эликсиры из самой столицы. Повысь свои боевые качества прямо сейчас за горсть золотых монет!»
             </p>
 
-            <div className="w-full mt-6 p-4 bg-obsidian-950 border border-obsidian-800 rounded font-mono text-sm flex justify-between items-center text-slate-300">
+            <div className="w-full mt-6 p-4 bg-slate-200 border border-slate-300 rounded font-mono text-sm flex justify-between items-center text-slate-750">
               <span>Золотые монеты:</span>
-              <span className="text-amber-400 font-bold text-base">💰 {player.gold} золота</span>
+              <span className="text-amber-700 font-extrabold text-base">💰 {player.gold} золота</span>
             </div>
           </div>
 
           {/* Market logs */}
           {marketLog && (
-            <div className="p-5 border border-gold-900/30 rounded bg-gold-950/10 text-sm text-gold-300 font-serif leading-relaxed whitespace-pre-line animate-fade-in flex gap-2.5">
-              <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-400 mt-0.5" />
+            <div className="p-5 border border-gold-300 rounded bg-amber-50 text-sm text-amber-900 font-serif leading-relaxed whitespace-pre-line animate-fade-in flex gap-2.5">
+              <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-555 mt-0.5" />
               <span>{marketLog}</span>
             </div>
           )}
@@ -231,9 +232,9 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
 
         {/* Store Shelf */}
         <div className="md:col-span-2 space-y-4">
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg space-y-4">
-            <h3 className="text-lg font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
-              <ShoppingBag className="w-6 h-6 text-gold-500" /> Прилавок Магазина
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-4 text-slate-800">
+            <h3 className="text-lg font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              <ShoppingBag className="w-6 h-6 text-gold-650" /> Прилавок Магазина
             </h3>
 
             <div className="space-y-4 max-h-[600px] overflow-y-auto rpg-scrollbar pr-1">
@@ -242,22 +243,22 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
                 return (
                   <div 
                     key={item.key}
-                    className="border border-obsidian-800 p-5 rounded bg-obsidian-950/40 flex flex-col sm:flex-row items-center justify-between gap-5 hover:border-gold-800/20 transition-all"
+                    className="border border-slate-250 p-5 rounded bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-5 hover:border-gold-555/20 transition-all"
                   >
                     <div className="flex items-center gap-5 text-center sm:text-left">
-                      <div className="text-5xl p-2.5 bg-obsidian-900 border border-obsidian-800 rounded-lg select-none">
-                        {item.icon}
+                      <div className="w-16 h-16 p-1 bg-slate-100 border border-slate-250 rounded-lg select-none flex items-center justify-center flex-shrink-0">
+                        <img src={getMarketItemImage(item.key)} alt={item.name} className="w-full h-full object-contain" />
                       </div>
                       <div>
-                        <h4 className="text-base font-bold text-slate-200">{item.name}</h4>
-                        <p className="text-sm text-slate-400 mt-1 max-w-lg">{item.desc}</p>
+                        <h4 className="text-base font-bold text-slate-900">{item.name}</h4>
+                        <p className="text-sm text-slate-650 mt-1 max-w-lg">{item.desc}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-5 border-t sm:border-0 border-obsidian-800/40 pt-3 sm:pt-0 w-full sm:w-auto justify-between sm:justify-end">
+                    <div className="flex items-center gap-5 border-t sm:border-0 border-slate-250 pt-3 sm:pt-0 w-full sm:w-auto justify-between sm:justify-end">
                       <div className="text-right">
-                        <span className="text-xs font-mono text-slate-500 uppercase block">Цена:</span>
-                        <span className={`font-mono text-sm font-bold ${canAfford ? 'text-amber-400' : 'text-rose-400'}`}>
+                        <span className="text-xs font-mono text-slate-650 uppercase block">Цена:</span>
+                        <span className={`font-mono text-sm font-bold ${canAfford ? 'text-amber-700' : 'text-rose-700'}`}>
                           💰 {item.cost} золота
                         </span>
                       </div>

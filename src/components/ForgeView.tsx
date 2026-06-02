@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Character } from '../types';
 import { Button } from './ui/Button';
-import { Hammer, Sparkles, Swords, Shield, Heart, Zap } from 'lucide-react';
+import { Sparkles, Swords, Shield, Heart, Zap } from 'lucide-react';
 
 interface ForgeViewProps {
   player: Character;
@@ -81,12 +81,12 @@ export const ForgeView: React.FC<ForgeViewProps> = ({ player, onSave, onBack }) 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-obsidian-800 pb-4">
+      <div className="flex justify-between items-center border-b border-slate-300 pb-4">
         <div>
-          <h2 className="text-3xl font-bold font-gothic text-gold-400 tracking-widest flex items-center gap-2.5">
+          <h2 className="text-3xl font-bold font-gothic text-slate-900 tracking-widest flex items-center gap-2.5">
             🔥 КУЗНИЦА ПЛАМЕНИ
           </h2>
-          <p className="text-sm font-mono text-slate-500 mt-1 uppercase tracking-wider">
+          <p className="text-sm font-mono text-slate-650 mt-1 uppercase tracking-wider">
             Закалите свое снаряжение в жарком горне кузнеца Торвальда
           </p>
         </div>
@@ -98,24 +98,16 @@ export const ForgeView: React.FC<ForgeViewProps> = ({ player, onSave, onBack }) 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left column: Blacksmith dialogue and log */}
         <div className="md:col-span-1 space-y-4">
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg flex flex-col items-center text-center">
-            {/* Blacksmith graphic */}
-            <div className="w-28 h-28 bg-obsidian-950 border border-gold-600/30 rounded-full flex items-center justify-center text-6xl mb-4 relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)]">
-              🧔
-              <div className="absolute -bottom-1 -right-1 bg-gold-600 text-obsidian-950 p-1.5 rounded-full text-sm font-bold">
-                <Hammer className="w-4.5 h-4.5" />
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-bold font-gothic text-slate-200">Кузнец Торвальд</h3>
-            <p className="text-sm text-slate-400 mt-2.5 italic leading-relaxed">
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg flex flex-col items-center text-center text-slate-800">
+            <h3 className="text-lg font-bold font-gothic text-slate-900">Кузнец Торвальд</h3>
+            <p className="text-sm text-slate-650 mt-2.5 italic leading-relaxed">
               «Здорово, боец! Принёс золото? Молот готов раздуть угли. Твоё оружие станет острее, а доспех — прочнее!»
             </p>
             
             {/* Player's Wallet */}
-            <div className="w-full mt-6 p-4 bg-obsidian-950 border border-obsidian-800 rounded font-mono text-sm flex justify-between items-center text-slate-300">
+            <div className="w-full mt-6 p-4 bg-slate-200 border border-slate-300 rounded font-mono text-sm flex justify-between items-center text-slate-700">
               <span>Ваше золото:</span>
-              <span className="text-amber-400 font-bold text-base md:text-lg">💰 {player.gold} золота</span>
+              <span className="text-amber-700 font-extrabold text-base md:text-lg">💰 {player.gold} золота</span>
             </div>
           </div>
 
@@ -130,8 +122,8 @@ export const ForgeView: React.FC<ForgeViewProps> = ({ player, onSave, onBack }) 
 
         {/* Right column: Upgrades sheet */}
         <div className="md:col-span-2 space-y-4">
-          <div className="gothic-panel p-7 bg-obsidian-900/80 rounded-lg space-y-5">
-            <h3 className="text-lg font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-2.5">
+          <div className="gothic-panel p-7 bg-slate-100/90 border-slate-300 rounded-lg space-y-5 text-slate-800">
+            <h3 className="text-lg font-bold font-gothic text-slate-900 border-b border-slate-250 pb-2.5">
               Доступные Улучшения Снаряжения
             </h3>
 
@@ -145,27 +137,27 @@ export const ForgeView: React.FC<ForgeViewProps> = ({ player, onSave, onBack }) 
                 return (
                   <div 
                     key={attr.key}
-                    className="border border-obsidian-800 p-5 rounded bg-obsidian-950/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 hover:border-gold-800/20 transition-all"
+                    className="border border-slate-250 p-5 rounded bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 hover:border-gold-555/20 transition-all"
                   >
                     <div className="flex items-start gap-3.5">
-                      <div className="p-2.5 bg-obsidian-900 border border-obsidian-800 rounded-lg mt-0.5">
+                      <div className="p-2.5 bg-slate-100 border border-slate-250 rounded-lg mt-0.5">
                         {attr.icon}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2.5">
-                          <h4 className="text-base font-bold text-slate-200">{attr.name}</h4>
-                          <span className="text-xs font-mono bg-gold-900/20 border border-gold-600/30 text-gold-400 px-2.5 py-0.5 rounded-full font-bold">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h4 className="text-base font-bold text-slate-900">{attr.name}</h4>
+                          <span className="text-xs font-mono bg-slate-200 border border-slate-300 text-slate-700 px-2.5 py-0.5 rounded-full font-bold">
                             Уровень улучш.: +{level}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-400 mt-1.5">{attr.desc}</p>
+                        <p className="text-sm text-slate-650 mt-1.5">{attr.desc}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-0 border-obsidian-800/40 pt-3 sm:pt-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-0 border-slate-250 pt-3 sm:pt-0">
                       <div className="text-right">
-                        <span className="text-xs font-mono text-slate-500 uppercase block font-semibold">Стоимость:</span>
-                        <span className={`font-mono text-sm md:text-base font-bold ${canAfford ? 'text-amber-400' : 'text-rose-400'}`}>
+                        <span className="text-xs font-mono text-slate-650 uppercase block font-semibold">Стоимость:</span>
+                        <span className={`font-mono text-sm md:text-base font-bold ${canAfford ? 'text-amber-700' : 'text-rose-700'}`}>
                           💰 {cost} золота
                         </span>
                       </div>
@@ -189,7 +181,7 @@ export const ForgeView: React.FC<ForgeViewProps> = ({ player, onSave, onBack }) 
               })}
             </div>
 
-            <div className="p-4 bg-obsidian-950/60 border border-obsidian-800 rounded text-xs font-sans text-slate-500 leading-relaxed">
+            <div className="p-4 bg-slate-200 border border-slate-300 rounded text-xs font-sans text-slate-650 leading-relaxed">
               * Внимание: Каждое улучшение навсегда прибавляет +1 к характеристике персонажа. Стоимость каждого последующего улучшения одной характеристики увеличивается на 25 золота.
             </div>
           </div>

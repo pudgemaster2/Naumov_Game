@@ -28,34 +28,28 @@ interface CharSelectScreenProps {
 export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClass }) => {
   const [selectedRace, setSelectedRace] = useState<CharacterRace>('human');
   const [selectedClass, setSelectedClass] = useState<CharacterClass>('warrior');
-  
-  // Retrieve the temporarily stored name
-  const tempName = sessionStorage.getItem('rpg_temp_name') || 'Гость';
+  const [charName, setCharName] = useState('');
 
-  const racesList: { key: CharacterRace; title: string; color: string; icon: string }[] = [
+  const racesList: { key: CharacterRace; title: string; color: string }[] = [
     { 
       key: 'human', 
       title: 'Человек', 
-      color: 'border-slate-500 text-slate-400 bg-slate-950/10 shadow-[0_0_12px_rgba(148,163,184,0.15)]', 
-      icon: '🧑'
+      color: 'border-slate-400 bg-slate-50 shadow-[0_0_12px_rgba(148,163,184,0.1)]', 
     },
     { 
       key: 'elf', 
       title: 'Эльф', 
-      color: 'border-emerald-500 text-emerald-400 bg-emerald-950/10 shadow-[0_0_12px_rgba(16,185,129,0.15)]', 
-      icon: '🧝'
+      color: 'border-emerald-400 bg-emerald-50 shadow-[0_0_12px_rgba(16,185,129,0.1)]', 
     },
     { 
       key: 'gnome', 
       title: 'Гном', 
-      color: 'border-amber-500 text-amber-400 bg-amber-950/10 shadow-[0_0_12px_rgba(245,158,11,0.15)]', 
-      icon: '🧔'
+      color: 'border-amber-400 bg-amber-50 shadow-[0_0_12px_rgba(245,158,11,0.1)]', 
     },
     { 
       key: 'orc', 
       title: 'Орк', 
-      color: 'border-rose-500 text-rose-400 bg-rose-950/10 shadow-[0_0_12px_rgba(244,63,94,0.15)]', 
-      icon: '👹'
+      color: 'border-rose-400 bg-rose-50 shadow-[0_0_12px_rgba(244,63,94,0.1)]', 
     },
   ];
 
@@ -63,19 +57,19 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
     { 
       key: 'warrior', 
       title: 'Воин', 
-      color: 'border-rose-500 text-rose-400 bg-rose-950/10 shadow-[0_0_12px_rgba(244,63,94,0.15)]', 
+      color: 'border-rose-400 bg-rose-50 shadow-[0_0_12px_rgba(244,63,94,0.1)]', 
       icon: '⚔️'
     },
     { 
       key: 'archer', 
       title: 'Лучник', 
-      color: 'border-emerald-500 text-emerald-400 bg-emerald-950/10 shadow-[0_0_12px_rgba(16,185,129,0.15)]', 
+      color: 'border-emerald-400 bg-emerald-50 shadow-[0_0_12px_rgba(16,185,129,0.1)]', 
       icon: '🏹'
     },
     { 
       key: 'mage', 
       title: 'Маг', 
-      color: 'border-sky-500 text-sky-400 bg-sky-950/10 shadow-[0_0_12px_rgba(56,189,248,0.15)]', 
+      color: 'border-sky-400 bg-sky-50 shadow-[0_0_12px_rgba(56,189,248,0.1)]', 
       icon: '🧙'
     },
   ];
@@ -104,7 +98,11 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
   };
 
   const handleConfirm = () => {
-    onSelectClass(selectedRace, selectedClass, tempName);
+    const trimmed = charName.trim();
+    if (trimmed.length < 2 || trimmed.length > 14) {
+      return;
+    }
+    onSelectClass(selectedRace, selectedClass, trimmed);
   };
 
   const raceStats = RACE_TEMPLATES[selectedRace].baseStats;
@@ -117,12 +115,14 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
     intellect: raceStats.intellect + classModifiers.intellect,
   };
 
+  const isNameValid = charName.trim().length >= 2 && charName.trim().length <= 14;
+
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8 animate-fade-in select-none">
       <div className="text-center mb-8">
         <h2 className="text-4xl font-bold font-gothic tracking-widest text-gold-400">СОЗДАНИЕ ПЕРСОНАЖА</h2>
-        <p className="text-sm font-mono text-slate-400 mt-3">
-          Боец: <span className="text-gold-300 font-bold">{tempName}</span>. Настройте вашу расу и боевой класс.
+        <p className="text-sm font-mono text-slate-350 mt-3">
+          Настройте имя героя, его расу и боевой класс перед путешествием.
         </p>
       </div>
 
@@ -140,20 +140,17 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
                 onClick={() => setSelectedRace(item.key)}
                 className={`gothic-panel p-5 cursor-pointer flex flex-col justify-between transition-all duration-300 group hover:-translate-y-0.5 ${
                   isSelected 
-                    ? `${item.color} border-2` 
-                    : 'border-obsidian-750 opacity-60 hover:opacity-100'
+                    ? `${item.color} border-2 ring-1 ring-gold-500` 
+                    : 'border-slate-300 bg-slate-100/90 opacity-75 hover:opacity-100'
                 }`}
               >
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="text-2xl p-1.5 bg-obsidian-950 border border-obsidian-700 rounded select-none">
-                      {item.icon}
-                    </div>
-                    <h3 className="text-base font-bold font-gothic tracking-wider text-slate-100 group-hover:text-gold-400 transition-colors">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-base font-bold font-gothic tracking-wider text-slate-900 group-hover:text-amber-700 transition-colors">
                       {template.title}
                     </h3>
                   </div>
-                  <p className="text-xs text-slate-450 font-sans leading-relaxed">
+                  <p className="text-xs text-slate-700 font-sans leading-relaxed">
                     {template.description}
                   </p>
                 </div>
@@ -177,20 +174,20 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
                 onClick={() => setSelectedClass(item.key)}
                 className={`gothic-panel p-5 cursor-pointer flex flex-col justify-between transition-all duration-300 group hover:-translate-y-0.5 ${
                   isSelected 
-                    ? `${item.color} border-2` 
-                    : 'border-obsidian-750 opacity-60 hover:opacity-100'
+                    ? `${item.color} border-2 ring-1 ring-gold-500` 
+                    : 'border-slate-300 bg-slate-100/90 opacity-75 hover:opacity-100'
                 }`}
               >
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="text-2xl p-1.5 bg-obsidian-950 border border-obsidian-700 rounded select-none">
+                    <div className="text-xl p-1.5 bg-slate-200 border border-slate-300 rounded select-none">
                       {item.icon}
                     </div>
-                    <h3 className="text-base font-bold font-gothic tracking-wider text-slate-100 group-hover:text-gold-400 transition-colors">
+                    <h3 className="text-base font-bold font-gothic tracking-wider text-slate-900 group-hover:text-amber-700 transition-colors">
                       {template.title}
                     </h3>
                   </div>
-                  <p className="text-xs text-slate-450 font-sans leading-relaxed">
+                  <p className="text-xs text-slate-700 font-sans leading-relaxed">
                     {template.description}
                   </p>
                 </div>
@@ -214,12 +211,12 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
           </div>
         </div>
 
-        <div className="lg:col-span-6 space-y-5">
+        <div className="lg:col-span-5 space-y-5">
           <h3 className="text-2xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 uppercase tracking-wide">
             {RACE_TEMPLATES[selectedRace].title} • {CLASS_TEMPLATES[selectedClass].title}
           </h3>
           
-          <div className="text-sm text-slate-350 space-y-3 leading-relaxed">
+          <div className="text-sm text-slate-300 space-y-3 leading-relaxed">
             {selectedClass === 'warrior' && (
               <>
                 <p>🛡️ <strong className="text-rose-400">Сокрушительная сила и мощь</strong>. Воины превосходно сражаются в ближнем бою. Их физический урон масштабируется от характеристики <strong className="text-rose-400">Сила</strong>, а выносливость дает максимальный запас HP.</p>
@@ -242,15 +239,40 @@ export const CharSelectScreen: React.FC<CharSelectScreenProps> = ({ onSelectClas
         </div>
 
         {/* Detailed stats table for chosen combination */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-4">
           <StatTable stats={combinedStats} classType={selectedClass} />
         </div>
       </div>
 
+      {/* Name Input Section */}
+      <div className="flex flex-col items-center justify-center max-w-md mx-auto mt-8 space-y-2">
+        <label className="text-sm font-mono text-slate-400 font-bold uppercase tracking-widest">
+          Введите имя персонажа:
+        </label>
+        <input
+          type="text"
+          placeholder="Имя героя..."
+          value={charName}
+          onChange={(e) => setCharName(e.target.value)}
+          className="w-full gothic-input px-4 py-3 rounded text-center text-base font-bold tracking-wide focus:ring-2 focus:ring-gold-500 bg-obsidian-950/80 border-gold-900/30"
+          maxLength={14}
+        />
+        {charName.trim() && charName.trim().length < 2 && (
+          <span className="text-xs text-rose-455 font-mono animate-pulse">
+            * Имя должно содержать от 2 до 14 символов
+          </span>
+        )}
+      </div>
+
       {/* Action panel */}
-      <div className="flex justify-center mt-8">
-        <Button onClick={handleConfirm} size="lg" className="w-full max-w-md">
-          Вступить в Бойцовский Клуб
+      <div className="flex justify-center mt-6">
+        <Button 
+          onClick={handleConfirm} 
+          disabled={!isNameValid}
+          size="lg" 
+          className="w-full max-w-md"
+        >
+          Появиться в Средиземье Наумова
         </Button>
       </div>
     </div>

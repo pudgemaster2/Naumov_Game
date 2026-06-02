@@ -42,6 +42,11 @@
 
 /* Custom base styles */
 html, body {
+  background-image: url('./assets/Background/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: var(--color-obsidian-950);
   color: #e2e8f0;
   font-family: var(--font-sans);
@@ -71,15 +76,17 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Gothic styled components */
 .gothic-panel {
-  background: linear-gradient(135deg, var(--color-obsidian-900) 0%, var(--color-obsidian-800) 100%);
-  border: 1px solid var(--color-gold-700);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 1px solid #c5a028;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #111827;
 }
 
 .gothic-panel-gold {
-  background: linear-gradient(135deg, var(--color-obsidian-900) 0%, var(--color-obsidian-800) 100%);
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   border: 2px solid var(--color-gold-500);
-  box-shadow: 0 0 15px rgba(197, 160, 40, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 15px rgba(197, 160, 40, 0.15), inset 0 0 10px rgba(255, 255, 255, 0.6);
+  color: #111827;
 }
 
 .gold-text-shimmer {
@@ -164,8 +171,8 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.25s ease-in-out;
 }
 .town-hotzone:hover {
-  background: rgba(197, 160, 40, 0.12) !important;
-  border-color: rgba(229, 193, 88, 0.6) !important;
-  box-shadow: 0 0 20px rgba(197, 160, 40, 0.4) !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 

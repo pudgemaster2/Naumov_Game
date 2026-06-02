@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Character } from '../types';
 import { CLASS_TEMPLATES, RACE_TEMPLATES } from '../types';
 import { TownMap } from '../components/TownMap';
@@ -7,12 +7,13 @@ import { ForgeView } from '../components/ForgeView';
 import { TavernView } from '../components/TavernView';
 import { TempleView } from '../components/TempleView';
 import { MarketView } from '../components/MarketView';
+import { SuburbsView } from '../components/SuburbsView';
 import { OtherLocationsView } from '../components/OtherLocationsView';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { StatTable } from '../components/StatTable';
 import { Button } from '../components/ui/Button';
 import { GeneralChat } from '../components/GeneralChat';
-import { Swords, Award, LogOut, Compass, Sparkles, Heart } from 'lucide-react';
+import { Swords, Award, LogOut, Sparkles, Heart } from 'lucide-react';
 import { getPortrait } from '../utils/portraitHelper';
 
 interface HubScreenProps {
@@ -20,6 +21,7 @@ interface HubScreenProps {
   onStartCombat: () => void;
   onLogout: () => void;
   onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
+  onChangeCharacter?: () => void;
 }
 
 type SubLocation =
@@ -33,7 +35,8 @@ type SubLocation =
   | 'gates'
   | 'siege'
   | 'post'
-  | 'upper_tier';
+  | 'upper_tier'
+  | 'suburbs';
 
 // getPortrait is now imported from portraitHelper
 
@@ -42,8 +45,26 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   onStartCombat,
   onLogout,
   onUpdatePlayer,
+  onChangeCharacter,
 }) => {
   const [activeSubLoc, setActiveSubLoc] = useState<SubLocation>('town');
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [tempName, setTempName] = useState(player.name);
+
+  // Sync tempName when player updates
+  useEffect(() => {
+    setTempName(player.name);
+  }, [player.name]);
+
+  const handleSaveSettings = async () => {
+    if (!tempName.trim()) return;
+    const updatedPlayer = {
+      ...player,
+      name: tempName.trim(),
+    };
+    await onUpdatePlayer(updatedPlayer);
+    setShowSettingsModal(false);
+  };
   
   // Transition loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -112,6 +133,11 @@ export const HubScreen: React.FC<HubScreenProps> = ({
       case 'arena':
         return renderArenaLobby();
       case 'gates':
+        return (
+          <SuburbsView 
+            onBack={() => handleNavigateTo('town')} 
+          />
+        );
       case 'siege':
       case 'post':
       case 'upper_tier':
@@ -135,14 +161,14 @@ export const HubScreen: React.FC<HubScreenProps> = ({
     const isWounded = player.currentHp < player.maxHp;
 
     return (
-      <div className="max-w-5xl mx-auto px-4 py-4 space-y-6 animate-fade-in">
+      <div className="max-w-5xl mx-auto px-4 py-4 space-y-6 animate-fade-in text-slate-850">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-obsidian-800 pb-4">
+        <div className="flex justify-between items-center border-b border-slate-300 pb-4">
           <div>
-            <h2 className="text-2xl font-bold font-gothic text-gold-400 tracking-widest flex items-center gap-2">
+            <h2 className="text-2xl font-bold font-gothic text-slate-900 tracking-widest flex items-center gap-2">
               🏟️ АРЕНА ГЛАДИАТОРОВ
             </h2>
-            <p className="text-xs font-mono text-slate-500 mt-1 uppercase tracking-wider">
+            <p className="text-xs font-mono text-slate-650 mt-1 uppercase tracking-wider">
               Испытайте свою сталь против обученных боевых ботов
             </p>
           </div>
@@ -155,34 +181,34 @@ export const HubScreen: React.FC<HubScreenProps> = ({
           {/* Stats Lobby Details */}
           <div className="lg:col-span-5 space-y-6">
             {/* Arena Stats summary */}
-            <div className="gothic-panel p-6 bg-obsidian-900/60 rounded-lg space-y-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-gold-400 font-gothic flex items-center gap-2 border-b border-obsidian-800 pb-2">
-                <Award className="w-4 h-4 text-gold-500" /> Боевые Показатели
+            <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-4 text-slate-800">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic flex items-center gap-2 border-b border-slate-250 pb-2">
+                <Award className="w-4 h-4 text-gold-650" /> Боевые Показатели
               </h4>
               <div className="grid grid-cols-3 gap-3 text-center font-mono">
-                <div className="p-3 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-[10px] text-slate-500 uppercase">Бои</div>
-                  <div className="text-lg font-bold text-slate-300">{totalBattles}</div>
+                <div className="p-3 bg-slate-200 rounded border border-slate-300">
+                  <div className="text-[10px] text-slate-600 uppercase font-semibold">Бои</div>
+                  <div className="text-lg font-bold text-slate-800">{totalBattles}</div>
                 </div>
-                <div className="p-3 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-[10px] text-emerald-500 uppercase">Победы</div>
-                  <div className="text-lg font-bold text-emerald-400">{player.wins}</div>
+                <div className="p-3 bg-slate-200 rounded border border-slate-300">
+                  <div className="text-[10px] text-emerald-700 uppercase font-bold">Победы</div>
+                  <div className="text-lg font-bold text-emerald-700">{player.wins}</div>
                 </div>
-                <div className="p-3 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-[10px] text-rose-500 uppercase">Пораж.</div>
-                  <div className="text-lg font-bold text-rose-400">{player.losses}</div>
+                <div className="p-3 bg-slate-200 rounded border border-slate-300">
+                  <div className="text-[10px] text-rose-700 uppercase font-bold">Пораж.</div>
+                  <div className="text-lg font-bold text-rose-700">{player.losses}</div>
                 </div>
               </div>
-              <div className="p-3 bg-obsidian-950 rounded border border-obsidian-800 text-center font-mono text-xs">
+              <div className="p-3 bg-slate-200 rounded border border-slate-300 text-center font-mono text-xs text-slate-800">
                 <span>Процент побед (Винрейт): </span>
-                <span className="text-gold-400 font-bold">{winRate}%</span>
+                <span className="text-amber-700 font-extrabold">{winRate}%</span>
               </div>
             </div>
 
             {/* Rules / Tips panel */}
-            <div className="p-4 border border-obsidian-800 rounded bg-obsidian-950/50 text-xs text-slate-500 leading-relaxed space-y-2">
-              <p className="font-semibold text-slate-400 uppercase tracking-widest text-[10px] font-gothic flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-gold-500" /> Советы Гладиаторам:
+            <div className="p-4 border border-slate-300 rounded bg-slate-50 text-xs text-slate-650 leading-relaxed space-y-2">
+              <p className="font-semibold text-slate-800 uppercase tracking-widest text-[10px] font-gothic flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-gold-650" /> Советы Гладиаторам:
               </p>
               <p>1. В бою обязательно выбирайте зону для атаки и зону для защиты. Без этого совершить ход невозможно.</p>
               <p>2. Урон зависит от ваших базовых характеристик, а также временных эффектов таверны или храма.</p>
@@ -192,16 +218,16 @@ export const HubScreen: React.FC<HubScreenProps> = ({
 
           {/* Stat Sheet and Battle Button */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="gothic-panel p-6 bg-obsidian-900/60 rounded-lg">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-gold-400 font-gothic border-b border-obsidian-800 pb-2 mb-4 flex items-center gap-2">
-                <Swords className="w-4 h-4 text-gold-500" /> Характеристики Героя
+            <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg text-slate-850">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic border-b border-slate-250 pb-2 mb-4 flex items-center gap-2">
+                <Swords className="w-4 h-4 text-gold-650" /> Характеристики Героя
               </h4>
               <StatTable stats={player.stats} classType={player.classType} />
             </div>
 
             {/* Injury warning */}
             {isWounded && (
-              <div className="p-3 border border-rose-900/40 bg-rose-950/10 rounded text-xs text-rose-400 flex items-center gap-2 font-mono animate-pulse">
+              <div className="p-3 border border-rose-300 bg-rose-50 rounded text-xs text-rose-800 flex items-center gap-2 font-mono animate-pulse">
                 <Heart className="w-4 h-4 flex-shrink-0" />
                 <span>Внимание: Вы ранены ({player.currentHp} / {player.maxHp} HP). Выход в бой при неполном здоровье опасен! Восстановите силы!</span>
               </div>
@@ -209,7 +235,7 @@ export const HubScreen: React.FC<HubScreenProps> = ({
 
             <Button onClick={onStartCombat} fullWidth className="py-4 text-base flex justify-center items-center gap-3">
               <Swords className="w-5 h-5 animate-pulse" />
-              ВСТУПИТЬ В БОЙ С БОТОМ
+              ВСТУПИТЬ В БОЙ
             </Button>
           </div>
         </div>
@@ -221,7 +247,7 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   const maxMp = player.maxMana !== undefined ? player.maxMana : player.stats.intellect * 10;
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-2 space-y-6">
+    <div className="h-full flex flex-row gap-4 w-full px-4 py-2 select-none overflow-hidden min-h-0 items-stretch">
       
       {/* Loading Screen Overlay */}
       {isLoading && (
@@ -230,144 +256,184 @@ export const HubScreen: React.FC<HubScreenProps> = ({
         />
       )}
 
-      {/* Premium HUD Status Bar */}
-      <div className="gothic-panel p-6 md:p-8 bg-obsidian-900/90 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6 border-gold-900/40 relative overflow-hidden shadow-lg select-none">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-gold-500/5 to-transparent pointer-events-none rounded-full" />
-        
-        {/* Left Section: Portrait and Name */}
-        <div className="flex items-center gap-6 w-full md:w-auto">
-          <div className="bg-obsidian-950 border border-gold-500/50 shadow-md w-20 h-24 overflow-hidden rounded flex-shrink-0">
-            <img 
-              src={getPortrait(player.race, player.classType)} 
-              alt={`${player.race} ${player.classType}`} 
-              className="w-full h-full object-cover" 
-            />
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-3">
-              <h3 className="text-2xl font-bold font-gothic text-slate-100">{player.name}</h3>
-              <span className="text-xs font-mono font-bold bg-gold-900/30 border border-gold-600/30 text-gold-400 px-3 py-1 rounded-full">
-                Уровень {player.level}
+      {/* Left Column: Vertical Character panel */}
+      <div className="w-80 flex-shrink-0 flex flex-col justify-between gothic-panel p-4 bg-slate-100/95 border-slate-350 shadow-lg h-full select-none text-slate-800">
+        {/* Profile + Stats block (grouped to stay close) */}
+        <div className="flex flex-col items-center w-full space-y-6">
+          {/* Profile Block */}
+          <div className="flex flex-col items-center text-center space-y-3.5">
+            <div className="bg-slate-200 border border-slate-350 shadow-md w-48 h-56 overflow-hidden rounded relative flex-shrink-0">
+              <img 
+                src={getPortrait(player.race, player.classType)} 
+                alt={`${player.race} ${player.classType}`} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center gap-2 leading-none mb-1.5">
+                <span className="text-2xl font-bold font-gothic text-slate-900">{player.name}</span>
+                <span className="text-base font-mono font-bold bg-slate-200 border border-slate-300 text-slate-700 px-2 py-0.5 rounded">
+                  Ур. {player.level}
+                </span>
+              </div>
+              <span className="text-sm text-slate-650 font-mono tracking-wider font-semibold uppercase block">
+                {RACE_TEMPLATES[player.race]?.title || player.race} | {CLASS_TEMPLATES[player.classType]?.title || player.classType}
               </span>
             </div>
-            <p className="text-sm md:text-base text-gold-400 font-gothic tracking-wider font-semibold uppercase">
-              Раса: {RACE_TEMPLATES[player.race]?.title || player.race} | Класс: {CLASS_TEMPLATES[player.classType]?.title || player.classType}
-            </p>
-          </div>
-        </div>
-
-        {/* Center Section: HP, MP & XP bars */}
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
-          {/* Health points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Здоровье (HP)</span>
-              <span className="text-rose-400 font-bold">{player.currentHp} / {player.maxHp} HP</span>
-            </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%`,
-                  background: 'linear-gradient(to right, #9f1239, #f43f5e)',
-                  boxShadow: '0 0 5px rgba(244, 63, 94, 0.5)'
-                }} 
-              />
-            </div>
           </div>
 
-          {/* Mana points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Мана (MP)</span>
-              <span className="text-sky-400 font-bold">{currentMp} / {maxMp} MP</span>
+          {/* Stats Bars */}
+          <div className="space-y-4 w-full px-2">
+            {/* HP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-650">
+                <span>Здоровье (HP)</span>
+                <span className="text-rose-700 font-extrabold">{player.currentHp} / {player.maxHp} HP</span>
+              </div>
+              <div className="h-4 bg-slate-200 rounded overflow-hidden p-[2px] border border-slate-300">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, (player.currentHp / player.maxHp) * 100))}%`,
+                    background: 'linear-gradient(to right, #b91c1c, #ef4444)',
+                  }} 
+                />
+              </div>
             </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%`,
-                  background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
-                  boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)'
-                }} 
-              />
-            </div>
-          </div>
 
-          {/* Experience points bar */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs md:text-sm font-bold font-mono text-slate-400">
-              <span>Опыт (XP)</span>
-              <span className="text-amber-400 font-bold">{player.experience} / {player.level * 100} XP</span>
+            {/* MP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-650">
+                <span>Мана (MP)</span>
+                <span className="text-sky-700 font-extrabold">{currentMp} / {maxMp} MP</span>
+              </div>
+              <div className="h-4 bg-slate-200 rounded overflow-hidden p-[2px] border border-slate-300">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, (currentMp / maxMp) * 100))}%`,
+                    background: 'linear-gradient(to right, #1d4ed8, #3b82f6)',
+                  }} 
+                />
+              </div>
             </div>
-            <div className="h-4 bg-obsidian-950 rounded overflow-hidden p-[1.5px] border border-obsidian-800">
-              <div 
-                className="h-full rounded-sm transition-all duration-300" 
-                style={{ 
-                  width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%`,
-                  background: 'linear-gradient(to right, #d97706, #f59e0b)',
-                  boxShadow: '0 0 5px rgba(245, 158, 11, 0.5)'
-                }} 
-              />
+
+            {/* XP */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-base font-bold font-mono text-slate-650">
+                <span>Опыт (XP)</span>
+                <span className="text-amber-700 font-extrabold">{player.experience} / {player.level * 100} XP</span>
+              </div>
+              <div className="h-4 bg-slate-200 rounded overflow-hidden p-[2px] border border-slate-300">
+                <div 
+                  className="h-full rounded-sm transition-all duration-300" 
+                  style={{ 
+                    width: `${Math.min(100, (player.experience / (player.level * 100)) * 100)}%`,
+                    background: 'linear-gradient(to right, #d97706, #f59e0b)',
+                  }} 
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Right Section: Gold status, Buff indicator & Return/Logout Button */}
-        <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-0 border-obsidian-800/40 pt-4 md:pt-0">
-          {/* Wallet */}
-          <div className="flex items-center gap-2.5">
-            <span className="text-sm font-semibold font-mono text-slate-400">Кошелек:</span>
-            <span className="text-amber-400 font-bold font-mono text-xl md:text-2xl tracking-wide whitespace-nowrap">
-              💰 {player.gold}
-            </span>
-          </div>
-
-          {/* Buff details icon if present */}
-          {player.activeBuff && (
-            <div className="flex items-center gap-1.5 bg-gold-950/20 border border-gold-600/30 px-3 py-1.5 rounded text-xs md:text-sm font-mono text-gold-400 animate-pulse">
-              <Sparkles className="w-4.5 h-4.5" />
-              <span className="uppercase tracking-widest font-bold font-sans">
-                {player.activeBuff.type === 'strength' ? 'СИЛА' : 'ИНТ'} +{player.activeBuff.value} ({player.activeBuff.fightsLeft}б)
+            {/* Wallet */}
+            <div className="flex justify-between items-center border-t border-slate-250 pt-3.5 mt-3 flex-shrink-0">
+              <span className="text-base font-mono text-slate-650 uppercase tracking-wider">Кошелек:</span>
+              <span className="text-amber-700 font-extrabold font-mono text-2xl whitespace-nowrap">
+                💰 {player.gold}
               </span>
             </div>
-          )}
 
-          {/* Nav buttons */}
-          <div className="flex gap-2">
-            {activeSubLoc !== 'town' && (
-              <Button 
-                variant="secondary" 
-                onClick={() => handleNavigateTo('town')} 
-                className="p-3 px-5 text-sm md:text-base flex items-center gap-2"
-                title="Вернуться на карту города"
-              >
-                <Compass className="w-5 h-5" /> <span className="hidden sm:inline">Карта</span>
-              </Button>
+            {/* Buff details icon if present */}
+            {player.activeBuff && (
+              <div className="bg-amber-100 border border-amber-300 py-1.5 rounded text-sm font-mono text-amber-800 text-center animate-pulse mt-2.5 flex-shrink-0">
+                <span className="font-bold">
+                  {player.activeBuff.type === 'strength' ? 'СИЛА' : 'ИНТ'} +{player.activeBuff.value}
+                </span>
+              </div>
             )}
-            
-            <Button 
-              variant="secondary" 
-              onClick={onLogout} 
-              className="p-3 px-5 text-sm md:text-base flex items-center gap-2 hover:text-rose-400 hover:border-rose-900/50"
-              title="Выйти из игры"
-            >
-              <LogOut className="w-5 h-5" /> <span className="hidden sm:inline">Выйти</span>
-            </Button>
           </div>
         </div>
 
+        {/* Buttons Block */}
+        <div className="space-y-2 border-t border-slate-250 pt-3 flex-shrink-0 w-full">
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowSettingsModal(true)}
+            className="w-full py-2.5 text-base flex items-center justify-center gap-1 hover:text-gold-700 hover:border-slate-400"
+            title="Настройки персонажа"
+          >
+            Настройки
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={onLogout} 
+            className="w-full py-2.5 text-base flex items-center justify-center gap-1 hover:text-rose-700 hover:border-rose-300"
+            title="Выйти из игры"
+          >
+            <LogOut className="w-4 h-4" /> Выйти
+          </Button>
+        </div>
       </div>
 
-      {/* 2-Column Town Layout: Active View (Left/Center) & General Chat (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        <div className="lg:col-span-3 w-full animate-fade-in">
+      {/* Middle Column (Town map / active view) - expanded to fill remaining space */}
+      <div className="flex-grow flex-shrink min-w-0 flex flex-col items-center h-full overflow-hidden">
+        <div className={`w-full h-full overflow-y-auto rpg-scrollbar animate-fade-in flex flex-col min-h-0 ${
+          (activeSubLoc === 'town' || activeSubLoc === 'gates') ? 'justify-center' : 'justify-start'
+        }`}>
           {renderActiveView()}
         </div>
-        <div className="lg:col-span-1 w-full">
-          <GeneralChat playerName={player.name} />
-        </div>
       </div>
+
+      {/* Right Column: General Chat */}
+      <div className="w-80 flex-shrink-0 flex flex-col min-h-0 h-full">
+        <GeneralChat playerName={player.name} />
+      </div>
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-fade-in select-none">
+          <div className="gothic-panel-gold max-w-md w-full p-8 bg-slate-100 shadow-[0_0_50px_rgba(0,0,0,0.15)] rounded-lg space-y-6 text-slate-800">
+            <h3 className="text-xl font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              ⚙️ НАСТРОЙКИ ГЕРОЯ
+            </h3>
+            <div className="space-y-4">
+              <div className="space-y-1.5 text-left">
+                <label className="text-sm font-mono text-slate-650 block">Имя персонажа</label>
+                <input 
+                  type="text" 
+                  value={tempName} 
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="w-full gothic-input px-4 py-2.5 rounded text-sm focus:ring-1 focus:ring-gold-500"
+                  maxLength={14}
+                />
+              </div>
+
+              {onChangeCharacter && (
+                <div className="pt-3 border-t border-slate-250">
+                  <Button 
+                    variant="secondary"
+                    onClick={() => {
+                      setShowSettingsModal(false);
+                      onChangeCharacter();
+                    }}
+                    className="w-full text-sm hover:text-gold-700 py-2.5 border-slate-350"
+                  >
+                    Выбор другого персонажа
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={handleSaveSettings} className="flex-1">
+                Сохранить
+              </Button>
+              <Button variant="secondary" onClick={() => setShowSettingsModal(false)} className="flex-1">
+                Закрыть
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
