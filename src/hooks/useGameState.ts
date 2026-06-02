@@ -13,48 +13,24 @@ import type {
 import { auth } from '../services/auth';
 import type { UserSession } from '../services/auth';
 import { db } from '../services/db';
+import { getItemImage } from '../utils/itemHelper';
 
 const defaultStartingItems: Item[] = [
-  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: '/src/assets/items/helmet.png' },
-  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: '/src/assets/items/gloves.png' },
-  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: '/src/assets/items/armor.png' },
-  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: '/src/assets/items/boots.png' },
-  { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
-  { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
-  { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
-  { id: 'potion_mp_1', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
-  { id: 'potion_mp_2', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
-  { id: 'potion_mp_3', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
-  { id: 'scroll_atk_1', name: 'Свиток Ярости', type: 'scroll_atk', stats: {}, description: 'Увеличивает наносимый урон на +10 до конца боя.', icon: '/src/assets/items/scroll.png' },
-  { id: 'scroll_def_1', name: 'Свиток Каменной Кожи', type: 'scroll_def', stats: {}, description: 'Снижает получаемый урон на 5 до конца боя.', icon: '/src/assets/items/scroll.png' },
-  { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: '/src/assets/items/scroll.png' },
-  { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: '/src/assets/items/scroll.png' }
+  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: getItemImage('helmet') },
+  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: getItemImage('gloves') },
+  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: getItemImage('armor') },
+  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: getItemImage('boots') },
+  { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
+  { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
+  { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
+  { id: 'potion_mp_1', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: getItemImage('potion_mp') },
+  { id: 'potion_mp_2', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: getItemImage('potion_mp') },
+  { id: 'potion_mp_3', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: getItemImage('potion_mp') },
+  { id: 'scroll_atk_1', name: 'Свиток Ярости', type: 'scroll_atk', stats: {}, description: 'Увеличивает наносимый урон на +10 до конца боя.', icon: getItemImage('scroll_atk') },
+  { id: 'scroll_def_1', name: 'Свиток Каменной Кожи', type: 'scroll_def', stats: {}, description: 'Снижает получаемый урон на 5 до конца боя.', icon: getItemImage('scroll_def') },
+  { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: getItemImage('scroll_dodge') },
+  { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: getItemImage('scroll_crit') }
 ];
-
-const getItemImage = (type: string, oldIcon: string) => {
-  switch (type) {
-    case 'helmet': return '/src/assets/items/helmet.png';
-    case 'armor': return '/src/assets/items/armor.png';
-    case 'gloves': return '/src/assets/items/gloves.png';
-    case 'boots': return '/src/assets/items/boots.png';
-    case 'weapon': return '/src/assets/items/weapon.png';
-    case 'shield': return '/src/assets/items/shield.png';
-    case 'belt': return '/src/assets/items/leggings.png';
-    case 'ring': 
-    case 'ring1': 
-    case 'ring2': 
-      return '/src/assets/items/ring.png';
-    case 'spellbook': return '/src/assets/items/spellbook.png';
-    case 'potion_hp': return '/src/assets/items/potion_hp.png';
-    case 'potion_mp': return '/src/assets/items/potion_mp.png';
-    case 'scroll_atk':
-    case 'scroll_def':
-    case 'scroll_dodge':
-    case 'scroll_crit':
-      return '/src/assets/items/scroll.png';
-    default: return oldIcon;
-  }
-};
 
 export const useGameState = () => {
   const [screen, setScreen] = useState<ScreenState>('auth');

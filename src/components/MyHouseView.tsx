@@ -4,6 +4,7 @@ import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { Button } from './ui/Button';
 import { Package } from 'lucide-react';
 import { getPortrait } from '../utils/portraitHelper';
+import { getItemImage, getBedImage, getChestImage } from '../utils/itemHelper';
 
 interface MyHouseViewProps {
   player: Character;
@@ -227,20 +228,10 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
   };
 
   const getSlotBackgroundIcon = (slotKey: string) => {
-    switch (slotKey) {
-      case 'helmet': return '/src/assets/items/helmet.png';
-      case 'armor': return '/src/assets/items/armor.png';
-      case 'belt': return '/src/assets/items/leggings.png';
-      case 'weapon': return '/src/assets/items/weapon.png';
-      case 'shield': return '/src/assets/items/shield.png';
-      case 'gloves': return '/src/assets/items/gloves.png';
-      case 'boots': return '/src/assets/items/boots.png';
-      case 'spellbook': return '/src/assets/items/spellbook.png';
-      case 'ring1':
-      case 'ring2':
-        return '/src/assets/items/ring.png';
-      default: return '📦';
+    if (slotKey === 'ring1' || slotKey === 'ring2') {
+      return getItemImage('ring');
     }
+    return getItemImage(slotKey);
   };
 
   const ItemHtmlTooltip: React.FC<{ item: Item }> = ({ item }) => {
@@ -396,7 +387,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 }`}
                 title={player.currentHp >= player.maxHp && player.currentMana >= player.maxMana ? "Вы полностью здоровы" : "Кликните на кровать, чтобы отдохнуть (8 сек)"}
               >
-                <img src="/src/assets/items/bed.png" alt="Кровать" className="w-full h-full object-cover" />
+                <img src={getBedImage()} alt="Кровать" className="w-full h-full object-cover" />
                 {!(player.currentHp >= player.maxHp && player.currentMana >= player.maxMana) && (
                   <div className="absolute inset-0 bg-black/15 hover:bg-transparent flex items-center justify-center text-white font-gothic text-xs tracking-wider uppercase font-bold">
                     🛌 Отдохнуть (8с)
@@ -418,7 +409,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 className="w-16 h-16 flex-shrink-0 flex items-center justify-center bg-amber-100 border border-amber-200 rounded-lg cursor-pointer hover:bg-amber-200/50 hover:border-amber-500 hover:scale-105 active:scale-95 transition-all shadow-sm"
                 title="Кликните на сундук, чтобы открыть"
               >
-                <img src="/src/assets/items/chest.png" alt="Сундук" className="w-12 h-12 object-contain" />
+                <img src={getChestImage()} alt="Сундук" className="w-12 h-12 object-contain" />
               </div>
               <div>
                 <h4 className="text-base font-bold text-slate-900">Сундук</h4>
@@ -451,7 +442,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
             <div className="gothic-panel-gold p-6 bg-slate-50 border-amber-500 rounded-lg space-y-4 text-center animate-fade-in text-slate-900">
               <h3 className="text-base font-bold font-gothic text-amber-800">Старинный Сундук</h3>
               <div className="py-2 flex justify-center">
-                <img src="/src/assets/items/chest.png" alt="Сундук" className="w-20 h-20 object-contain animate-bounce" />
+                <img src={getChestImage()} alt="Сундук" className="w-20 h-20 object-contain animate-bounce" />
               </div>
               <p className="text-xs text-slate-700 leading-relaxed font-semibold">
                 {chestMessage}

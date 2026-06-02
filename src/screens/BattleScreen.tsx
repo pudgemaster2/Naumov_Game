@@ -4,6 +4,7 @@ import { FighterCard } from '../components/FighterCard';
 import { CombatLog } from '../components/CombatLog';
 import { Button } from '../components/ui/Button';
 import { Swords, Award, RefreshCw, ChevronLeft, Crosshair, ShieldAlert, Zap } from 'lucide-react';
+import { getItemImage } from '../utils/itemHelper';
 
 interface BattleScreenProps {
   player: Character;
@@ -249,7 +250,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Восстановить 50 HP (Максимум 3 зелья за бой)"
                   >
-                    <img src="/src/assets/items/potion_hp.png" alt="HP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('potion_hp')} alt="HP Potion" className="w-4 h-4 object-contain inline-block" />
                     <span>Здоровье ({hpPotionsCount})</span>
                   </button>
 
@@ -260,7 +261,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Восстановить 50 MP (Максимум 3 зелья за бой)"
                   >
-                    <img src="/src/assets/items/potion_mp.png" alt="MP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('potion_mp')} alt="MP Potion" className="w-4 h-4 object-contain inline-block" />
                     <span>Мана ({mpPotionsCount})</span>
                   </button>
 
@@ -271,7 +272,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Ярости (+10 к урону)"
                   >
-                    <img src="/src/assets/items/scroll.png" alt="Scroll Atk" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('scroll_atk')} alt="Scroll Atk" className="w-4 h-4 object-contain inline-block" />
                     <span>Свиток Урона ({scrollAtkCount})</span>
                   </button>
 
@@ -282,7 +283,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Каменной Кожи (-5 к получаемому урону)"
                   >
-                    <img src="/src/assets/items/scroll.png" alt="Scroll Def" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('scroll_def')} alt="Scroll Def" className="w-4 h-4 object-contain inline-block" />
                     <span>Свиток Блока ({scrollDefCount})</span>
                   </button>
 
@@ -293,7 +294,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate col-span-2 flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed mb-1"
                     title="Свиток Ветра (+15% уклонения)"
                   >
-                    <img src="/src/assets/items/scroll.png" alt="Scroll Dodge" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('scroll_dodge')} alt="Scroll Dodge" className="w-4 h-4 object-contain inline-block" />
                     <span>Свиток Уклонения ({scrollDodgeCount})</span>
                   </button>
 
@@ -304,7 +305,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                     className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate col-span-2 flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Гнева (+15% крита)"
                   >
-                    <img src="/src/assets/items/scroll.png" alt="Scroll Crit" className="w-4 h-4 object-contain inline-block" />
+                    <img src={getItemImage('scroll_crit')} alt="Scroll Crit" className="w-4 h-4 object-contain inline-block" />
                     <span>Свиток Крит. удара ({scrollCritCount})</span>
                   </button>
                 </div>

@@ -2,21 +2,13 @@ import React, { useState } from 'react';
 import type { Character } from '../types';
 import { Button } from './ui/Button';
 import { ShoppingBag, Sparkles } from 'lucide-react';
+import { getItemImage } from '../utils/itemHelper';
 
 const getMarketItemImage = (key: string) => {
-  switch (key) {
-    case 'amulet': return '/src/assets/items/amulet.png';
-    case 'ring': return '/src/assets/items/ring.png';
-    case 'elixir': return '/src/assets/items/potion_mp.png';
-    case 'potion_hp': return '/src/assets/items/potion_hp.png';
-    case 'potion_mp': return '/src/assets/items/potion_mp.png';
-    case 'scroll_atk':
-    case 'scroll_def':
-    case 'scroll_dodge':
-    case 'scroll_crit':
-      return '/src/assets/items/scroll.png';
-    default: return '';
+  if (key === 'elixir') {
+    return getItemImage('potion_mp');
   }
+  return getItemImage(key);
 };
 
 interface MarketViewProps {
@@ -88,12 +80,12 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
     } else {
       // Consumables purchase
       const consumablesMap: Record<string, { name: string; type: any; desc: string; icon: string }> = {
-        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: '/src/assets/items/potion_hp.png' },
-        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: '/src/assets/items/potion_mp.png' },
-        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: '/src/assets/items/scroll.png' },
-        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: '/src/assets/items/scroll.png' },
-        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: '/src/assets/items/scroll.png' },
-        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: '/src/assets/items/scroll.png' }
+        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: getItemImage('potion_hp') },
+        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: getItemImage('potion_mp') },
+        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: getItemImage('scroll_atk') },
+        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: getItemImage('scroll_def') },
+        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: getItemImage('scroll_dodge') },
+        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: getItemImage('scroll_crit') }
       };
 
       const c = consumablesMap[itemKey];
