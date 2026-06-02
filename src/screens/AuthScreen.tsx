@@ -76,7 +76,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
         </div>
 
         <h1 className="text-4xl font-extrabold font-gothic text-center tracking-widest text-gold-400 mb-2 gold-text-shimmer">
-          БОЙЦОВСКИЙ КЛУБ
+          СРЕДИЗЕМЬЕ НАУМОВА
         </h1>
         <p className="text-xs text-center text-slate-400 font-mono tracking-widest uppercase mb-10">
           Легендарная бойцовская арена

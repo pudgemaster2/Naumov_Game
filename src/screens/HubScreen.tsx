@@ -235,7 +235,7 @@ export const HubScreen: React.FC<HubScreenProps> = ({
 
             <Button onClick={onStartCombat} fullWidth className="py-4 text-base flex justify-center items-center gap-3">
               <Swords className="w-5 h-5 animate-pulse" />
-              ВСТУПИТЬ В БОЙ С БОТОМ
+              ВСТУПИТЬ В БОЙ
             </Button>
           </div>
         </div>

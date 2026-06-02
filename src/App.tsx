@@ -29,7 +29,8 @@ function App() {
     useCombatScroll,
     surrenderCombat,
     potionsUsed,
-    activeScrolls
+    activeScrolls,
+    combatSummary
   } = useGameState();
 
   const handleSelectChoice = (type: 'attack' | 'defense', zone: any) => {
@@ -87,6 +88,7 @@ function App() {
               onSurrender={surrenderCombat}
               potionsUsedCount={potionsUsed}
               activeScrollsState={activeScrolls}
+              combatSummary={combatSummary}
             />
           </div>
         )}

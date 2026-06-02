@@ -27,6 +27,15 @@ interface BattleScreenProps {
     dodge: boolean;
     crit: boolean;
   };
+  combatSummary: {
+    goldReward: number;
+    expReward: number;
+    damageDealt: number;
+    damageReceived: number;
+    damageBlocked: number;
+    lastTurnDamageDealt: number;
+    lastTurnDamageReceived: number;
+  };
 }
 
 export const BattleScreen: React.FC<BattleScreenProps> = ({
@@ -43,6 +52,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   onSurrender,
   potionsUsedCount,
   activeScrollsState,
+  combatSummary,
 }) => {
   const [isAutoBattle, setIsAutoBattle] = useState(false);
 
@@ -134,7 +144,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         <div className={`flex flex-col justify-between h-full ${isGameOver ? 'opacity-70' : ''}`}>
           <FighterCard
             fighter={player}
-            isPlayer={true}
           />
         </div>
 
@@ -237,60 +246,66 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                   <button
                     onClick={() => onUsePotion('hp')}
                     disabled={hpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentHp >= player.maxHp}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Восстановить 50 HP (Максимум 3 зелья за бой)"
                   >
-                    <span>🧪 Здоровье ({hpPotionsCount})</span>
+                    <img src="/src/assets/items/potion_hp.png" alt="HP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <span>Здоровье ({hpPotionsCount})</span>
                   </button>
 
                   {/* Mana Potion */}
                   <button
                     onClick={() => onUsePotion('mp')}
                     disabled={mpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentMana >= player.maxMana}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Восстановить 50 MP (Максимум 3 зелья за бой)"
                   >
-                    <span>🧪 Мана ({mpPotionsCount})</span>
+                    <img src="/src/assets/items/potion_mp.png" alt="MP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <span>Мана ({mpPotionsCount})</span>
                   </button>
 
                   {/* Scroll Attack */}
                   <button
                     onClick={() => onUseScroll('atk')}
                     disabled={scrollAtkCount === 0 || activeScrollsState.atk}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Ярости (+10 к урону)"
                   >
-                    <span>📜 Свиток Урона ({scrollAtkCount})</span>
+                    <img src="/src/assets/items/scroll.png" alt="Scroll Atk" className="w-4 h-4 object-contain inline-block" />
+                    <span>Свиток Урона ({scrollAtkCount})</span>
                   </button>
 
                   {/* Scroll Defense */}
                   <button
                     onClick={() => onUseScroll('def')}
                     disabled={scrollDefCount === 0 || activeScrollsState.def}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Каменной Кожи (-5 к получаемому урону)"
                   >
-                    <span>📜 Свиток Блока ({scrollDefCount})</span>
+                    <img src="/src/assets/items/scroll.png" alt="Scroll Def" className="w-4 h-4 object-contain inline-block" />
+                    <span>Свиток Блока ({scrollDefCount})</span>
                   </button>
 
                   {/* Scroll Dodge */}
                   <button
                     onClick={() => onUseScroll('dodge')}
                     disabled={scrollDodgeCount === 0 || activeScrollsState.dodge}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate col-span-2 flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed mb-1"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate col-span-2 flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed mb-1"
                     title="Свиток Ветра (+15% уклонения)"
                   >
-                    <span>📜 Свиток Уклонения ({scrollDodgeCount})</span>
+                    <img src="/src/assets/items/scroll.png" alt="Scroll Dodge" className="w-4 h-4 object-contain inline-block" />
+                    <span>Свиток Уклонения ({scrollDodgeCount})</span>
                   </button>
 
                   {/* Scroll Crit */}
                   <button
                     onClick={() => onUseScroll('crit')}
                     disabled={scrollCritCount === 0 || activeScrollsState.crit}
-                    className="p-3 rounded border border-obsidian-800 bg-obsidian-950 hover:bg-obsidian-900/40 text-xs font-bold text-slate-350 font-mono text-left truncate col-span-2 flex items-center justify-between gap-1 disabled:opacity-40 disabled:hover:bg-obsidian-950 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-3 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-900 font-mono text-left truncate col-span-2 flex items-center gap-1.5 disabled:opacity-40 disabled:hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
                     title="Свиток Гнева (+15% крита)"
                   >
-                    <span>📜 Свиток Крит. удара ({scrollCritCount})</span>
+                    <img src="/src/assets/items/scroll.png" alt="Scroll Crit" className="w-4 h-4 object-contain inline-block" />
+                    <span>Свиток Крит. удара ({scrollCritCount})</span>
                   </button>
                 </div>
               </div>
@@ -331,7 +346,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         <div className={`flex flex-col justify-between h-full ${isGameOver ? 'opacity-70' : ''}`}>
           <FighterCard
             fighter={bot}
-            isPlayer={false}
           />
         </div>
 
@@ -388,6 +402,46 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                 </p>
               </div>
             )}
+
+            {/* Battle Stats Summary Table */}
+            <div className="mt-6 p-4.5 border border-gold-700/30 rounded bg-obsidian-950/90 text-left space-y-3.5 select-none">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-gold-500 font-gothic border-b border-obsidian-850 pb-2 flex justify-between items-center">
+                <span>Итоги сражения</span>
+                <span className="text-[10px] font-mono font-normal text-slate-400 capitalize">
+                  {combatWinner === 'player' ? 'победа' : combatWinner === 'bot' ? 'поражение' : 'ничья'}
+                </span>
+              </h4>
+              <div className="grid grid-cols-1 gap-2.5 font-mono text-xs">
+                <div className="flex justify-between items-center border-b border-obsidian-850/50 pb-1.5">
+                  <span className="text-slate-400">Получено золота:</span>
+                  <span className="text-amber-400 font-bold">+{combatSummary.goldReward} 🪙</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-obsidian-850/50 pb-1.5">
+                  <span className="text-slate-400">Получено опыта:</span>
+                  <span className="text-purple-400 font-bold">+{combatSummary.expReward} XP</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-obsidian-850/50 pb-1.5">
+                  <span className="text-slate-400">Нанесено урона:</span>
+                  <span className="text-emerald-400 font-bold">{combatSummary.damageDealt}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-obsidian-850/50 pb-1.5">
+                  <span className="text-slate-400">Получено урона:</span>
+                  <span className="text-rose-400 font-bold">{combatSummary.damageReceived}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-obsidian-850/50 pb-1.5">
+                  <span className="text-slate-400">Заблокировано урона:</span>
+                  <span className="text-sky-400 font-bold">{combatSummary.damageBlocked}</span>
+                </div>
+                <div className="flex justify-between items-center pb-0.5">
+                  <span className="text-slate-400">Последний ход:</span>
+                  <span className="text-slate-200">
+                    <span className="text-emerald-400 font-bold">+{combatSummary.lastTurnDamageDealt}</span>
+                    <span className="text-slate-500 mx-1">/</span>
+                    <span className="text-rose-455 font-bold">-{combatSummary.lastTurnDamageReceived}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
 
             <div className="pt-6 mt-6 border-t border-obsidian-800">
               <Button onClick={onExitCombat} fullWidth className="py-3">

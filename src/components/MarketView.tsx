@@ -3,6 +3,22 @@ import type { Character } from '../types';
 import { Button } from './ui/Button';
 import { ShoppingBag, Sparkles } from 'lucide-react';
 
+const getMarketItemImage = (key: string) => {
+  switch (key) {
+    case 'amulet': return '/src/assets/items/amulet.png';
+    case 'ring': return '/src/assets/items/ring.png';
+    case 'elixir': return '/src/assets/items/potion_mp.png';
+    case 'potion_hp': return '/src/assets/items/potion_hp.png';
+    case 'potion_mp': return '/src/assets/items/potion_mp.png';
+    case 'scroll_atk':
+    case 'scroll_def':
+    case 'scroll_dodge':
+    case 'scroll_crit':
+      return '/src/assets/items/scroll.png';
+    default: return '';
+  }
+};
+
 interface MarketViewProps {
   player: Character;
   onSave: (updatedPlayer: Character) => Promise<void>;
@@ -72,12 +88,12 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
     } else {
       // Consumables purchase
       const consumablesMap: Record<string, { name: string; type: any; desc: string; icon: string }> = {
-        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: '🧪' },
-        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: '🧪' },
-        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: '📜' },
-        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: '📜' },
-        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: '📜' },
-        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: '📜' }
+        potion_hp: { name: 'Зелье здоровья', type: 'potion_hp', desc: 'Восстанавливает 50 HP.', icon: '/src/assets/items/potion_hp.png' },
+        potion_mp: { name: 'Зелье маны', type: 'potion_mp', desc: 'Восстанавливает 50 MP.', icon: '/src/assets/items/potion_mp.png' },
+        scroll_atk: { name: 'Свиток Ярости', type: 'scroll_atk', desc: 'Дарует +10 к урону до конца боя.', icon: '/src/assets/items/scroll.png' },
+        scroll_def: { name: 'Свиток Каменной Кожи', type: 'scroll_def', desc: 'Снижает получаемый урон на 5 до конца боя.', icon: '/src/assets/items/scroll.png' },
+        scroll_dodge: { name: 'Свиток Ветра', type: 'scroll_dodge', desc: 'Дарует +15% к увороту до конца боя.', icon: '/src/assets/items/scroll.png' },
+        scroll_crit: { name: 'Свиток Гнева', type: 'scroll_crit', desc: 'Дарует +15% к криту до конца боя.', icon: '/src/assets/items/scroll.png' }
       };
 
       const c = consumablesMap[itemKey];
@@ -238,8 +254,8 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
                     className="border border-slate-250 p-5 rounded bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-5 hover:border-gold-555/20 transition-all"
                   >
                     <div className="flex items-center gap-5 text-center sm:text-left">
-                      <div className="text-5xl p-2.5 bg-slate-100 border border-slate-250 rounded-lg select-none">
-                        {item.icon}
+                      <div className="w-16 h-16 p-1 bg-slate-100 border border-slate-250 rounded-lg select-none flex items-center justify-center flex-shrink-0">
+                        <img src={getMarketItemImage(item.key)} alt={item.name} className="w-full h-full object-contain" />
                       </div>
                       <div>
                         <h4 className="text-base font-bold text-slate-900">{item.name}</h4>

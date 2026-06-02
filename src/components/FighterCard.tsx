@@ -2,17 +2,14 @@ import React from 'react';
 import type { Character } from '../types';
 import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { ProgressBar } from './ui/ProgressBar';
-import { ShieldAlert, Crosshair } from 'lucide-react';
 import { getPortrait } from '../utils/portraitHelper';
 
 interface FighterCardProps {
   fighter: Character;
-  isPlayer: boolean;
 }
 
 export const FighterCard: React.FC<FighterCardProps> = ({
   fighter,
-  isPlayer,
 }) => {
   const getFighterTheme = (classType: string) => {
     switch (classType) {
@@ -88,22 +85,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
         className="mb-4"
       />
 
-      {/* Bot Static Card/Status */}
-      {!isPlayer && (
-        <div className="p-4 rounded border border-obsidian-800 bg-obsidian-950/40 text-center space-y-2 select-none">
-          <p className="text-xs text-slate-500 uppercase tracking-wider font-gothic">Намерения противника скрыты</p>
-          <div className="flex justify-center gap-4 text-slate-600">
-            <div className="flex items-center gap-1">
-              <Crosshair className="w-4 h-4" />
-              <span className="text-sm font-bold font-mono">?</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <ShieldAlert className="w-4 h-4" />
-              <span className="text-sm font-bold font-mono">?</span>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Bot Static Card/Status removed */}
     </div>
   );
 };

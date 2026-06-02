@@ -15,21 +15,46 @@ import type { UserSession } from '../services/auth';
 import { db } from '../services/db';
 
 const defaultStartingItems: Item[] = [
-  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: '⛑️' },
-  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: '🧤' },
-  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: '🧥' },
-  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: '🥾' },
-  { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
-  { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
-  { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '🧪' },
-  { id: 'potion_mp_1', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
-  { id: 'potion_mp_2', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
-  { id: 'potion_mp_3', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '🧪' },
-  { id: 'scroll_atk_1', name: 'Свиток Ярости', type: 'scroll_atk', stats: {}, description: 'Увеличивает наносимый урон на +10 до конца боя.', icon: '📜' },
-  { id: 'scroll_def_1', name: 'Свиток Каменной Кожи', type: 'scroll_def', stats: {}, description: 'Снижает получаемый урон на 5 до конца боя.', icon: '📜' },
-  { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: '📜' },
-  { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: '📜' }
+  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: '/src/assets/items/helmet.png' },
+  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: '/src/assets/items/gloves.png' },
+  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: '/src/assets/items/armor.png' },
+  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: '/src/assets/items/boots.png' },
+  { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
+  { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
+  { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: '/src/assets/items/potion_hp.png' },
+  { id: 'potion_mp_1', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
+  { id: 'potion_mp_2', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
+  { id: 'potion_mp_3', name: 'Зелье маны', type: 'potion_mp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 MP в бою.', icon: '/src/assets/items/potion_mp.png' },
+  { id: 'scroll_atk_1', name: 'Свиток Ярости', type: 'scroll_atk', stats: {}, description: 'Увеличивает наносимый урон на +10 до конца боя.', icon: '/src/assets/items/scroll.png' },
+  { id: 'scroll_def_1', name: 'Свиток Каменной Кожи', type: 'scroll_def', stats: {}, description: 'Снижает получаемый урон на 5 до конца боя.', icon: '/src/assets/items/scroll.png' },
+  { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: '/src/assets/items/scroll.png' },
+  { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: '/src/assets/items/scroll.png' }
 ];
+
+const getItemImage = (type: string, oldIcon: string) => {
+  switch (type) {
+    case 'helmet': return '/src/assets/items/helmet.png';
+    case 'armor': return '/src/assets/items/armor.png';
+    case 'gloves': return '/src/assets/items/gloves.png';
+    case 'boots': return '/src/assets/items/boots.png';
+    case 'weapon': return '/src/assets/items/weapon.png';
+    case 'shield': return '/src/assets/items/shield.png';
+    case 'belt': return '/src/assets/items/leggings.png';
+    case 'ring': 
+    case 'ring1': 
+    case 'ring2': 
+      return '/src/assets/items/ring.png';
+    case 'spellbook': return '/src/assets/items/spellbook.png';
+    case 'potion_hp': return '/src/assets/items/potion_hp.png';
+    case 'potion_mp': return '/src/assets/items/potion_mp.png';
+    case 'scroll_atk':
+    case 'scroll_def':
+    case 'scroll_dodge':
+    case 'scroll_crit':
+      return '/src/assets/items/scroll.png';
+    default: return oldIcon;
+  }
+};
 
 export const useGameState = () => {
   const [screen, setScreen] = useState<ScreenState>('auth');
@@ -45,6 +70,15 @@ export const useGameState = () => {
     defense: CombatZone | null;
   }>({ attack: null, defense: null });
   const [combatWinner, setCombatWinner] = useState<'player' | 'bot' | 'draw' | null>(null);
+  const [combatSummary, setCombatSummary] = useState({
+    goldReward: 0,
+    expReward: 0,
+    damageDealt: 0,
+    damageReceived: 0,
+    damageBlocked: 0,
+    lastTurnDamageDealt: 0,
+    lastTurnDamageReceived: 0
+  });
 
   // Combat Consumable Tracking States
   const [potionsUsed, setPotionsUsed] = useState(0);
@@ -93,17 +127,12 @@ export const useGameState = () => {
             character.equipment = {};
           }
 
-          // Item icons migration for compatibility with older Windows versions
+          // Item icons migration for compatibility with custom PNG assets
           const migrateItems = (items: Item[]) => {
-            return items.map(item => {
-              if (item.type === 'helmet' && item.icon === '🪖') {
-                return { ...item, icon: '⛑️' };
-              }
-              if (item.type === 'armor' && item.icon === '👕') {
-                return { ...item, icon: '🧥' };
-              }
-              return item;
-            });
+            return items.map(item => ({
+              ...item,
+              icon: getItemImage(item.type, item.icon)
+            }));
           };
 
           character.inventory = migrateItems(character.inventory);
@@ -112,12 +141,7 @@ export const useGameState = () => {
             const k = key as keyof typeof equipment;
             const eq = equipment[k];
             if (eq) {
-              if (eq.type === 'helmet' && eq.icon === '🪖') {
-                eq.icon = '⛑️';
-              }
-              if (eq.type === 'armor' && eq.icon === '👕') {
-                eq.icon = '🧥';
-              }
+              eq.icon = getItemImage(eq.type, eq.icon);
             }
           });
 
@@ -225,6 +249,15 @@ export const useGameState = () => {
     // Reset combat potions and scrolls tracker
     setPotionsUsed(0);
     setActiveScrolls({ atk: false, def: false, dodge: false, crit: false });
+    setCombatSummary({
+      goldReward: 0,
+      expReward: 0,
+      damageDealt: 0,
+      damageReceived: 0,
+      damageBlocked: 0,
+      lastTurnDamageDealt: 0,
+      lastTurnDamageReceived: 0
+    });
 
     // Generate random bot combination of race and class
     const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
@@ -456,6 +489,9 @@ export const useGameState = () => {
     // Resolve Player Attack -> Bot Defense
     const playerAttacksZone = playerChoices.attack;
     const botBlocksZone = botChoices.defense;
+    let turnDmgDealt = 0;
+    let turnDmgReceived = 0;
+    let turnDmgBlocked = 0;
 
     if (playerAttacksZone === botBlocksZone) {
       addLog('block', `🛡️ ${player.name} атаковал в ${zoneNames[playerAttacksZone]}, но ${bot.name} заблокировал удар!`);
@@ -494,6 +530,7 @@ export const useGameState = () => {
         if (isCrit) damage *= 2;
 
         nextBotHp = Math.max(0, nextBotHp - damage);
+        turnDmgDealt = damage;
         
         let logPrefix = '';
         if (player.classType === 'mage') {
@@ -518,6 +555,30 @@ export const useGameState = () => {
 
     if (botAttacksZone === playerBlocksZone) {
       addLog('block', `🛡️ ${bot.name} атаковал в ${zoneNames[botAttacksZone]}, но вы заблокировали удар!`);
+      // Compute potential damage for block stats
+      const baseDamage = Math.floor(Math.random() * 5) + 5;
+      const botAgility = getEffectiveStat(bot, 'agility');
+      const botIntellect = getEffectiveStat(bot, 'intellect');
+      const botStrength = getEffectiveStat(bot, 'strength');
+      
+      let modifier = 0;
+      if (bot.classType === 'mage') {
+        modifier = isBotMageSpell ? botIntellect * 1.1 : botStrength * 0.6;
+      } else if (bot.classType === 'warrior') {
+        modifier = botStrength * 1.0;
+      } else if (bot.classType === 'archer') {
+        modifier = botAgility * 0.9 + botStrength * 0.3;
+      }
+      
+      let damage = Math.round(baseDamage + modifier);
+      const isCrit = Math.random() * 100 < (botAgility * 1.5);
+      
+      if (activeScrolls.def) {
+        damage = Math.max(0, damage - 5);
+      }
+      if (isCrit) damage *= 2;
+      
+      turnDmgBlocked = damage;
     } else {
       let playerDodgeChance = getEffectiveStat(player, 'agility') * 1.0;
       // Scroll of Dodge adds +15% dodge rate
@@ -547,15 +608,19 @@ export const useGameState = () => {
         }
         
         let damage = Math.round(baseDamage + modifier);
+        const rawDmg = damage;
         
         // Scroll of Defense reduces damage taken by 5
         if (activeScrolls.def) {
           damage = Math.max(0, damage - 5);
+          const scrollMitigated = (rawDmg - damage) * (isCrit ? 2 : 1);
+          turnDmgBlocked += scrollMitigated;
         }
 
         if (isCrit) damage *= 2;
 
         nextPlayerHp = Math.max(0, nextPlayerHp - damage);
+        turnDmgReceived = damage;
 
         let logPrefix = '';
         if (bot.classType === 'mage') {
@@ -573,6 +638,16 @@ export const useGameState = () => {
         }
       }
     }
+
+    // Accumulate combat stats
+    setCombatSummary(prev => ({
+      ...prev,
+      damageDealt: prev.damageDealt + turnDmgDealt,
+      damageReceived: prev.damageReceived + turnDmgReceived,
+      damageBlocked: prev.damageBlocked + turnDmgBlocked,
+      lastTurnDamageDealt: turnDmgDealt,
+      lastTurnDamageReceived: turnDmgReceived
+    }));
 
     // Prepare character statistics update values
     let expReward = 0;
@@ -602,6 +677,11 @@ export const useGameState = () => {
 
     if (winnerOutcome) {
       setCombatWinner(winnerOutcome);
+      setCombatSummary(prev => ({
+        ...prev,
+        goldReward,
+        expReward
+      }));
       
       // Calculate levels and stats
       let nextLevel = player.level;
@@ -715,7 +795,8 @@ export const useGameState = () => {
     useCombatScroll,
     surrenderCombat,
     potionsUsed,
-    activeScrolls
+    activeScrolls,
+    combatSummary
   };
 };
 
