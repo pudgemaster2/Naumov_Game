@@ -489,7 +489,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                   {renderSlot('shield', 'Щит', 'Щит')}
                   {renderSlot('gloves', 'Руки', 'Перчатки')}
                   {renderSlot('boots', 'Ноги', 'Сапоги')}
-                  {renderSlot('spellbook', 'Книга зак.', 'Книга заклинаний')}
+                  {renderSlot('spellbook', 'Книга заклинаний', 'Книга заклинаний')}
                 </div>
 
               </div>
@@ -584,8 +584,8 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                         }`}
                       >
                         <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                          <div className="text-3xl p-2 bg-slate-100 border border-slate-250 rounded select-none flex-shrink-0">
-                            {item.icon}
+                          <div className="w-12 h-12 bg-slate-100 border border-slate-250 rounded select-none flex-shrink-0 flex items-center justify-center">
+                            {renderItemIcon(item.icon, "w-9 h-9 object-contain group-hover:scale-105 transition-transform")}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">

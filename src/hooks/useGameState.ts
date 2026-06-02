@@ -16,10 +16,10 @@ import { db } from '../services/db';
 import { getItemImage } from '../utils/itemHelper';
 
 const defaultStartingItems: Item[] = [
-  { id: 'start_helmet', name: 'Кожаный шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой кожаный шлем для защиты головы.', icon: getItemImage('helmet') },
-  { id: 'start_gloves', name: 'Кожаные перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые кожаные перчатки, повышающие хватку.', icon: getItemImage('gloves') },
-  { id: 'start_armor', name: 'Кожаный нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий кожаный нагрудник, защищающий грудь.', icon: getItemImage('armor') },
-  { id: 'start_boots', name: 'Кожаные сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: getItemImage('boots') },
+  { id: 'start_helmet', name: 'Шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой шлем для защиты головы.', icon: getItemImage('helmet') },
+  { id: 'start_gloves', name: 'Перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые перчатки, повышающие хватку.', icon: getItemImage('gloves') },
+  { id: 'start_armor', name: 'Нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий нагрудник, защищающий грудь.', icon: getItemImage('armor') },
+  { id: 'start_boots', name: 'Сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: getItemImage('boots') },
   { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
   { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
   { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
@@ -103,12 +103,34 @@ export const useGameState = () => {
             character.equipment = {};
           }
 
-          // Item icons migration for compatibility with custom PNG assets
+          // Item icons & names migration for compatibility with custom PNG assets and names
           const migrateItems = (items: Item[]) => {
-            return items.map(item => ({
-              ...item,
-              icon: getItemImage(item.type, item.icon)
-            }));
+            return items.map(item => {
+              let newName = item.name;
+              newName = newName.replace(/Кожаный\s+/g, '')
+                               .replace(/Кожаные\s+/g, '')
+                               .replace(/кожаный\s+/g, '')
+                               .replace(/кожаные\s+/g, '');
+              if (newName.length > 0) {
+                newName = newName.charAt(0).toUpperCase() + newName.slice(1);
+              }
+
+              let newDesc = item.description || '';
+              newDesc = newDesc.replace(/Кожаный\s+/gi, '')
+                               .replace(/Кожаные\s+/gi, '')
+                               .replace(/кожаный\s+/gi, '')
+                               .replace(/кожаные\s+/gi, '');
+              if (newDesc.length > 0) {
+                newDesc = newDesc.charAt(0).toUpperCase() + newDesc.slice(1);
+              }
+
+              return {
+                ...item,
+                name: newName,
+                description: newDesc,
+                icon: getItemImage(item.type, item.icon)
+              };
+            });
           };
 
           character.inventory = migrateItems(character.inventory);
@@ -117,6 +139,26 @@ export const useGameState = () => {
             const k = key as keyof typeof equipment;
             const eq = equipment[k];
             if (eq) {
+              let newName = eq.name;
+              newName = newName.replace(/Кожаный\s+/g, '')
+                               .replace(/Кожаные\s+/g, '')
+                               .replace(/кожаный\s+/g, '')
+                               .replace(/кожаные\s+/g, '');
+              if (newName.length > 0) {
+                newName = newName.charAt(0).toUpperCase() + newName.slice(1);
+              }
+              eq.name = newName;
+
+              let newDesc = eq.description || '';
+              newDesc = newDesc.replace(/Кожаный\s+/gi, '')
+                               .replace(/Кожаные\s+/gi, '')
+                               .replace(/кожаный\s+/gi, '')
+                               .replace(/кожаные\s+/gi, '');
+              if (newDesc.length > 0) {
+                newDesc = newDesc.charAt(0).toUpperCase() + newDesc.slice(1);
+              }
+              eq.description = newDesc;
+
               eq.icon = getItemImage(eq.type, eq.icon);
             }
           });
