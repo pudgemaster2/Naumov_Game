@@ -50,7 +50,7 @@ export const formatLogMessage = (
     // Player Name
     if (text === playerName || lowerText === playerName.toLowerCase()) {
       elements.push(
-        <span key={keyIndex++} className="text-emerald-400 font-extrabold">
+        <span key={keyIndex++} className="text-emerald-700 font-extrabold">
           {text}
         </span>
       );
@@ -58,7 +58,7 @@ export const formatLogMessage = (
     // Bot/Enemy Name
     else if (text === botName || lowerText === botName.toLowerCase()) {
       elements.push(
-        <span key={keyIndex++} className="text-rose-400 font-extrabold">
+        <span key={keyIndex++} className="text-rose-700 font-extrabold">
           {text}
         </span>
       );
@@ -66,25 +66,25 @@ export const formatLogMessage = (
     // Player Pronouns
     else if (['вы', 'вам', 'вашу', 'вас'].includes(lowerText)) {
       elements.push(
-        <span key={keyIndex++} className="text-emerald-400 font-bold">
+        <span key={keyIndex++} className="text-emerald-700 font-bold">
           {text}
         </span>
       );
     }
     // Damage numbers
     else if (/^\d+/.test(text)) {
-      let dmgClass = 'text-slate-100 font-bold';
+      let dmgClass = 'text-slate-900 font-bold';
       if (isPlayerDealt) {
         if (type === 'crit') {
-          dmgClass = 'text-purple-400 text-[14px] md:text-[16px] font-black uppercase tracking-wide drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]';
+          dmgClass = 'text-purple-700 text-[14px] md:text-[16px] font-black uppercase tracking-wide';
         } else {
-          dmgClass = 'text-emerald-300 font-extrabold text-[13px] md:text-[14px]';
+          dmgClass = 'text-emerald-800 font-extrabold text-[13px] md:text-[14px]';
         }
       } else if (isPlayerReceived) {
         if (type === 'crit') {
-          dmgClass = 'text-rose-500 font-black text-[14px] md:text-[16px] uppercase tracking-wide drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]';
+          dmgClass = 'text-red-700 font-black text-[14px] md:text-[16px] uppercase tracking-wide';
         } else {
-          dmgClass = 'text-rose-455 font-extrabold text-[13px] md:text-[14px]';
+          dmgClass = 'text-rose-800 font-extrabold text-[13px] md:text-[14px]';
         }
       }
       elements.push(
@@ -116,21 +116,21 @@ export const CombatLog: React.FC<CombatLogProps> = ({ logs, playerName, botName 
   const getLogStyle = (type: string) => {
     switch (type) {
       case 'crit':
-        return 'border-l-2 border-purple-500/50 pl-2 bg-purple-950/10 py-1 my-1';
+        return 'border-l-2 border-purple-500 pl-2 bg-purple-50/70 py-1 my-1 text-slate-800';
       case 'hit':
-        return 'text-slate-300 pl-2 border-l border-slate-800';
+        return 'text-slate-800 pl-2 border-l border-slate-300';
       case 'block':
-        return 'text-slate-400 italic pl-2 border-l border-slate-800';
+        return 'text-slate-500 italic pl-2 border-l border-slate-300';
       case 'dodge':
-        return 'text-sky-350 italic pl-2 border-l border-sky-900/40';
+        return 'text-sky-700 italic pl-2 border-l border-sky-300';
       case 'system':
-        return 'text-amber-400 font-semibold border-l-2 border-amber-500/50 pl-2 bg-amber-950/20 py-1 my-1';
+        return 'text-amber-900 font-semibold border-l-2 border-amber-500/50 pl-2 bg-amber-50 py-1 my-1';
       case 'victory':
-        return 'text-emerald-400 font-bold border-l-2 border-emerald-500 pl-2 bg-emerald-950/20 py-2 my-2 text-sm md:text-base';
+        return 'text-emerald-800 font-bold border-l-2 border-emerald-500 pl-2 bg-emerald-50 py-2 my-2 text-sm md:text-base';
       case 'defeat':
-        return 'text-rose-400 font-bold border-l-2 border-rose-500 pl-2 bg-rose-950/20 py-2 my-2 text-sm md:text-base';
+        return 'text-rose-800 font-bold border-l-2 border-rose-500 pl-2 bg-rose-50 py-2 my-2 text-sm md:text-base';
       default:
-        return 'text-slate-400';
+        return 'text-slate-700';
     }
   };
 
@@ -138,13 +138,13 @@ export const CombatLog: React.FC<CombatLogProps> = ({ logs, playerName, botName 
     const turnIndex = Math.floor(index / 2);
     switch (turnIndex) {
       case 0:
-        return 'text-sm md:text-base font-bold opacity-100 border-b border-slate-800/40 pb-2 mb-2';
+        return 'text-sm md:text-base font-bold opacity-100 border-b border-slate-200 pb-2 mb-2';
       case 1:
-        return 'text-[12px] md:text-[14px] font-semibold opacity-85';
+        return 'text-[12px] md:text-[14px] font-semibold opacity-90';
       case 2:
-        return 'text-[11px] md:text-[13px] opacity-60';
+        return 'text-[11px] md:text-[13px] opacity-75';
       default:
-        return 'text-[10px] md:text-[12px] opacity-35';
+        return 'text-[10px] md:text-[12px] opacity-55';
     }
   };
 
@@ -152,15 +152,15 @@ export const CombatLog: React.FC<CombatLogProps> = ({ logs, playerName, botName 
   const reversedLogs = [...logs].reverse();
 
   return (
-    <div className="gothic-panel p-5 flex flex-col h-full bg-slate-900 border border-slate-750/80 rounded-lg relative overflow-hidden shadow-xl">
-      {/* Background dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 to-slate-900/40 pointer-events-none" />
+    <div className="gothic-panel p-5 flex flex-col h-full bg-slate-100/90 border border-slate-300 rounded-lg relative overflow-hidden shadow-lg text-slate-800">
+      {/* Background light gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
 
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-slate-850 pb-3 mb-4 relative z-10">
-        <Swords className="w-5 h-5 text-gold-555" />
-        <h4 className="text-sm font-semibold uppercase tracking-widest text-gold-400 font-gothic flex-1">Бой</h4>
-        <Terminal className="w-4 h-4 text-slate-500" />
+      <div className="flex items-center gap-3 border-b border-slate-300 pb-3 mb-4 relative z-10">
+        <Swords className="w-5 h-5 text-amber-700" />
+        <h4 className="text-sm font-semibold uppercase tracking-widest text-slate-900 font-gothic flex-1">Бой</h4>
+        <Terminal className="w-4 h-4 text-slate-400" />
       </div>
 
       {/* Scrollable logs area */}
@@ -176,7 +176,7 @@ export const CombatLog: React.FC<CombatLogProps> = ({ logs, playerName, botName 
               key={log.id}
               className={`font-mono transition-all duration-300 leading-relaxed ${getLogStyle(log.type)} ${getLogFontSizeAndOpacity(index)}`}
             >
-              <span className="text-[10px] text-slate-500 mr-2 font-mono">[{log.timestamp}]</span>
+              <span className="text-[10px] text-slate-400 mr-2 font-mono">[{log.timestamp}]</span>
               <span>{formatLogMessage(log.message, log.type, playerName, botName)}</span>
             </div>
           ))

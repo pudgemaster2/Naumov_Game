@@ -3,7 +3,7 @@ import type { Character, CombatZone, CombatLogEntry } from '../types';
 import { FighterCard } from '../components/FighterCard';
 import { CombatLog } from '../components/CombatLog';
 import { Button } from '../components/ui/Button';
-import { Swords, Award, RefreshCw, ChevronLeft, Crosshair, ShieldAlert, Zap } from 'lucide-react';
+import { Swords, Award, RefreshCw, Crosshair, ShieldAlert, Zap } from 'lucide-react';
 import { getItemImage } from '../utils/itemHelper';
 
 interface BattleScreenProps {
@@ -123,19 +123,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-6 animate-fade-in relative select-none">
       
       {/* Upper Navigation/Status Header */}
-      <div className="flex justify-between items-center border-b border-obsidian-800 pb-4">
-        <button
-          onClick={onExitCombat}
-          className="text-sm font-semibold text-slate-400 hover:text-gold-400 transition-colors flex items-center gap-1.5 font-mono uppercase cursor-pointer"
-          disabled={!isGameOver && player.currentHp > 0 && bot.currentHp > 0}
-          title={isGameOver ? 'Выйти в хаб' : 'Нельзя покинуть поле боя во время сражения!'}
-        >
-          <ChevronLeft className="w-5 h-5" /> Сбежать с арены
-        </button>
+      <div className="flex justify-center items-center border-b border-slate-350 pb-4">
         <div className="text-center">
-          <span className="text-base md:text-lg font-bold font-gothic tracking-widest text-gold-400 uppercase">Поединок на арене</span>
+          <span className="text-lg md:text-xl font-black font-gothic tracking-widest text-rose-950 uppercase">Поединок на арене</span>
         </div>
-        <div className="w-20" /> {/* Spacer */}
       </div>
 
       {/* 3-Column Battle Layout */}
@@ -167,7 +158,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             <button
               onClick={onSurrender}
               disabled={isGameOver}
-              className="flex-1 py-3 rounded border border-rose-900/50 bg-slate-800 text-rose-455 hover:bg-slate-750 hover:text-rose-350 hover:border-rose-500/40 text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-colors"
+              className="flex-1 py-3 rounded border border-slate-700 bg-slate-800 text-rose-500 hover:bg-slate-750 hover:border-rose-500/40 text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-all duration-250"
             >
               🏳️ Сдаться
             </button>
@@ -363,46 +354,46 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       {/* Game Over Modal Overlay */}
       {isGameOver && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian-950/80 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="gothic-panel-gold max-w-md w-full p-8 text-center bg-obsidian-900 shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-lg">
+          <div className="gothic-panel-gold max-w-md w-full p-8 text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-lg">
             
             {combatWinner === 'player' && (
-              <div className="space-y-6">
-                <div className="flex justify-center">
-                  <div className="p-4 rounded-full bg-emerald-950/50 border border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                    <Award className="w-16 h-16 animate-bounce" />
+              <div className="space-y-4">
+                <div className="flex justify-center mb-2">
+                  <div className="p-4 rounded-full bg-emerald-100 border-2 border-emerald-400 text-emerald-600 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                    <Award className="w-14 h-14 animate-bounce" />
                   </div>
                 </div>
-                <h3 className="text-3xl font-extrabold font-gothic tracking-widest text-emerald-400 gold-text-shimmer">ПОБЕДА!</h3>
-                <p className="text-sm text-slate-300">
-                  Вы одолели врага <strong className="text-slate-100">{bot.name}</strong> и вернулись с почетом! Ваша статистика побед обновлена в профиле.
+                <h3 className="text-3xl font-black font-gothic tracking-widest text-emerald-900">ПОБЕДА!</h3>
+                <p className="text-sm font-sans font-medium text-slate-900 leading-relaxed">
+                  Вы одолели врага <strong className="text-slate-950 font-bold">{bot.name}</strong> и вернулись с почетом! Ваша статистика побед обновлена в профиле.
                 </p>
               </div>
             )}
 
             {combatWinner === 'bot' && (
-              <div className="space-y-6">
-                <div className="flex justify-center">
-                  <div className="p-4 rounded-full bg-rose-950/50 border border-rose-500 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
-                    <SkullIcon className="w-16 h-16" />
+              <div className="space-y-4">
+                <div className="flex justify-center mb-2">
+                  <div className="p-4 rounded-full bg-rose-100 border-2 border-rose-400 text-rose-600 shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+                    <SkullIcon className="w-14 h-14" />
                   </div>
                 </div>
-                <h3 className="text-3xl font-extrabold font-gothic tracking-widest text-rose-500">ПОРАЖЕНИЕ</h3>
-                <p className="text-sm text-slate-300">
-                  Вы пали под натиском бойца <strong className="text-slate-100">{bot.name}</strong>. Подлечите раны в хабе и попробуйте снова!
+                <h3 className="text-3xl font-black font-gothic tracking-widest text-rose-900">ПОРАЖЕНИЕ</h3>
+                <p className="text-sm font-sans font-medium text-slate-900 leading-relaxed">
+                  Вы пали под натиском бойца <strong className="text-slate-950 font-bold">{bot.name}</strong>. Подлечите раны в хабе и попробуйте снова!
                 </p>
               </div>
             )}
 
             {combatWinner === 'draw' && (
-              <div className="space-y-6">
-                <div className="flex justify-center">
-                  <div className="p-4 rounded-full bg-slate-900 border border-slate-500 text-slate-400">
-                    <RefreshCw className="w-16 h-16" />
+              <div className="space-y-4">
+                <div className="flex justify-center mb-2">
+                  <div className="p-4 rounded-full bg-slate-200 border-2 border-slate-455 text-slate-600">
+                    <RefreshCw className="w-14 h-14" />
                   </div>
                 </div>
-                <h3 className="text-3xl font-extrabold font-gothic tracking-widest text-slate-400">НИЧЬЯ</h3>
-                <p className="text-sm text-slate-300">
-                  Взаимный нокаут! Вы и <strong className="text-slate-100">{bot.name}</strong> пали одновременно. Силы равны.
+                <h3 className="text-3xl font-black font-gothic tracking-widest text-slate-900">НИЧЬЯ</h3>
+                <p className="text-sm font-sans font-medium text-slate-900 leading-relaxed">
+                  Взаимный нокаут! Вы и <strong className="text-slate-950 font-bold">{bot.name}</strong> пали одновременно. Силы равны.
                 </p>
               </div>
             )}

@@ -41,18 +41,18 @@ export const FighterCard: React.FC<FighterCardProps> = ({
       {/* Fighter Stats Header */}
       <div className="flex justify-between items-start mb-6 relative z-10">
         <div>
-          <h3 className="text-3xl font-bold font-gothic text-slate-100 flex items-center gap-3">
+          <h3 className="text-3xl font-black font-gothic text-slate-950 flex items-center gap-3">
             {fighter.name}
-            <span className="text-sm px-3 py-1 rounded-full bg-obsidian-950 border border-obsidian-700 text-gold-400 font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-gold-300 font-mono">
               Lvl {fighter.level}
             </span>
           </h3>
-          <p className="text-sm font-semibold font-gothic tracking-widest text-gold-400/90 uppercase mt-1">
+          <p className="text-xs font-bold font-gothic tracking-widest text-slate-700 uppercase mt-1">
             {RACE_TEMPLATES[fighter.race]?.title || fighter.race} • {CLASS_TEMPLATES[fighter.classType]?.title || fighter.classType}
           </p>
         </div>
         <div className="text-right">
-          <span className="text-sm font-mono text-slate-400">Победы: {fighter.wins}</span>
+          <span className="text-xs font-mono text-slate-700 font-bold">Победы: {fighter.wins}</span>
         </div>
       </div>
 
