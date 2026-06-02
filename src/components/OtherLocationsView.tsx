@@ -170,25 +170,25 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
     switch (locationKey) {
       case 'gates':
         return (
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg space-y-6">
-            <h3 className="text-xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
-              <Shield className="w-6 h-6 text-gold-500" /> Караульный пост у Ворот
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-6 text-slate-800">
+            <h3 className="text-xl font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              <Shield className="w-6 h-6 text-gold-650" /> Караульный пост у Ворот
             </h3>
             
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+            <p className="text-sm text-slate-650 leading-relaxed font-sans">
               Главные ворота — оплот безопасности эльфийского города. Стражники неустанно следят за рубежами. Вы можете помочь им и заступить в караульный патруль на стены, чтобы заработать жалование.
             </p>
 
-            <div className="flex flex-col items-center p-8 border border-obsidian-800 rounded bg-obsidian-950/40 text-center space-y-5">
+            <div className="flex flex-col items-center p-8 border border-slate-250 rounded bg-slate-50/50 text-center space-y-5">
               {isPatrolling ? (
                 <div className="space-y-4">
-                  <div className="w-20 h-20 bg-gold-950/20 text-gold-500 border border-gold-900/30 rounded-full flex items-center justify-center text-2xl font-bold animate-pulse mx-auto">
+                  <div className="w-20 h-20 bg-amber-50 text-gold-700 border border-amber-300 rounded-full flex items-center justify-center text-2xl font-bold animate-pulse mx-auto">
                     {patrolTimeLeft}с
                   </div>
-                  <div className="text-sm text-slate-400 font-mono">Обход периметра стен...</div>
-                  <div className="w-64 h-2.5 bg-obsidian-900 rounded overflow-hidden">
+                  <div className="text-sm text-slate-650 font-mono">Обход периметра стен...</div>
+                  <div className="w-64 h-2.5 bg-slate-200 rounded overflow-hidden">
                     <div 
-                      className="h-full bg-gold-500 transition-all duration-1000"
+                      className="h-full bg-gold-600 transition-all duration-1000"
                       style={{ width: `${(5 - patrolTimeLeft) * 20}%` }}
                     />
                   </div>
@@ -197,8 +197,8 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
                 <div className="space-y-5">
                   <div className="text-5xl select-none">💂</div>
                   <div>
-                    <h4 className="text-base font-bold text-slate-200">Дозор на Стенах</h4>
-                    <p className="text-xs text-slate-500 mt-1">Время дозора: 5 секунд. Награда: 💰 15 золота.</p>
+                    <h4 className="text-base font-bold text-slate-900">Дозор на Стенах</h4>
+                    <p className="text-xs text-slate-650 mt-1">Время дозора: 5 секунд. Награда: 💰 15 золота.</p>
                   </div>
                   <Button 
                     onClick={handleStartPatrol}
@@ -214,20 +214,20 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
 
       case 'siege':
         return (
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg space-y-6">
-            <h3 className="text-xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
-              <Target className="w-6 h-6 text-gold-500" /> Осадный Расчет Катапульты
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-6 text-slate-800">
+            <h3 className="text-xl font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              <Target className="w-6 h-6 text-gold-650" /> Осадный Расчет Катапульты
             </h3>
             
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+            <p className="text-sm text-slate-650 leading-relaxed font-sans">
               На вершине южной стены установлены мощные катапульты и баллисты, способные пробивать доспехи великанов. Испытайте свою удачу и глазомер: зарядите снаряд и произведите выстрел по вражескому лагерю в лесу!
             </p>
 
-            <div className="flex flex-col items-center p-8 border border-obsidian-800 rounded bg-obsidian-950/40 text-center space-y-5">
+            <div className="flex flex-col items-center p-8 border border-slate-250 rounded bg-slate-50/50 text-center space-y-5">
               <div className="text-6xl select-none">☄️</div>
               <div>
-                <h4 className="text-base font-bold text-slate-200">Произвести Выстрел по Окрестностям</h4>
-                <p className="text-xs text-slate-500 mt-1">Испытайте удачу. Случайная награда: золото или боевой опыт.</p>
+                <h4 className="text-base font-bold text-slate-900">Произвести Выстрел по Окрестностям</h4>
+                <p className="text-xs text-slate-650 mt-1">Испытайте удачу. Случайная награда: золото или боевой опыт.</p>
               </div>
               <Button 
                 onClick={handleFireCatapult}
@@ -241,20 +241,20 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
 
       case 'post':
         return (
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg space-y-6">
-            <h3 className="text-xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
-              <Timer className="w-6 h-6 text-gold-500" /> Плац Оборонительного Поста
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-6 text-slate-800">
+            <h3 className="text-xl font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              <Timer className="w-6 h-6 text-gold-650" /> Плац Оборонительного Поста
             </h3>
             
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+            <p className="text-sm text-slate-650 leading-relaxed font-sans">
               Оборонительный пост стражи кипит жизнью. Новобранцы и элитные лучники отрабатывают боевые стойки под бдительным взором сержанта. Здесь вы можете потренироваться в искусстве фехтования, пожертвовав золото на амуницию.
             </p>
 
-            <div className="flex flex-col items-center p-8 border border-obsidian-800 rounded bg-obsidian-950/40 text-center space-y-5">
+            <div className="flex flex-col items-center p-8 border border-slate-250 rounded bg-slate-50/50 text-center space-y-5">
               <div className="text-5xl select-none">⚔️</div>
               <div>
-                <h4 className="text-base font-bold text-slate-200">Боевой Тренировочный Спарринг</h4>
-                <p className="text-xs text-slate-500 mt-1">Стоимость: 💰 10 золота. Награда: ⭐ +25 Опыта (XP).</p>
+                <h4 className="text-base font-bold text-slate-900">Боевой Тренировочный Спарринг</h4>
+                <p className="text-xs text-slate-650 mt-1">Стоимость: 💰 10 золота. Награда: ⭐ +25 Опыта (XP).</p>
               </div>
               <Button 
                 onClick={handleTrain}
@@ -268,27 +268,27 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
 
       case 'upper_tier':
         return (
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg space-y-6">
-            <h3 className="text-xl font-bold font-gothic text-gold-400 border-b border-obsidian-800 pb-3 flex items-center gap-3">
-              <HelpCircle className="w-6 h-6 text-gold-500" /> Дерево Старейшин (Верхний Ярус)
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-6 text-slate-800">
+            <h3 className="text-xl font-bold font-gothic text-slate-900 border-b border-slate-250 pb-3 flex items-center gap-3">
+              <HelpCircle className="w-6 h-6 text-gold-650" /> Дерево Старейшин (Верхний Ярус)
             </h3>
             
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+            <p className="text-sm text-slate-650 leading-relaxed font-sans">
               Верхний ярус утопает в листве гигантского дуба. Здесь, среди веревочных переходов, живет верховный Старейшина эльфов по имени Элронд. Он помнит времена основания города и готов побеседовать о судьбе мира.
             </p>
 
-            <div className="border border-obsidian-800 p-6 rounded bg-obsidian-950/40 space-y-5">
+            <div className="border border-slate-250 p-6 rounded bg-slate-50/50 space-y-5">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-obsidian-900 border border-gold-600/30 rounded-full flex items-center justify-center text-4xl shadow-[inset_0_2px_5px_rgba(0,0,0,0.8)] select-none">
+                <div className="w-16 h-16 bg-slate-100 border border-slate-300 rounded-full flex items-center justify-center text-4xl shadow-[inset_0_2px_5px_rgba(0,0,0,0.1)] select-none">
                   👴
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-slate-200 font-gothic">Архивариус Элронд</h4>
-                  <p className="text-xs text-slate-500 uppercase tracking-widest font-mono">Старейшина города</p>
+                  <h4 className="text-base font-bold text-slate-900 font-gothic">Архивариус Элронд</h4>
+                  <p className="text-xs text-slate-650 uppercase tracking-widest font-mono">Старейшина города</p>
                 </div>
               </div>
               
-              <div className="p-5 border-l-2 border-gold-500 bg-obsidian-900/50 rounded-r text-sm text-slate-300 italic font-serif leading-relaxed space-y-3">
+              <div className="p-5 border-l-2 border-gold-500 bg-amber-50 rounded-r text-sm text-slate-800 italic font-serif leading-relaxed space-y-3">
                 <p>«Приветствую тебя, молодой боец {player.name}. Твой путь ведет на славную Арену, где куется дух бойцов.»</p>
                 <p>«Помни эльфийскую мудрость: Сила дает мощный замах меча, Ловкость защищает от ударов врага и позволяет поразить уязвимое место, а Выносливость дает стойкость пережить самую свирепую атаку.»</p>
                 <p>«Зарабатывай золото в боях и у кузнеца, трать его с умом на усиление духа. Пусть твой клинок никогда не затупится!»</p>
@@ -318,12 +318,12 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-obsidian-800 pb-5">
+      <div className="flex justify-between items-center border-b border-slate-300 pb-5">
         <div>
-          <h2 className="text-3xl font-bold font-gothic text-gold-400 tracking-widest flex items-center gap-3">
+          <h2 className="text-3xl font-bold font-gothic text-slate-900 tracking-widest flex items-center gap-3">
             🧭 {getTitle()}
           </h2>
-          <p className="text-sm font-mono text-slate-500 mt-2 uppercase tracking-wider">
+          <p className="text-sm font-mono text-slate-650 mt-2 uppercase tracking-wider">
             Эльфийский Город-Государство и его рубежи
           </p>
         </div>
@@ -335,24 +335,20 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Info panel */}
         <div className="space-y-4">
-          <div className="gothic-panel p-6 bg-obsidian-900/80 rounded-lg flex flex-col items-center text-center">
-            <div className="w-28 h-28 bg-obsidian-950 border border-gold-600/30 rounded-full flex items-center justify-center text-5xl mb-5 relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)]">
-              🏰
-            </div>
-            
-            <h3 className="text-lg font-bold font-gothic text-slate-200">Эльфийская Цитадель</h3>
-            <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+          <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg flex flex-col items-center text-center text-slate-800">
+            <h3 className="text-lg font-bold font-gothic text-slate-900">Эльфийская Цитадель</h3>
+            <p className="text-sm text-slate-650 mt-3 leading-relaxed">
               Древний форпост в лесах, защищающий жителей от диких лесных чудовищ.
             </p>
 
-            <div className="w-full mt-6 p-4 bg-obsidian-950 border border-obsidian-800 rounded font-mono text-sm flex justify-between items-center text-slate-300">
+            <div className="w-full mt-6 p-4 bg-slate-200 border border-slate-300 rounded font-mono text-sm flex justify-between items-center text-slate-750">
               <span>Золото:</span>
-              <span className="text-amber-400 font-bold text-base">💰 {player.gold}</span>
+              <span className="text-amber-700 font-extrabold text-base">💰 {player.gold}</span>
             </div>
 
-            <div className="w-full mt-3 p-4 bg-obsidian-950 border border-obsidian-800 rounded font-mono text-sm flex justify-between items-center text-slate-300">
+            <div className="w-full mt-3 p-4 bg-slate-200 border border-slate-300 rounded font-mono text-sm flex justify-between items-center text-slate-750">
               <span>Опыт (XP):</span>
-              <span className="text-gold-400 font-bold text-base">⭐ {player.experience}</span>
+              <span className="text-amber-700 font-extrabold text-base">⭐ {player.experience}</span>
             </div>
           </div>
         </div>
@@ -363,8 +359,8 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
 
           {/* Activity log */}
           {log && (
-            <div className="p-5 border border-gold-900/30 rounded bg-gold-950/10 text-sm text-gold-300 font-serif leading-relaxed whitespace-pre-line animate-fade-in flex items-start gap-2.5">
-              <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-400 mt-0.5" />
+            <div className="p-5 border border-gold-300 rounded bg-amber-50 text-sm text-amber-900 font-serif leading-relaxed whitespace-pre-line animate-fade-in flex items-start gap-2.5">
+              <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-700 mt-0.5" />
               <span>{log}</span>
             </div>
           )}

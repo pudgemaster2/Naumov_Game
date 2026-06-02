@@ -42,8 +42,6 @@ export interface Equipment {
   belt?: Item;
   ring1?: Item;
   ring2?: Item;
-  ring3?: Item;
-  ring4?: Item;
   spellbook?: Item;
 }
 

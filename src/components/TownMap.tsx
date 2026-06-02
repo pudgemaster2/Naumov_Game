@@ -30,61 +30,61 @@ const TOWN_LOCATIONS: TownLocationData[] = [
     key: 'upper_tier',
     name: 'Верхний Ярус',
     description: 'Веревочные мосты и дома старейшин в кронах священных деревьев.',
-    style: { top: '6.5%', left: '50%', width: '22%', height: '7%' }
+    style: { top: '6.5%', left: '50%', width: '26.4%', height: '8.4%' }
   },
   {
     key: 'temple',
     name: 'Храм',
     description: 'Величественное святилище у водопада, где эльфы молят о благословении.',
-    style: { top: '25.5%', left: '54%', width: '13%', height: '7%' }
+    style: { top: '25.5%', left: '54%', width: '15.6%', height: '8.4%' }
   },
   {
     key: 'arena',
     name: 'Арена',
     description: 'Круглая каменная платформа, на которой бойцы доказывают свою силу.',
-    style: { top: '34.5%', left: '33.5%', width: '13%', height: '7%' }
+    style: { top: '34.5%', left: '33.5%', width: '15.6%', height: '8.4%' }
   },
   {
     key: 'market',
     name: 'Рынок',
     description: 'Шумный рынок с редкими снадобьями, амулетами и экипировкой.',
-    style: { top: '37.5%', left: '76.5%', width: '14%', height: '7%' }
+    style: { top: '37.5%', left: '76.5%', width: '16.8%', height: '8.4%' }
   },
   {
     key: 'tavern',
     name: 'Таверна',
     description: 'Место сбора путешественников. Здесь наливают эль и играют в кости.',
-    style: { top: '41.5%', left: '90%', width: '16%', height: '7%' }
+    style: { top: '41.5%', left: '90%', width: '19.2%', height: '8.4%' }
   },
   {
     key: 'forge',
     name: 'Кузница',
     description: 'Каменный горн кузнеца Торвальда. Здесь куются мечи и доспехи.',
-    style: { top: '52.5%', left: '24%', width: '16%', height: '7%' }
+    style: { top: '52.5%', left: '24%', width: '19.2%', height: '8.4%' }
   },
   {
     key: 'my_house',
     name: 'Мой Дом',
     description: 'Ваш личный уютный уголок. Здесь находится кровать, сундук и снаряжение.',
-    style: { top: '57.5%', left: '68%', width: '16%', height: '7%' }
+    style: { top: '57.5%', left: '68%', width: '19.2%', height: '8.4%' }
   },
   {
     key: 'gates',
     name: 'Главные Врата',
     description: 'Оборонительные врата города. Отсюда воины уходят патрулировать стены.',
-    style: { top: '74%', left: '36%', width: '24%', height: '7%' }
+    style: { top: '74%', left: '36%', width: '28.8%', height: '8.4%' }
   },
   {
     key: 'siege',
     name: 'Осадные Орудия',
     description: 'Мощная баллиста и катапульта для обороны города. Можно сделать выстрел.',
-    style: { top: '73%', left: '76%', width: '28%', height: '7%' }
+    style: { top: '73%', left: '76%', width: '33.6%', height: '8.4%' }
   },
   {
     key: 'post',
     name: 'Оборонительный Пост',
     description: 'Башня стражи, где новобранцы тренируются и изучают военное ремесло.',
-    style: { top: '92.5%', left: '84%', width: '32%', height: '7%' }
+    style: { top: '92.5%', left: '84%', width: '38.4%', height: '8.4%' }
   },
 ];
 

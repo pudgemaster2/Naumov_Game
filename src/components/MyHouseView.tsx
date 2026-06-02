@@ -93,8 +93,6 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
       // Find first empty ring slot
       if (!equipment.ring1) slotKey = 'ring1';
       else if (!equipment.ring2) slotKey = 'ring2';
-      else if (!equipment.ring3) slotKey = 'ring3';
-      else if (!equipment.ring4) slotKey = 'ring4';
       else slotKey = 'ring1'; // overwrite ring1 if all full
     }
 
@@ -253,8 +251,6 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
       case 'spellbook': return '📖';
       case 'ring1':
       case 'ring2':
-      case 'ring3':
-      case 'ring4':
         return '💍';
       default: return '📦';
     }
@@ -287,28 +283,28 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
   };
 
   // Slot Renderer
-  const renderSlot = (slotKey: keyof Equipment | 'ring1' | 'ring2' | 'ring3' | 'ring4', label: string, name: string) => {
+  const renderSlot = (slotKey: keyof Equipment, label: string, name: string) => {
     const equippedItem = player.equipment?.[slotKey];
     return (
       <div 
         onClick={() => equippedItem && handleUnequipItem(slotKey as keyof Equipment)}
         className={`w-24 h-24 border rounded flex flex-col items-center justify-center cursor-pointer transition-all duration-200 select-none relative group ${
           equippedItem
-            ? 'border-gold-500 bg-gold-950/40 hover:bg-rose-950/40 hover:border-rose-500 shadow-[0_0_12px_rgba(197,160,40,0.4)]'
-            : 'border-obsidian-800 bg-obsidian-950/60 hover:border-gold-700/50 hover:bg-obsidian-900/50'
+            ? 'border-gold-500 bg-gold-500/10 hover:bg-rose-500/10 hover:border-rose-500 shadow-[0_0_12px_rgba(197,160,40,0.3)]'
+            : 'border-slate-300 bg-slate-100 hover:border-gold-500/50 hover:bg-gold-500/5'
         }`}
         title={equippedItem ? undefined : `Ячейка: ${name}`}
       >
         {equippedItem ? (
           <>
             <span className="text-4xl group-hover:scale-105 transition-transform">{equippedItem.icon}</span>
-            <span className="text-[10px] text-slate-300 font-mono mt-1.5 text-center truncate w-full px-1.5">{equippedItem.name}</span>
+            <span className="text-[10px] text-slate-800 font-mono mt-1.5 text-center truncate w-full px-1.5">{equippedItem.name}</span>
             <ItemHtmlTooltip item={equippedItem} />
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center opacity-30 select-none pointer-events-none">
+          <div className="flex flex-col items-center justify-center opacity-40 select-none pointer-events-none">
             <span className="text-3xl leading-none">{getSlotBackgroundIcon(slotKey)}</span>
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider mt-1 text-slate-400">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider mt-1 text-slate-600">
               {label}
             </span>
           </div>
@@ -522,10 +518,10 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
             {/* Symmetrical Layout */}
             <div className="flex flex-col items-center gap-4 max-w-3xl mx-auto">
-              <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 md:gap-5">
+              <div className="flex flex-row items-center justify-center gap-1 sm:gap-1.5 md:gap-2.5">
                 
                 {/* Left Column: 4 Slots */}
-                <div className="flex flex-col gap-2.5 items-end">
+                <div className="flex flex-col gap-1 items-end">
                   {renderSlot('helmet', 'Шлем', 'Шлем')}
                   {renderSlot('armor', 'Доспех', 'Нагрудный доспех')}
                   {renderSlot('belt', 'Пояс', 'Пояс')}
@@ -534,17 +530,17 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
                 {/* Center Portrait */}
                 <div className="flex flex-col items-center">
-                  <div className="border border-gold-900/40 rounded-lg overflow-hidden bg-obsidian-950 p-2 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+                  <div className="border border-gold-500/30 rounded-lg overflow-hidden bg-slate-200 p-2 shadow-[0_0_20px_rgba(0,0,0,0.1)]">
                     <img 
                       src={getPortrait(player.race, player.classType)} 
                       alt={`${player.race} ${player.classType}`} 
-                      className="w-[320px] h-[460px] object-cover rounded border border-obsidian-800" 
+                      className="w-[320px] h-[460px] object-cover rounded border border-slate-300" 
                     />
                   </div>
                 </div>
 
                 {/* Right Column: 4 Slots */}
-                <div className="flex flex-col gap-2.5 items-start">
+                <div className="flex flex-col gap-1 items-start">
                   {renderSlot('shield', 'Щит', 'Щит')}
                   {renderSlot('gloves', 'Руки', 'Перчатки')}
                   {renderSlot('boots', 'Ноги', 'Сапоги')}
@@ -554,11 +550,9 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
               </div>
 
               {/* Rings Row below the portrait & vertical grids */}
-              <div className="flex flex-wrap justify-center gap-3 mt-1.5">
+              <div className="flex flex-wrap justify-center gap-1.5 mt-1.5">
                 {renderSlot('ring1', 'Кольцо', 'Кольцо 1')}
                 {renderSlot('ring2', 'Кольцо', 'Кольцо 2')}
-                {renderSlot('ring3', 'Кольцо', 'Кольцо 3')}
-                {renderSlot('ring4', 'Кольцо', 'Кольцо 4')}
               </div>
 
               <div className="mt-1.5 text-center space-y-1">
@@ -576,43 +570,43 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             
             {/* Attribute sheet */}
-            <div className="md:col-span-5 gothic-panel p-5 bg-obsidian-900/80 rounded-lg space-y-4">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gold-400 font-gothic border-b border-obsidian-800 pb-2">
+            <div className="md:col-span-5 gothic-panel p-5 bg-slate-100/90 rounded-lg space-y-4 text-slate-800 border-slate-300">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic border-b border-slate-300 pb-2">
                 Характеристики персонажа
               </h3>
               
               <div className="grid grid-cols-2 gap-4 text-center py-2 font-mono">
-                <div className="p-3.5 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">Сила</div>
-                  <div className="text-xl font-bold text-slate-200 mt-1">{getEffectiveStatValue('strength')}</div>
-                  {gearStats.strength > 0 && <div className="text-xs text-emerald-400 font-bold mt-0.5">+{gearStats.strength} от вещ.</div>}
+                <div className="p-3.5 bg-slate-50 border border-slate-300">
+                  <div className="text-xs font-semibold text-slate-600 uppercase">Сила</div>
+                  <div className="text-xl font-bold text-rose-700 mt-1">{getEffectiveStatValue('strength')}</div>
+                  {gearStats.strength > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.strength} от вещ.</div>}
                 </div>
-                <div className="p-3.5 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">Ловкость</div>
-                  <div className="text-xl font-bold text-slate-200 mt-1">{getEffectiveStatValue('agility')}</div>
-                  {gearStats.agility > 0 && <div className="text-xs text-emerald-400 font-bold mt-0.5">+{gearStats.agility} от вещ.</div>}
+                <div className="p-3.5 bg-slate-50 border border-slate-300">
+                  <div className="text-xs font-semibold text-slate-600 uppercase">Ловкость</div>
+                  <div className="text-xl font-bold text-amber-700 mt-1">{getEffectiveStatValue('agility')}</div>
+                  {gearStats.agility > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.agility} от вещ.</div>}
                 </div>
-                <div className="p-3.5 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">Выносл.</div>
-                  <div className="text-xl font-bold text-slate-200 mt-1">{getEffectiveStatValue('endurance')}</div>
-                  {gearStats.endurance > 0 && <div className="text-xs text-emerald-400 font-bold mt-0.5">+{gearStats.endurance} от вещ.</div>}
+                <div className="p-3.5 bg-slate-50 border border-slate-300">
+                  <div className="text-xs font-semibold text-slate-600 uppercase">Выносл.</div>
+                  <div className="text-xl font-bold text-emerald-700 mt-1">{getEffectiveStatValue('endurance')}</div>
+                  {gearStats.endurance > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.endurance} от вещ.</div>}
                 </div>
-                <div className="p-3.5 bg-obsidian-950 rounded border border-obsidian-800">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">Интеллект</div>
-                  <div className="text-xl font-bold text-slate-200 mt-1">{getEffectiveStatValue('intellect')}</div>
-                  {gearStats.intellect > 0 && <div className="text-xs text-emerald-400 font-bold mt-0.5">+{gearStats.intellect} от вещ.</div>}
+                <div className="p-3.5 bg-slate-50 border border-slate-300">
+                  <div className="text-xs font-semibold text-slate-600 uppercase">Интеллект</div>
+                  <div className="text-xl font-bold text-sky-700 mt-1">{getEffectiveStatValue('intellect')}</div>
+                  {gearStats.intellect > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.intellect} от вещ.</div>}
                 </div>
               </div>
             </div>
 
             {/* Inventory Backpack */}
-            <div className="md:col-span-7 gothic-panel p-5 bg-obsidian-900/80 rounded-lg space-y-4">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gold-400 font-gothic border-b border-obsidian-800 pb-2 flex items-center gap-2">
-                <Package className="w-4 h-4 text-gold-500" /> Рюкзак (Инвентарь)
+            <div className="md:col-span-7 gothic-panel p-5 bg-slate-100/90 rounded-lg space-y-4 text-slate-800 border-slate-300">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic border-b border-slate-300 pb-2 flex items-center gap-2">
+                <Package className="w-4 h-4 text-gold-555" /> Рюкзак (Инвентарь)
               </h3>
 
               {!player.inventory || player.inventory.length === 0 ? (
-                <div className="text-center p-8 bg-obsidian-950/40 border border-obsidian-800 rounded text-slate-500 font-mono text-sm">
+                <div className="text-center p-8 bg-slate-200 border border-slate-300 rounded text-slate-650 font-mono text-sm">
                   Рюкзак пуст. Все вещи надеты или у вас нет предметов в инвентаре.
                 </div>
               ) : (
@@ -638,26 +632,26 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                         onClick={handleItemClick}
                         className={`border p-4 rounded flex items-center justify-between gap-3.5 transition-all select-none relative group ${
                           isCombatOnly
-                            ? 'border-obsidian-850 bg-obsidian-950/20 opacity-60 cursor-default'
+                            ? 'border-slate-200 bg-slate-150/40 opacity-60 cursor-default text-slate-700'
                             : isHpPotion && isHpFull
-                            ? 'border-obsidian-800 bg-obsidian-950/35 opacity-70 cursor-not-allowed'
-                            : 'border-obsidian-800 bg-obsidian-950/40 hover:border-gold-555/50 hover:bg-gold-950/10 cursor-pointer shadow-sm hover:shadow-[0_0_8px_rgba(197,160,40,0.15)]'
+                            ? 'border-slate-200 bg-slate-150/50 opacity-70 cursor-not-allowed text-slate-700'
+                            : 'border-slate-300 bg-slate-50/70 hover:border-gold-500/50 hover:bg-gold-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_8px_rgba(197,160,40,0.15)] text-slate-800'
                         }`}
                       >
                         <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                          <div className="text-3xl p-2 bg-obsidian-900 border border-obsidian-800 rounded select-none flex-shrink-0">
+                          <div className="text-3xl p-2 bg-slate-100 border border-slate-250 rounded select-none flex-shrink-0">
                             {item.icon}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="text-sm font-bold text-slate-200">{item.name}</h4>
+                              <h4 className="text-sm font-bold text-slate-900">{item.name}</h4>
                               {isCombatOnly && (
-                                <span className="text-[9px] font-mono text-amber-500/70 border border-amber-900/30 bg-amber-950/20 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                                <span className="text-[9px] font-mono text-amber-700 border border-amber-300 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
                                   Боевой
                                 </span>
                               )}
                               {isHpPotion && (
-                                <span className="text-[9px] font-mono text-emerald-555 border border-emerald-900/30 bg-emerald-950/20 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                                <span className="text-[9px] font-mono text-emerald-700 border border-emerald-300 bg-emerald-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
                                   Зелье HP
                                 </span>
                               )}
@@ -667,12 +661,12 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                             {Object.entries(item.stats).length > 0 && (
                               <div className="mt-1 flex flex-row gap-2 flex-wrap">
                                 {Object.entries(item.stats).map(([key, val]) => {
-                                  let colorClass = 'text-slate-350';
+                                  let colorClass = 'text-slate-600';
                                   let label = key;
-                                  if (key === 'strength') { colorClass = 'text-rose-455'; label = 'Сила'; }
-                                  if (key === 'agility') { colorClass = 'text-emerald-455'; label = 'Ловк.'; }
-                                  if (key === 'endurance') { colorClass = 'text-red-455'; label = 'Выносл.'; }
-                                  if (key === 'intellect') { colorClass = 'text-sky-455'; label = 'Инт.'; }
+                                  if (key === 'strength') { colorClass = 'text-rose-700'; label = 'Сила'; }
+                                  if (key === 'agility') { colorClass = 'text-amber-700'; label = 'Ловк.'; }
+                                  if (key === 'endurance') { colorClass = 'text-emerald-700'; label = 'Выносл.'; }
+                                  if (key === 'intellect') { colorClass = 'text-sky-700'; label = 'Инт.'; }
                                   return (
                                     <span key={key} className={`text-xs font-mono font-bold ${colorClass}`}>
                                       +{val} {label}
