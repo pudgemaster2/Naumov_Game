@@ -156,10 +156,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             <button
               onClick={() => setIsAutoBattle(!isAutoBattle)}
               disabled={isGameOver}
-              className={`flex-1 py-3 rounded border text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-all duration-200 ${
+              className={`flex-1 py-3 rounded border text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-all duration-250 ${
                 isAutoBattle
-                  ? 'bg-amber-600 border-amber-400 text-obsidian-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] animate-pulse'
-                  : 'bg-obsidian-950 border-obsidian-800 text-amber-500 hover:border-amber-900/50 hover:bg-obsidian-900/40'
+                  ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-[0_0_12px_rgba(245,158,11,0.35)] animate-pulse'
+                  : 'bg-slate-800 border-slate-700 text-amber-500 hover:bg-slate-750 hover:border-amber-500/40'
               }`}
             >
               {isAutoBattle ? '⏸️ Автобой вкл' : '▶️ Автобой'}
@@ -167,7 +167,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             <button
               onClick={onSurrender}
               disabled={isGameOver}
-              className="flex-1 py-3 rounded border border-rose-950 bg-obsidian-950 text-rose-500 hover:bg-rose-950/20 text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-colors"
+              className="flex-1 py-3 rounded border border-rose-900/50 bg-slate-800 text-rose-455 hover:bg-slate-750 hover:text-rose-350 hover:border-rose-500/40 text-xs md:text-sm font-bold font-gothic tracking-wider uppercase cursor-pointer transition-colors"
             >
               🏳️ Сдаться
             </button>
@@ -176,10 +176,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           {/* Active Scroll Buffs Row */}
           {(activeScrollsState.atk || activeScrollsState.def || activeScrollsState.dodge || activeScrollsState.crit) && (
             <div className="flex gap-2 justify-center flex-wrap">
-              {activeScrollsState.atk && <span className="bg-rose-950/40 text-rose-455 border border-rose-500/30 text-xs px-2.5 py-1 rounded font-mono uppercase font-bold">Урон +10</span>}
-              {activeScrollsState.def && <span className="bg-sky-950/40 text-sky-455 border border-sky-500/30 text-xs px-2.5 py-1 rounded font-mono uppercase font-bold">Защита +5</span>}
-              {activeScrollsState.dodge && <span className="bg-emerald-950/40 text-emerald-455 border border-emerald-500/30 text-xs px-2.5 py-1 rounded font-mono uppercase font-bold">Уворот +15%</span>}
-              {activeScrollsState.crit && <span className="bg-amber-950/40 text-amber-455 border border-amber-500/30 text-xs px-2.5 py-1 rounded font-mono uppercase font-bold">Крит +15%</span>}
+              {activeScrollsState.atk && <span className="bg-rose-100 text-rose-800 border border-rose-300 text-xs px-2.5 py-1 rounded font-mono font-bold shadow-sm">Урон +10</span>}
+              {activeScrollsState.def && <span className="bg-sky-100 text-sky-850 border border-sky-300 text-xs px-2.5 py-1 rounded font-mono font-bold shadow-sm">Защита +5</span>}
+              {activeScrollsState.dodge && <span className="bg-emerald-100 text-emerald-850 border border-emerald-300 text-xs px-2.5 py-1 rounded font-mono font-bold shadow-sm">Уворот +15%</span>}
+              {activeScrollsState.crit && <span className="bg-amber-100 text-amber-850 border border-amber-300 text-xs px-2.5 py-1 rounded font-mono font-bold shadow-sm">Крит +15%</span>}
             </div>
           )}
 
@@ -189,8 +189,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               {/* Attack Selection */}
               <div className="space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <Crosshair className="w-4.5 h-4.5 text-rose-500 animate-pulse" />
-                  <span className="text-sm font-bold tracking-widest uppercase text-rose-400 font-gothic">Атака (Куда бить)</span>
+                  <Crosshair className="w-4.5 h-4.5 text-rose-600 animate-pulse" />
+                  <span className="text-sm font-bold tracking-widest uppercase text-rose-500 font-gothic">Атака (Куда бить)</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {zones.map((zone) => (
@@ -198,10 +198,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                       key={`attack-${zone.key}`}
                       onClick={() => !isAutoBattle && onSelectChoice('attack', zone.key)}
                       disabled={isAutoBattle}
-                      className={`py-3.5 px-2 text-sm font-semibold rounded border transition-all duration-150 uppercase tracking-widest font-gothic select-none ${
+                      className={`py-3.5 px-2 text-sm font-bold rounded border transition-all duration-200 uppercase tracking-widest font-gothic select-none ${
                         playerChoices.attack === zone.key
-                          ? 'bg-rose-950/40 text-rose-300 border-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]'
-                          : 'bg-obsidian-950/80 text-slate-400 border-obsidian-800 hover:border-rose-900/60 hover:text-rose-400'
+                          ? 'bg-gradient-to-r from-rose-600 to-rose-700 border-2 border-rose-500 text-white shadow-[0_0_12px_rgba(220,38,38,0.45)] scale-[1.03]'
+                          : 'bg-slate-800 border border-slate-750 text-slate-100 hover:bg-slate-750 hover:border-rose-800 hover:text-rose-400'
                       } ${isAutoBattle ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       {zone.label}
@@ -213,8 +213,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               {/* Block Selection */}
               <div className="space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <ShieldAlert className="w-4.5 h-4.5 text-sky-400" />
-                  <span className="text-sm font-bold tracking-widest uppercase text-sky-400 font-gothic">Блок (Что защищать)</span>
+                  <ShieldAlert className="w-4.5 h-4.5 text-sky-600" />
+                  <span className="text-sm font-bold tracking-widest uppercase text-sky-500 font-gothic">Блок (Что защищать)</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {zones.map((zone) => (
@@ -222,10 +222,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                       key={`defense-${zone.key}`}
                       onClick={() => !isAutoBattle && onSelectChoice('defense', zone.key)}
                       disabled={isAutoBattle}
-                      className={`py-3.5 px-2 text-sm font-semibold rounded border transition-all duration-150 uppercase tracking-widest font-gothic select-none ${
+                      className={`py-3.5 px-2 text-sm font-bold rounded border transition-all duration-200 uppercase tracking-widest font-gothic select-none ${
                         playerChoices.defense === zone.key
-                          ? 'bg-sky-950/40 text-sky-300 border-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.3)]'
-                          : 'bg-obsidian-950/80 text-slate-400 border-obsidian-800 hover:border-sky-900/60 hover:text-sky-400'
+                          ? 'bg-gradient-to-r from-sky-600 to-sky-700 border-2 border-sky-500 text-white shadow-[0_0_12px_rgba(14,165,233,0.45)] scale-[1.03]'
+                          : 'bg-slate-800 border border-slate-750 text-slate-100 hover:bg-slate-750 hover:border-sky-850 hover:text-sky-400'
                       } ${isAutoBattle ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       {zone.label}
@@ -314,23 +314,26 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               {/* Ready check & Submit */}
               <div className="pt-4 border-t border-obsidian-800 space-y-3">
                 <div className="flex justify-center gap-4 text-xs font-bold font-mono">
-                  <span className={playerChoices.attack ? 'text-emerald-400' : 'text-slate-500'}>
+                  <span className={playerChoices.attack ? 'text-emerald-600 font-extrabold' : 'text-slate-500'}>
                     {playerChoices.attack ? '✓ Атака выбрана' : '✗ Атака не выбрана'}
                   </span>
-                  <span className={playerChoices.defense ? 'text-emerald-400' : 'text-slate-500'}>
+                  <span className={playerChoices.defense ? 'text-emerald-600 font-extrabold' : 'text-slate-500'}>
                     {playerChoices.defense ? '✓ Блок выбран' : '✗ Блок не выбран'}
                   </span>
                 </div>
 
-                <Button
+                <button
                   onClick={onSubmitTurn}
                   disabled={!isTurnReady || isAutoBattle}
-                  fullWidth
-                  className="py-4.5 text-base flex justify-center items-center gap-2"
+                  className={`w-full py-4 rounded-lg text-base font-bold font-gothic tracking-widest flex justify-center items-center gap-2 transition-all duration-300 shadow-md ${
+                    !isTurnReady || isAutoBattle
+                      ? 'bg-slate-200 border border-slate-350 text-slate-450 cursor-not-allowed opacity-50'
+                      : 'bg-gradient-to-r from-amber-500 via-gold-500 to-amber-600 border border-gold-600 text-slate-950 hover:from-amber-600 hover:to-amber-700 hover:shadow-[0_0_15px_rgba(217,119,6,0.4)] cursor-pointer active:scale-95'
+                  }`}
                 >
                   <Swords className="w-5.5 h-5.5" />
                   УДАРИТЬ (ХОД)
-                </Button>
+                </button>
               </div>
             </div>
           ) : (
