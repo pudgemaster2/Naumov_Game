@@ -489,7 +489,7 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                   {renderSlot('shield', 'Щит', 'Щит')}
                   {renderSlot('gloves', 'Руки', 'Перчатки')}
                   {renderSlot('boots', 'Ноги', 'Сапоги')}
-                  {renderSlot('spellbook', 'Книга заклинаний', 'Книга заклинаний')}
+                  {renderSlot('spellbook', 'Боевой пояс', 'Боевой пояс')}
                 </div>
 
               </div>
