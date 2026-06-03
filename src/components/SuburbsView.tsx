@@ -37,9 +37,10 @@ const DUNGEONS: DungeonData[] = [
 
 interface SuburbsViewProps {
   onBack: () => void;
+  onEnterDungeon: (dungKey: string) => void;
 }
 
-export const SuburbsView: React.FC<SuburbsViewProps> = ({ onBack }) => {
+export const SuburbsView: React.FC<SuburbsViewProps> = ({ onBack, onEnterDungeon }) => {
   const [hoveredDungeon, setHoveredDungeon] = useState<DungeonData | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
 
@@ -68,7 +69,7 @@ export const SuburbsView: React.FC<SuburbsViewProps> = ({ onBack }) => {
           <button
             key={dung.key}
             type="button"
-            onClick={() => setModalText(`Вы подошли к входу: ${dung.name}. В данный момент проход завален камнями. Драконы и чудовища появятся здесь позже!`)}
+            onClick={() => onEnterDungeon(dung.key)}
             onMouseEnter={() => setHoveredDungeon(dung)}
             onMouseLeave={() => setHoveredDungeon(null)}
             className="absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-md cursor-pointer select-none town-hotzone"

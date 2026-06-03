@@ -8,6 +8,7 @@ import { TavernView } from '../components/TavernView';
 import { TempleView } from '../components/TempleView';
 import { MarketView } from '../components/MarketView';
 import { SuburbsView } from '../components/SuburbsView';
+import { DungeonCrawler } from '../components/DungeonCrawler';
 import { OtherLocationsView } from '../components/OtherLocationsView';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { StatTable } from '../components/StatTable';
@@ -15,14 +16,6 @@ import { Button } from '../components/ui/Button';
 import { GeneralChat } from '../components/GeneralChat';
 import { Swords, Award, LogOut, Sparkles, Heart } from 'lucide-react';
 import { getPortrait } from '../utils/portraitHelper';
-
-interface HubScreenProps {
-  player: Character;
-  onStartCombat: () => void;
-  onLogout: () => void;
-  onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
-  onChangeCharacter?: () => void;
-}
 
 type SubLocation =
   | 'town'
@@ -36,7 +29,20 @@ type SubLocation =
   | 'siege'
   | 'post'
   | 'upper_tier'
-  | 'suburbs';
+  | 'suburbs'
+  | 'dungeon';
+
+interface HubScreenProps {
+  player: Character;
+  onStartCombat: (customEnemy?: any) => void;
+  onLogout: () => void;
+  onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
+  onChangeCharacter?: () => void;
+  activeSubLoc: SubLocation;
+  setActiveSubLoc: (loc: SubLocation) => void;
+  dungeonState: any;
+  setDungeonState: (state: any) => void;
+}
 
 // getPortrait is now imported from portraitHelper
 
@@ -46,8 +52,11 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   onLogout,
   onUpdatePlayer,
   onChangeCharacter,
+  activeSubLoc,
+  setActiveSubLoc,
+  dungeonState,
+  setDungeonState,
 }) => {
-  const [activeSubLoc, setActiveSubLoc] = useState<SubLocation>('town');
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [tempName, setTempName] = useState(player.name);
 
@@ -136,6 +145,35 @@ export const HubScreen: React.FC<HubScreenProps> = ({
         return (
           <SuburbsView 
             onBack={() => handleNavigateTo('town')} 
+            onEnterDungeon={(dungKey) => {
+              // Set up initial coordinate grids for the dungeons
+              const isCatacomb = dungKey === 'dungeon_2';
+              setDungeonState({
+                activeDungeonKey: dungKey,
+                x: isCatacomb ? 1 : 3,
+                y: isCatacomb ? 10 : 8,
+                dir: 'N',
+                visited: [isCatacomb ? '1,10' : '3,8'],
+                defeatedMonsters: [],
+                openedChests: [],
+                unlockedDoors: [],
+                keys: [],
+                log: [`Вы вошли в подземелье: ${dungKey === 'dungeon_1' ? 'Заброшенная Канализация' : dungKey === 'dungeon_2' ? 'Катакомбы Мучений' : 'Тайное Логово'}`]
+              });
+              handleNavigateTo('dungeon');
+            }}
+          />
+        );
+      case 'dungeon':
+        return (
+          <DungeonCrawler
+            player={player}
+            onSave={onUpdatePlayer}
+            onBack={() => handleNavigateTo('gates')}
+            dungeonKey={dungeonState?.activeDungeonKey || 'dungeon_1'}
+            onStartCombat={(monster) => onStartCombat(monster)}
+            initialDungeonState={dungeonState}
+            onSaveDungeonState={setDungeonState}
           />
         );
       case 'siege':

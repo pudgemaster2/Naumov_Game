@@ -65,6 +65,15 @@ export const useGameState = () => {
     crit: false,
   });
 
+  // Dungeon Crawler States
+  const [activeSubLoc, setActiveSubLoc] = useState<any>('town');
+  const [dungeonState, setDungeonState] = useState<any>(null);
+  const [combatDungeonContext, setCombatDungeonContext] = useState<{
+    dungeonId: string;
+    monsterCoord: string;
+    isBoss: boolean;
+  } | null>(null);
+
   // Subscribe to auth state changes
   useEffect(() => {
     setAuthLoading(true);
@@ -260,7 +269,7 @@ export const useGameState = () => {
     setScreen('hub');
   };
 
-  const startCombat = () => {
+  const startCombat = (customEnemy?: Character & { isDungeonBoss?: boolean; dungeonId?: string; monsterCoord?: string }) => {
     if (!player) return;
 
     // Retain player current HP and current Mana (no auto healing!)
@@ -277,48 +286,68 @@ export const useGameState = () => {
       lastTurnDamageReceived: 0
     });
 
-    // Generate random bot combination of race and class
-    const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
-    const classes: CharacterClass[] = ['warrior', 'archer', 'mage'];
-    
-    const botRace = races[Math.floor(Math.random() * races.length)];
-    const botClass = classes[Math.floor(Math.random() * classes.length)];
-    
-    const raceTemplate = RACE_TEMPLATES[botRace];
-    const classTemplate = CLASS_TEMPLATES[botClass];
-    
-    const botNames = ['Грязный Гарри', 'Безумный Джо', 'Свирепый Орк', 'Теневой Убийца', 'Старый Гэндальф', 'Адепт Хаоса'];
-    const botName = botNames[Math.floor(Math.random() * botNames.length)];
+    let generatedBot: Character;
+    let raceTemplate: any;
+    let classTemplate: any;
 
-    // Base stats matching combination
-    const baseStats = raceTemplate.baseStats;
-    const modifiers = classTemplate.statModifiers;
-    
-    const levelDiff = player.level - 1;
-    const adjustedStats = {
-      strength: baseStats.strength + modifiers.strength + levelDiff,
-      agility: baseStats.agility + modifiers.agility + levelDiff,
-      endurance: baseStats.endurance + modifiers.endurance + levelDiff,
-      intellect: baseStats.intellect + modifiers.intellect + levelDiff,
-    };
-    const adjustedMaxHp = adjustedStats.endurance * 10;
-    const adjustedMaxMana = adjustedStats.intellect * 10;
+    if (customEnemy) {
+      generatedBot = { ...customEnemy };
+      raceTemplate = RACE_TEMPLATES[customEnemy.race];
+      classTemplate = CLASS_TEMPLATES[customEnemy.classType];
+      
+      if (customEnemy.dungeonId && customEnemy.monsterCoord) {
+        setCombatDungeonContext({
+          dungeonId: customEnemy.dungeonId,
+          monsterCoord: customEnemy.monsterCoord,
+          isBoss: !!customEnemy.isDungeonBoss
+        });
+      }
+    } else {
+      // Generate random bot combination of race and class
+      const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
+      const classes: CharacterClass[] = ['warrior', 'archer', 'mage'];
+      
+      const botRace = races[Math.floor(Math.random() * races.length)];
+      const botClass = classes[Math.floor(Math.random() * classes.length)];
+      
+      raceTemplate = RACE_TEMPLATES[botRace];
+      classTemplate = CLASS_TEMPLATES[botClass];
+      
+      const botNames = ['Грязный Гарри', 'Безумный Джо', 'Свирепый Орк', 'Теневой Убийца', 'Старый Гэндальф', 'Адепт Хаоса'];
+      const botName = botNames[Math.floor(Math.random() * botNames.length)];
 
-    const generatedBot: Character = {
-      name: botName,
-      race: botRace,
-      classType: botClass,
-      level: player.level,
-      experience: 0,
-      gold: 0,
-      stats: adjustedStats,
-      currentHp: adjustedMaxHp,
-      maxHp: adjustedMaxHp,
-      currentMana: adjustedMaxMana,
-      maxMana: adjustedMaxMana,
-      wins: 0,
-      losses: 0,
-    };
+      // Base stats matching combination
+      const baseStats = raceTemplate.baseStats;
+      const modifiers = classTemplate.statModifiers;
+      
+      const levelDiff = player.level - 1;
+      const adjustedStats = {
+        strength: baseStats.strength + modifiers.strength + levelDiff,
+        agility: baseStats.agility + modifiers.agility + levelDiff,
+        endurance: baseStats.endurance + modifiers.endurance + levelDiff,
+        intellect: baseStats.intellect + modifiers.intellect + levelDiff,
+      };
+      const adjustedMaxHp = adjustedStats.endurance * 10;
+      const adjustedMaxMana = adjustedStats.intellect * 10;
+
+      generatedBot = {
+        name: botName,
+        race: botRace,
+        classType: botClass,
+        level: player.level,
+        experience: 0,
+        gold: 0,
+        stats: adjustedStats,
+        currentHp: adjustedMaxHp,
+        maxHp: adjustedMaxHp,
+        currentMana: adjustedMaxMana,
+        maxMana: adjustedMaxMana,
+        wins: 0,
+        losses: 0,
+      };
+
+      setCombatDungeonContext(null);
+    }
 
     setBot(generatedBot);
     setCombatWinner(null);
@@ -680,13 +709,23 @@ export const useGameState = () => {
       goldReward = 5;
     } else if (nextPlayerHp <= 0) {
       winnerOutcome = 'bot';
-      expReward = 5;
-      goldReward = 2;
+      expReward = combatDungeonContext ? 10 : 5;
+      goldReward = combatDungeonContext ? 5 : 2;
       addLoss = 1;
     } else if (nextBotHp <= 0) {
       winnerOutcome = 'player';
-      expReward = 20;
-      goldReward = 10;
+      if (combatDungeonContext) {
+        if (combatDungeonContext.isBoss) {
+          expReward = 120;
+          goldReward = 60;
+        } else {
+          expReward = 40;
+          goldReward = 20;
+        }
+      } else {
+        expReward = 20;
+        goldReward = 10;
+      }
       addWin = 1;
     }
 
@@ -781,6 +820,43 @@ export const useGameState = () => {
     // Retain current health and mana levels (no auto healing!)
     setBot(null);
     setScreen('hub');
+
+    if (combatDungeonContext) {
+      const coord = combatDungeonContext.monsterCoord;
+      if (combatWinner === 'player') {
+        setDungeonState((prev: any) => {
+          if (!prev) return prev;
+          const defeated = [...(prev.defeatedMonsters || [])];
+          if (!defeated.includes(coord)) {
+            defeated.push(coord);
+          }
+          const time = new Date().toLocaleTimeString();
+          const log = [...(prev.log || [])];
+          log.push(`[${time}] Вы победили монстра ${bot?.name || 'Враг'}!`);
+          if (combatDungeonContext.isBoss) {
+            log.push(`[${time}] 🎉 Властелин этого подземелья повержен! Проход свободен.`);
+          }
+          return {
+            ...prev,
+            defeatedMonsters: defeated,
+            log
+          };
+        });
+      } else if (combatWinner === 'bot') {
+        setDungeonState((prev: any) => {
+          if (!prev) return prev;
+          const time = new Date().toLocaleTimeString();
+          const log = [...(prev.log || [])];
+          log.push(`[${time}] 💀 Вы проиграли бой с ${bot?.name || 'Враг'}. Восстановите силы и попробуйте снова.`);
+          return {
+            ...prev,
+            log
+          };
+        });
+      }
+      setActiveSubLoc('dungeon');
+      setCombatDungeonContext(null);
+    }
   };
 
   const updateCharacter = async (updatedPlayer: Character) => {
@@ -814,7 +890,11 @@ export const useGameState = () => {
     surrenderCombat,
     potionsUsed,
     activeScrolls,
-    combatSummary
+    combatSummary,
+    activeSubLoc,
+    setActiveSubLoc,
+    dungeonState,
+    setDungeonState
   };
 };
 
