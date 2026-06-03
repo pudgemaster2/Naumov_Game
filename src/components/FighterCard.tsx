@@ -46,9 +46,9 @@ export const FighterCard: React.FC<FighterCardProps> = ({
 
   const renderItemIcon = (icon: string) => {
     if (icon.includes('/') || icon.includes('.') || icon.startsWith('data:')) {
-      return <img src={icon} alt="item" className="w-7 h-7 object-contain transition-transform duration-200 group-hover:scale-105" />;
+      return <img src={icon} alt="item" className="w-11 h-11 object-contain transition-transform duration-200 group-hover:scale-105" />;
     }
-    return <span className="text-xl leading-none transition-transform duration-200 group-hover:scale-105">{icon}</span>;
+    return <span className="text-3xl leading-none transition-transform duration-200 group-hover:scale-105">{icon}</span>;
   };
 
   const getSlotBackgroundIcon = (slotKey: string) => {
@@ -90,25 +90,29 @@ export const FighterCard: React.FC<FighterCardProps> = ({
     
     return (
       <div 
-        className={`w-11 h-11 border rounded-lg flex flex-col items-center justify-center relative group select-none transition-colors duration-200 ${
+        className={`w-18 h-18 border rounded-xl flex flex-col items-center justify-center relative group select-none transition-all duration-200 ${
           equippedItem
-            ? 'border-gold-600/50 bg-gold-500/10 hover:border-gold-400 hover:bg-gold-500/15 shadow-[0_0_8px_rgba(197,160,40,0.15)]'
-            : 'border-obsidian-800 bg-obsidian-950/40 hover:border-obsidian-700'
+            ? 'border-gold-600/50 bg-gold-500/10 hover:border-gold-400 hover:bg-gold-500/20 shadow-[0_0_12px_rgba(197,160,40,0.2)]'
+            : 'border-obsidian-800 bg-obsidian-950/40 hover:border-obsidian-700 hover:bg-obsidian-900/20'
         }`}
         title={equippedItem ? undefined : `Ячейка: ${slotTitle}`}
       >
         {equippedItem ? (
           <>
-            {renderItemIcon(equippedItem.icon)}
+            <div className="p-0.5">{renderItemIcon(equippedItem.icon)}</div>
+            <span className="text-[8px] text-slate-400 font-mono mt-0.5 text-center truncate w-full px-1 relative z-10">{equippedItem.name}</span>
             <ItemHtmlTooltip item={equippedItem} />
           </>
         ) : (
           <div className="flex flex-col items-center justify-center opacity-25 select-none pointer-events-none w-full h-full p-1 text-center">
             {getSlotBackgroundIcon(slotKey).includes('/') ? (
-              <img src={getSlotBackgroundIcon(slotKey)} alt={label} className="w-5 h-5 object-contain grayscale" />
+              <img src={getSlotBackgroundIcon(slotKey)} alt={label} className="w-8 h-8 object-contain grayscale" />
             ) : (
-              <span className="text-xl leading-none">{getSlotBackgroundIcon(slotKey)}</span>
+              <span className="text-2xl leading-none">{getSlotBackgroundIcon(slotKey)}</span>
             )}
+            <span className="text-[8px] font-mono font-bold uppercase tracking-wider mt-1 text-slate-500">
+              {label}
+            </span>
           </div>
         )}
       </div>
@@ -141,7 +145,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
 
       {/* Symmetrical Layout for Equipment and Avatar */}
       <div className="flex flex-col items-center gap-3 mb-6 relative z-10">
-        <div className="flex flex-row items-center justify-center gap-2">
+        <div className="flex flex-row items-center justify-center gap-2.5">
           
           {/* Left Column: 4 Slots */}
           <div className="flex flex-col gap-2">
@@ -152,8 +156,8 @@ export const FighterCard: React.FC<FighterCardProps> = ({
           </div>
 
           {/* Center Portrait */}
-          <div className="flex justify-center items-center bg-obsidian-950/60 p-2.5 rounded border border-obsidian-800/50 shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
-            <div className={`p-1 bg-obsidian-900 border shadow-md w-28 h-40 overflow-hidden rounded ${getFighterTheme(fighter.classType)}`}>
+          <div className="flex justify-center items-center bg-obsidian-950/60 p-3 rounded-xl border border-obsidian-800/50 shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
+            <div className={`p-1 bg-obsidian-900 border shadow-md w-56 h-80 overflow-hidden rounded-lg ${getFighterTheme(fighter.classType)}`}>
               <img 
                 src={getFighterPortrait()} 
                 alt={fighter.sprite ? `${fighter.sprite} monster` : `${fighter.race} ${fighter.classType}`} 
