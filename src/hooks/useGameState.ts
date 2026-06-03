@@ -8,14 +8,22 @@ import type {
   CombatLogEntry, 
   ScreenState, 
   LogEntryType,
-  Item
+  Item,
+  Equipment
 } from '../types';
 import { auth } from '../services/auth';
 import type { UserSession } from '../services/auth';
 import { db } from '../services/db';
 import { getItemImage } from '../utils/itemHelper';
 
+// Class-specific weapon and off-hand starting images
+import staffImg from '../assets/items/staff.png';
+import bowImg from '../assets/items/bow.png';
+import quiverImg from '../assets/items/quiver.png';
+import spellbookImg from '../assets/items/spellbook.png';
+
 const defaultStartingItems: Item[] = [
+  { id: 'start_combat_belt', name: 'Боевой пояс', type: 'spellbook', stats: { endurance: 1 }, description: 'Пояс с ячейками для зелий и свитков. Позволяет использовать припасы в бою.', icon: getItemImage('spellbook') },
   { id: 'start_helmet', name: 'Шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой шлем для защиты головы.', icon: getItemImage('helmet') },
   { id: 'start_gloves', name: 'Перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые перчатки, повышающие хватку.', icon: getItemImage('gloves') },
   { id: 'start_armor', name: 'Нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий нагрудник, защищающий грудь.', icon: getItemImage('armor') },
@@ -65,6 +73,15 @@ export const useGameState = () => {
     crit: false,
   });
 
+  // Dungeon Crawler States
+  const [activeSubLoc, setActiveSubLoc] = useState<any>('town');
+  const [dungeonState, setDungeonState] = useState<any>(null);
+  const [combatDungeonContext, setCombatDungeonContext] = useState<{
+    dungeonId: string;
+    monsterCoord: string;
+    isBoss: boolean;
+  } | null>(null);
+
   // Subscribe to auth state changes
   useEffect(() => {
     setAuthLoading(true);
@@ -102,6 +119,96 @@ export const useGameState = () => {
           if (!character.equipment) {
             character.equipment = {};
           }
+          const hasBeltInInv = character.inventory.some((item: any) => item.type === 'spellbook');
+          const hasBeltInEq = character.equipment.spellbook !== undefined;
+          if (!hasBeltInInv && !hasBeltInEq) {
+            character.inventory.push({
+              id: 'start_combat_belt',
+              name: 'Боевой пояс',
+              type: 'spellbook',
+              stats: { endurance: 1 },
+              description: 'Пояс с ячейками для зелий и свитков. Позволяет использовать припасы в бою.',
+              icon: getItemImage('spellbook')
+            });
+          }
+
+          // Weapon and Shield migration for existing players
+          const classType = character.classType;
+          if (character.equipment.weapon === undefined) {
+            if (classType === 'warrior') {
+              character.equipment.weapon = {
+                id: 'start_weapon_warrior',
+                name: 'Короткий меч',
+                type: 'weapon',
+                stats: { strength: 2 },
+                description: 'Стальной гладиус новобранца.',
+                icon: getItemImage('weapon')
+              };
+            } else if (classType === 'archer') {
+              character.equipment.weapon = {
+                id: 'start_weapon_archer',
+                name: 'Простой лук',
+                type: 'weapon',
+                stats: { agility: 2 },
+                description: 'Упругий тисовый лук.',
+                icon: bowImg
+              };
+            } else if (classType === 'mage') {
+              character.equipment.weapon = {
+                id: 'start_weapon_mage',
+                name: 'Магический посох',
+                type: 'weapon',
+                stats: { intellect: 2 },
+                description: 'Посох послушника, хорошо проводящий ману.',
+                icon: staffImg
+              };
+            }
+          }
+
+          if (character.equipment.shield === undefined) {
+            if (classType === 'warrior') {
+              character.equipment.shield = {
+                id: 'start_shield_warrior',
+                name: 'Деревянный щит',
+                type: 'shield',
+                stats: { endurance: 1 },
+                description: 'Круглый дубовый щит с кованым умбоном.',
+                icon: getItemImage('shield')
+              };
+            } else if (classType === 'archer') {
+              character.equipment.shield = {
+                id: 'start_shield_archer',
+                name: 'Колчан стрел',
+                type: 'shield',
+                stats: { agility: 1 },
+                description: 'Кожаный колчан со стрелами с оперением.',
+                icon: quiverImg
+              };
+            } else if (classType === 'mage') {
+              character.equipment.shield = {
+                id: 'start_shield_mage',
+                name: 'Книга заклинаний',
+                type: 'shield',
+                stats: { intellect: 1 },
+                description: 'Фолиант с базовыми заклинаниями.',
+                icon: spellbookImg
+              };
+            }
+          }
+
+          // Dynamic stats recalculation for gear consistency
+          let equipEndurance = 0;
+          let equipIntellect = 0;
+          Object.values(character.equipment).forEach((item: any) => {
+            if (item && item.stats) {
+              if (item.stats.endurance) equipEndurance += item.stats.endurance;
+              if (item.stats.intellect) equipIntellect += item.stats.intellect;
+            }
+          });
+          character.maxHp = (character.stats.endurance + equipEndurance) * 10;
+          character.maxMana = (character.stats.intellect + equipIntellect) * 10;
+          character.currentHp = Math.min(character.currentHp !== undefined ? character.currentHp : character.maxHp, character.maxHp);
+          character.currentMana = Math.min(character.currentMana !== undefined ? character.currentMana : character.maxMana, character.maxMana);
 
           // Item icons & names migration for compatibility with custom PNG assets and names
           const migrateItems = (items: Item[]) => {
@@ -233,9 +340,86 @@ export const useGameState = () => {
       endurance: baseStats.endurance + modifiers.endurance,
       intellect: baseStats.intellect + modifiers.intellect,
     };
+
+    const startingEquipment: Equipment = {
+      spellbook: defaultStartingItems.find(i => i.id === 'start_combat_belt'),
+      helmet: defaultStartingItems.find(i => i.id === 'start_helmet'),
+      gloves: defaultStartingItems.find(i => i.id === 'start_gloves'),
+      armor: defaultStartingItems.find(i => i.id === 'start_armor'),
+      boots: defaultStartingItems.find(i => i.id === 'start_boots'),
+    };
+
+    if (classType === 'warrior') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_warrior',
+        name: 'Короткий меч',
+        type: 'weapon',
+        stats: { strength: 2 },
+        description: 'Стальной гладиус новобранца.',
+        icon: getItemImage('weapon')
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_warrior',
+        name: 'Деревянный щит',
+        type: 'shield',
+        stats: { endurance: 1 },
+        description: 'Круглый дубовый щит с кованым умбоном.',
+        icon: getItemImage('shield')
+      };
+    } else if (classType === 'archer') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_archer',
+        name: 'Простой лук',
+        type: 'weapon',
+        stats: { agility: 2 },
+        description: 'Упругий тисовый лук.',
+        icon: bowImg
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_archer',
+        name: 'Колчан стрел',
+        type: 'shield',
+        stats: { agility: 1 },
+        description: 'Кожаный колчан со стрелами с оперением.',
+        icon: quiverImg
+      };
+    } else if (classType === 'mage') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_mage',
+        name: 'Магический посох',
+        type: 'weapon',
+        stats: { intellect: 2 },
+        description: 'Посох послушника, хорошо проводящий ману.',
+        icon: staffImg
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_mage',
+        name: 'Книга заклинаний',
+        type: 'shield',
+        stats: { intellect: 1 },
+        description: 'Фолиант с базовыми заклинаниями.',
+        icon: spellbookImg
+      };
+    }
+
+    const startingInventory = defaultStartingItems.filter(
+      item => !['start_combat_belt', 'start_helmet', 'start_gloves', 'start_armor', 'start_boots'].includes(item.id)
+    );
+
+    let equipEndurance = 0;
+    let equipIntellect = 0;
+    Object.values(startingEquipment).forEach((item) => {
+      if (item && item.stats) {
+        if (item.stats.endurance) equipEndurance += item.stats.endurance;
+        if (item.stats.intellect) equipIntellect += item.stats.intellect;
+      }
+    });
+
+    const totalEndurance = stats.endurance + equipEndurance;
+    const totalIntellect = stats.intellect + equipIntellect;
     
-    const maxHp = stats.endurance * 10;
-    const maxMana = stats.intellect * 10;
+    const maxHp = totalEndurance * 10;
+    const maxMana = totalIntellect * 10;
     
     const newPlayer: Character = {
       name: name.trim() || `Игрок_${Math.floor(Math.random() * 1000)}`,
@@ -251,8 +435,8 @@ export const useGameState = () => {
       maxMana: maxMana,
       wins: 0,
       losses: 0,
-      inventory: [...defaultStartingItems],
-      equipment: {},
+      inventory: startingInventory,
+      equipment: startingEquipment,
     };
     
     setPlayer(newPlayer);
@@ -260,7 +444,7 @@ export const useGameState = () => {
     setScreen('hub');
   };
 
-  const startCombat = () => {
+  const startCombat = (customEnemy?: Character & { isDungeonBoss?: boolean; dungeonId?: string; monsterCoord?: string }) => {
     if (!player) return;
 
     // Retain player current HP and current Mana (no auto healing!)
@@ -277,48 +461,86 @@ export const useGameState = () => {
       lastTurnDamageReceived: 0
     });
 
-    // Generate random bot combination of race and class
-    const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
-    const classes: CharacterClass[] = ['warrior', 'archer', 'mage'];
-    
-    const botRace = races[Math.floor(Math.random() * races.length)];
-    const botClass = classes[Math.floor(Math.random() * classes.length)];
-    
-    const raceTemplate = RACE_TEMPLATES[botRace];
-    const classTemplate = CLASS_TEMPLATES[botClass];
-    
-    const botNames = ['Грязный Гарри', 'Безумный Джо', 'Свирепый Орк', 'Теневой Убийца', 'Старый Гэндальф', 'Адепт Хаоса'];
-    const botName = botNames[Math.floor(Math.random() * botNames.length)];
+    let generatedBot: Character;
+    let raceTemplate: any;
+    let classTemplate: any;
 
-    // Base stats matching combination
-    const baseStats = raceTemplate.baseStats;
-    const modifiers = classTemplate.statModifiers;
-    
-    const levelDiff = player.level - 1;
-    const adjustedStats = {
-      strength: baseStats.strength + modifiers.strength + levelDiff,
-      agility: baseStats.agility + modifiers.agility + levelDiff,
-      endurance: baseStats.endurance + modifiers.endurance + levelDiff,
-      intellect: baseStats.intellect + modifiers.intellect + levelDiff,
-    };
-    const adjustedMaxHp = adjustedStats.endurance * 10;
-    const adjustedMaxMana = adjustedStats.intellect * 10;
+    if (customEnemy && typeof customEnemy === 'object' && 'name' in customEnemy && typeof (customEnemy as any).name === 'string') {
+      generatedBot = { ...customEnemy };
+      raceTemplate = RACE_TEMPLATES[customEnemy.race];
+      classTemplate = CLASS_TEMPLATES[customEnemy.classType];
+      
+      if (customEnemy.dungeonId && customEnemy.monsterCoord) {
+        setCombatDungeonContext({
+          dungeonId: customEnemy.dungeonId,
+          monsterCoord: customEnemy.monsterCoord,
+          isBoss: !!customEnemy.isDungeonBoss
+        });
+      }
+    } else {
+      // Generate random bot combination of race and class
+      const races: CharacterRace[] = ['human', 'elf', 'gnome', 'orc'];
+      const classes: CharacterClass[] = ['warrior', 'archer', 'mage'];
+      
+      const botRace = races[Math.floor(Math.random() * races.length)];
+      const botClass = classes[Math.floor(Math.random() * classes.length)];
+      
+      raceTemplate = RACE_TEMPLATES[botRace];
+      classTemplate = CLASS_TEMPLATES[botClass];
+      
+      const botNames = ['Грязный Гарри', 'Безумный Джо', 'Свирепый Орк', 'Теневой Убийца', 'Старый Гэндальф', 'Адепт Хаоса'];
+      const botName = botNames[Math.floor(Math.random() * botNames.length)];
 
-    const generatedBot: Character = {
-      name: botName,
-      race: botRace,
-      classType: botClass,
-      level: player.level,
-      experience: 0,
-      gold: 0,
-      stats: adjustedStats,
-      currentHp: adjustedMaxHp,
-      maxHp: adjustedMaxHp,
-      currentMana: adjustedMaxMana,
-      maxMana: adjustedMaxMana,
-      wins: 0,
-      losses: 0,
-    };
+      // Base stats matching combination
+      const baseStats = raceTemplate.baseStats;
+      const modifiers = classTemplate.statModifiers;
+      
+      const levelDiff = player.level - 1;
+      const adjustedStats = {
+        strength: baseStats.strength + modifiers.strength + levelDiff,
+        agility: baseStats.agility + modifiers.agility + levelDiff,
+        endurance: baseStats.endurance + modifiers.endurance + levelDiff,
+        intellect: baseStats.intellect + modifiers.intellect + levelDiff,
+      };
+      const adjustedMaxHp = adjustedStats.endurance * 10;
+      const adjustedMaxMana = adjustedStats.intellect * 10;
+
+      const botEquipment: any = {
+        helmet: { id: 'bot_helmet', name: 'Шлем гладиатора', type: 'helmet', stats: { endurance: 1 }, description: 'Тяжелый шлем арены.', icon: getItemImage('helmet') },
+        armor: { id: 'bot_armor', name: 'Нагрудник гладиатора', type: 'armor', stats: { endurance: 2 }, description: 'Защитные пластины.', icon: getItemImage('armor') },
+        gloves: { id: 'bot_gloves', name: 'Рукавицы гладиатора', type: 'gloves', stats: { strength: 1 }, description: 'Боевые перчатки.', icon: getItemImage('gloves') },
+        boots: { id: 'bot_boots', name: 'Сапоги гладиатора', type: 'boots', stats: { agility: 1 }, description: 'Поношенные сапоги арены.', icon: getItemImage('boots') }
+      };
+      
+      if (botClass === 'warrior') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Короткий меч', type: 'weapon', stats: { strength: 2 }, description: 'Гладиус ближнего боя.', icon: getItemImage('weapon') };
+        botEquipment.shield = { id: 'bot_shield', name: 'Деревянный щит', type: 'shield', stats: { endurance: 1 }, description: 'Круглый щит.', icon: getItemImage('shield') };
+      } else if (botClass === 'archer') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Простой лук', type: 'weapon', stats: { agility: 2 }, description: 'Охотничий лук.', icon: getItemImage('weapon') };
+      } else if (botClass === 'mage') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Магический посох', type: 'weapon', stats: { intellect: 2 }, description: 'Посох послушника.', icon: getItemImage('weapon') };
+        botEquipment.spellbook = { id: 'bot_belt', name: 'Боевой пояс', type: 'spellbook', stats: { intellect: 1 }, description: 'Пояс с ячейками.', icon: getItemImage('spellbook') };
+      }
+
+      generatedBot = {
+        name: botName,
+        race: botRace,
+        classType: botClass,
+        level: player.level,
+        experience: 0,
+        gold: 0,
+        stats: adjustedStats,
+        currentHp: adjustedMaxHp,
+        maxHp: adjustedMaxHp,
+        currentMana: adjustedMaxMana,
+        maxMana: adjustedMaxMana,
+        wins: 0,
+        losses: 0,
+        equipment: botEquipment,
+      };
+
+      setCombatDungeonContext(null);
+    }
 
     setBot(generatedBot);
     setCombatWinner(null);
@@ -680,13 +902,23 @@ export const useGameState = () => {
       goldReward = 5;
     } else if (nextPlayerHp <= 0) {
       winnerOutcome = 'bot';
-      expReward = 5;
-      goldReward = 2;
+      expReward = combatDungeonContext ? 10 : 5;
+      goldReward = combatDungeonContext ? 5 : 2;
       addLoss = 1;
     } else if (nextBotHp <= 0) {
       winnerOutcome = 'player';
-      expReward = 20;
-      goldReward = 10;
+      if (combatDungeonContext) {
+        if (combatDungeonContext.isBoss) {
+          expReward = 120;
+          goldReward = 60;
+        } else {
+          expReward = 40;
+          goldReward = 20;
+        }
+      } else {
+        expReward = 20;
+        goldReward = 10;
+      }
       addWin = 1;
     }
 
@@ -781,6 +1013,43 @@ export const useGameState = () => {
     // Retain current health and mana levels (no auto healing!)
     setBot(null);
     setScreen('hub');
+
+    if (combatDungeonContext) {
+      const coord = combatDungeonContext.monsterCoord;
+      if (combatWinner === 'player') {
+        setDungeonState((prev: any) => {
+          if (!prev) return prev;
+          const defeated = [...(prev.defeatedMonsters || [])];
+          if (!defeated.includes(coord)) {
+            defeated.push(coord);
+          }
+          const time = new Date().toLocaleTimeString();
+          const log = [...(prev.log || [])];
+          log.push(`[${time}] Вы победили монстра ${bot?.name || 'Враг'}!`);
+          if (combatDungeonContext.isBoss) {
+            log.push(`[${time}] 🎉 Властелин этого подземелья повержен! Проход свободен.`);
+          }
+          return {
+            ...prev,
+            defeatedMonsters: defeated,
+            log
+          };
+        });
+      } else if (combatWinner === 'bot') {
+        setDungeonState((prev: any) => {
+          if (!prev) return prev;
+          const time = new Date().toLocaleTimeString();
+          const log = [...(prev.log || [])];
+          log.push(`[${time}] 💀 Вы проиграли бой с ${bot?.name || 'Враг'}. Восстановите силы и попробуйте снова.`);
+          return {
+            ...prev,
+            log
+          };
+        });
+      }
+      setActiveSubLoc('dungeon');
+      setCombatDungeonContext(null);
+    }
   };
 
   const updateCharacter = async (updatedPlayer: Character) => {
@@ -814,7 +1083,11 @@ export const useGameState = () => {
     surrenderCombat,
     potionsUsed,
     activeScrolls,
-    combatSummary
+    combatSummary,
+    activeSubLoc,
+    setActiveSubLoc,
+    dungeonState,
+    setDungeonState
   };
 };
 

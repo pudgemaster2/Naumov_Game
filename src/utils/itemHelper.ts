@@ -2,7 +2,7 @@ import bedImg from '../assets/items/bed.png';
 import chestImg from '../assets/items/chest.png';
 import potionHpImg from '../assets/items/potion_hp.png';
 import potionMpImg from '../assets/items/potion_mp.png';
-import spellbookImg from '../assets/items/spellbook.png';
+import combatBeltImg from '../assets/items/combat_belt.png';
 import helmetImg from '../assets/items/helmet.png';
 import armorImg from '../assets/items/armor.png';
 import glovesImg from '../assets/items/gloves.png';
@@ -15,6 +15,9 @@ import amuletImg from '../assets/items/amulet.png';
 import scrollImg from '../assets/items/scroll.png';
 
 export const getItemImage = (type: string, fallbackIcon?: string): string => {
+  if (fallbackIcon && (fallbackIcon.includes('/') || fallbackIcon.includes('.') || fallbackIcon.startsWith('data:'))) {
+    return fallbackIcon;
+  }
   switch (type) {
     case 'helmet': return helmetImg;
     case 'armor': return armorImg;
@@ -30,7 +33,7 @@ export const getItemImage = (type: string, fallbackIcon?: string): string => {
     case 'ring2':
       return ringImg;
     case 'amulet': return amuletImg;
-    case 'spellbook': return spellbookImg;
+    case 'spellbook': return combatBeltImg;
     case 'potion_hp': return potionHpImg;
     case 'potion_mp': return potionMpImg;
     case 'scroll':

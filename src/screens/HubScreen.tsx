@@ -8,6 +8,7 @@ import { TavernView } from '../components/TavernView';
 import { TempleView } from '../components/TempleView';
 import { MarketView } from '../components/MarketView';
 import { SuburbsView } from '../components/SuburbsView';
+import { DungeonCrawler } from '../components/DungeonCrawler';
 import { OtherLocationsView } from '../components/OtherLocationsView';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { StatTable } from '../components/StatTable';
@@ -15,14 +16,6 @@ import { Button } from '../components/ui/Button';
 import { GeneralChat } from '../components/GeneralChat';
 import { Swords, Award, LogOut, Sparkles, Heart } from 'lucide-react';
 import { getPortrait } from '../utils/portraitHelper';
-
-interface HubScreenProps {
-  player: Character;
-  onStartCombat: () => void;
-  onLogout: () => void;
-  onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
-  onChangeCharacter?: () => void;
-}
 
 type SubLocation =
   | 'town'
@@ -36,7 +29,20 @@ type SubLocation =
   | 'siege'
   | 'post'
   | 'upper_tier'
-  | 'suburbs';
+  | 'suburbs'
+  | 'dungeon';
+
+interface HubScreenProps {
+  player: Character;
+  onStartCombat: (customEnemy?: any) => void;
+  onLogout: () => void;
+  onUpdatePlayer: (updatedPlayer: Character) => Promise<void>;
+  onChangeCharacter?: () => void;
+  activeSubLoc: SubLocation;
+  setActiveSubLoc: (loc: SubLocation) => void;
+  dungeonState: any;
+  setDungeonState: (state: any) => void;
+}
 
 // getPortrait is now imported from portraitHelper
 
@@ -46,8 +52,11 @@ export const HubScreen: React.FC<HubScreenProps> = ({
   onLogout,
   onUpdatePlayer,
   onChangeCharacter,
+  activeSubLoc,
+  setActiveSubLoc,
+  dungeonState,
+  setDungeonState,
 }) => {
-  const [activeSubLoc, setActiveSubLoc] = useState<SubLocation>('town');
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [tempName, setTempName] = useState(player.name);
 
@@ -136,6 +145,35 @@ export const HubScreen: React.FC<HubScreenProps> = ({
         return (
           <SuburbsView 
             onBack={() => handleNavigateTo('town')} 
+            onEnterDungeon={(dungKey) => {
+              // Set up initial coordinate grids for the dungeons
+              const isCatacomb = dungKey === 'dungeon_2';
+              setDungeonState({
+                activeDungeonKey: dungKey,
+                x: isCatacomb ? 1 : 3,
+                y: isCatacomb ? 10 : 8,
+                dir: 'N',
+                visited: [isCatacomb ? '1,10' : '3,8'],
+                defeatedMonsters: [],
+                openedChests: [],
+                unlockedDoors: [],
+                keys: [],
+                log: [`Вы вошли в подземелье: ${dungKey === 'dungeon_1' ? 'Заброшенная Канализация' : dungKey === 'dungeon_2' ? 'Катакомбы Мучений' : 'Тайное Логово'}`]
+              });
+              handleNavigateTo('dungeon');
+            }}
+          />
+        );
+      case 'dungeon':
+        return (
+          <DungeonCrawler
+            player={player}
+            onSave={onUpdatePlayer}
+            onBack={() => handleNavigateTo('gates')}
+            dungeonKey={dungeonState?.activeDungeonKey || 'dungeon_1'}
+            onStartCombat={(monster) => onStartCombat(monster)}
+            initialDungeonState={dungeonState}
+            onSaveDungeonState={setDungeonState}
           />
         );
       case 'siege':
@@ -181,46 +219,57 @@ export const HubScreen: React.FC<HubScreenProps> = ({
           {/* Stats Lobby Details */}
           <div className="lg:col-span-5 space-y-6">
             {/* Arena Stats summary */}
-            <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg space-y-4 text-slate-800">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic flex items-center gap-2 border-b border-slate-250 pb-2">
-                <Award className="w-4 h-4 text-gold-650" /> Боевые Показатели
+            <div className="gothic-panel p-6 bg-gradient-to-br from-slate-50/95 via-slate-100/95 to-amber-50/95 border-amber-600/45 rounded-xl shadow-md space-y-5 text-slate-850">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-gothic flex items-center gap-2 border-b border-slate-350 pb-2.5">
+                <Award className="w-5 h-5 text-amber-600" /> Боевые Показатели
               </h4>
               <div className="grid grid-cols-3 gap-3 text-center font-mono">
-                <div className="p-3 bg-slate-200 rounded border border-slate-300">
-                  <div className="text-[10px] text-slate-600 uppercase font-semibold">Бои</div>
-                  <div className="text-lg font-bold text-slate-800">{totalBattles}</div>
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-350">
+                  <div className="text-[10px] text-slate-500 uppercase font-semibold tracking-wider">Бои</div>
+                  <div className="text-xl font-black text-slate-800 mt-1">{totalBattles}</div>
                 </div>
-                <div className="p-3 bg-slate-200 rounded border border-slate-300">
-                  <div className="text-[10px] text-emerald-700 uppercase font-bold">Победы</div>
-                  <div className="text-lg font-bold text-emerald-700">{player.wins}</div>
+                <div className="p-3 bg-emerald-50/60 rounded-lg border border-emerald-150 shadow-sm transition-all duration-200 hover:shadow-md hover:border-emerald-300">
+                  <div className="text-[10px] text-emerald-800 uppercase font-bold tracking-wider">Победы</div>
+                  <div className="text-xl font-black text-emerald-700 mt-1">{player.wins}</div>
                 </div>
-                <div className="p-3 bg-slate-200 rounded border border-slate-300">
-                  <div className="text-[10px] text-rose-700 uppercase font-bold">Пораж.</div>
-                  <div className="text-lg font-bold text-rose-700">{player.losses}</div>
+                <div className="p-3 bg-rose-50/60 rounded-lg border border-rose-150 shadow-sm transition-all duration-200 hover:shadow-md hover:border-rose-300">
+                  <div className="text-[10px] text-rose-800 uppercase font-bold tracking-wider">Пораж.</div>
+                  <div className="text-xl font-black text-rose-700 mt-1">{player.losses}</div>
                 </div>
               </div>
-              <div className="p-3 bg-slate-200 rounded border border-slate-300 text-center font-mono text-xs text-slate-800">
-                <span>Процент побед (Винрейт): </span>
-                <span className="text-amber-700 font-extrabold">{winRate}%</span>
+              <div className="p-3 bg-amber-50/60 rounded-lg border border-amber-150 text-center font-mono text-xs text-slate-850 flex justify-between items-center px-4">
+                <span className="font-semibold text-slate-700">Процент побед (Винрейт):</span>
+                <span className="text-amber-800 font-extrabold text-sm bg-amber-100 px-2 py-0.5 rounded border border-amber-250">{winRate}%</span>
               </div>
             </div>
 
             {/* Rules / Tips panel */}
-            <div className="p-4 border border-slate-300 rounded bg-slate-50 text-xs text-slate-650 leading-relaxed space-y-2">
-              <p className="font-semibold text-slate-800 uppercase tracking-widest text-[10px] font-gothic flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-gold-650" /> Советы Гладиаторам:
+            <div className="p-5 border border-amber-600/30 rounded-xl bg-amber-50/45 backdrop-blur-sm text-xs text-slate-800 leading-relaxed space-y-3 shadow-md">
+              <p className="font-bold text-amber-900 uppercase tracking-widest text-[10px] font-gothic flex items-center gap-1.5 border-b border-amber-200 pb-2">
+                <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" /> Советы Гладиаторам:
               </p>
-              <p>1. В бою обязательно выбирайте зону для атаки и зону для защиты. Без этого совершить ход невозможно.</p>
-              <p>2. Урон зависит от ваших базовых характеристик, а также временных эффектов таверны или храма.</p>
-              <p>3. Выносливость придает вам дополнительные HP. Если вы ранены, используйте кровать дома или лечитесь у жреца.</p>
+              <div className="space-y-2.5">
+                <p className="flex gap-2">
+                  <span className="text-amber-700 font-bold font-mono">1.</span>
+                  <span>В бою обязательно выбирайте зону для атаки и зону для защиты. Без этого совершить ход невозможно.</span>
+                </p>
+                <p className="flex gap-2">
+                  <span className="text-amber-700 font-bold font-mono">2.</span>
+                  <span>Урон зависит от ваших базовых характеристик, а также временных эффектов таверны или храма.</span>
+                </p>
+                <p className="flex gap-2">
+                  <span className="text-amber-700 font-bold font-mono">3.</span>
+                  <span>Выносливость придает вам дополнительные HP. Если вы ранены, используйте кровать дома или лечитесь у жреца.</span>
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Stat Sheet and Battle Button */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="gothic-panel p-6 bg-slate-100/90 border-slate-300 rounded-lg text-slate-850">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-900 font-gothic border-b border-slate-250 pb-2 mb-4 flex items-center gap-2">
-                <Swords className="w-4 h-4 text-gold-650" /> Характеристики Героя
+            <div className="gothic-panel p-6 bg-gradient-to-br from-slate-50/95 via-slate-100/95 to-amber-50/95 border-amber-600/45 rounded-xl shadow-md text-slate-850">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-gothic border-b border-slate-350 pb-2.5 mb-4 flex items-center gap-2">
+                <Swords className="w-5 h-5 text-amber-600" /> Характеристики Героя
               </h4>
               <StatTable stats={player.stats} classType={player.classType} />
             </div>
@@ -233,7 +282,7 @@ export const HubScreen: React.FC<HubScreenProps> = ({
               </div>
             )}
 
-            <Button onClick={onStartCombat} fullWidth className="py-4 text-base flex justify-center items-center gap-3">
+            <Button onClick={() => onStartCombat()} fullWidth className="py-4 text-base flex justify-center items-center gap-3">
               <Swords className="w-5 h-5 animate-pulse" />
               ВСТУПИТЬ В БОЙ
             </Button>

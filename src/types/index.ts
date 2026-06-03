@@ -69,6 +69,7 @@ export interface Character {
   lastDailyClaim?: string;
   inventory?: Item[];
   equipment?: Equipment;
+  sprite?: string;
 }
 
 export type CombatZone = 'head' | 'chest' | 'stomach' | 'legs';

@@ -236,21 +236,52 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
   const ItemHtmlTooltip: React.FC<{ item: Item }> = ({ item }) => {
     const stats = Object.entries(item.stats);
+    
+    const getItemTypeName = (type: string) => {
+      switch (type) {
+        case 'helmet': return 'Шлем';
+        case 'armor': return 'Нагрудник';
+        case 'gloves': return 'Перчатки';
+        case 'boots': return 'Сапоги';
+        case 'weapon': return 'Оружие';
+        case 'shield': return 'Вторая рука';
+        case 'spellbook': return 'Боевой пояс';
+        case 'ring': return 'Кольцо';
+        case 'potion_hp': return 'Зелье здоровья';
+        case 'potion_mp': return 'Зелье маны';
+        case 'scroll_atk': return 'Свиток Ярости';
+        case 'scroll_def': return 'Свиток Каменной Кожи';
+        case 'scroll_dodge': return 'Свиток Ветра';
+        case 'scroll_crit': return 'Свиток Гнева';
+        default: return 'Предмет';
+      }
+    };
+
     return (
-      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 w-56 p-3 bg-obsidian-950/95 border border-gold-900/40 rounded text-center shadow-2xl pointer-events-none invisible group-hover:visible group-hover\/item:visible opacity-0 group-hover:opacity-100 group-hover\/item:opacity-100 transition-all duration-150 font-sans">
-        <div className="text-sm font-bold text-slate-200">{item.name}</div>
+      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-50 w-60 p-3.5 bg-obsidian-950/95 border border-gold-600/40 rounded-xl text-center shadow-2xl pointer-events-none invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-150 font-sans backdrop-blur-sm">
+        <div className="text-sm font-bold text-gold-300 font-gothic tracking-wide border-b border-obsidian-800 pb-1.5">{item.name}</div>
+        <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-1.5 px-0.5">
+          <span>{getItemTypeName(item.type)}</span>
+          <span className="text-amber-500 font-bold">Уровень: 1</span>
+        </div>
+        {item.description && (
+          <div className="text-[10px] text-slate-300 italic mt-1.5 text-left border-t border-obsidian-900/60 pt-1.5 leading-relaxed">
+            {item.description}
+          </div>
+        )}
         {stats.length > 0 && (
-          <div className="mt-1.5 flex flex-col gap-1 text-xs font-mono font-bold">
+          <div className="mt-2 pt-1.5 border-t border-obsidian-900/60 flex flex-col gap-1 text-[11px] font-mono font-bold text-left px-0.5">
             {stats.map(([key, val]) => {
-              let colorClass = 'text-slate-350';
+              let colorClass = 'text-slate-300';
               let label = key;
-              if (key === 'strength') { colorClass = 'text-rose-455'; label = 'Сила'; }
-              if (key === 'agility') { colorClass = 'text-emerald-455'; label = 'Ловкость'; }
-              if (key === 'endurance') { colorClass = 'text-red-455'; label = 'Выносливость'; }
-              if (key === 'intellect') { colorClass = 'text-sky-455'; label = 'Интеллект'; }
+              if (key === 'strength') { colorClass = 'text-rose-400'; label = 'Сила'; }
+              if (key === 'agility') { colorClass = 'text-emerald-400'; label = 'Ловкость'; }
+              if (key === 'endurance') { colorClass = 'text-red-400'; label = 'Выносливость'; }
+              if (key === 'intellect') { colorClass = 'text-sky-400'; label = 'Интеллект'; }
               return (
-                <div key={key} className={colorClass}>
-                  +{val} {label}
+                <div key={key} className={`${colorClass} flex justify-between`}>
+                  <span>{label}:</span>
+                  <span>+{val}</span>
                 </div>
               );
             })}
@@ -470,7 +501,11 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                   {renderSlot('helmet', 'Шлем', 'Шлем')}
                   {renderSlot('armor', 'Доспех', 'Нагрудный доспех')}
                   {renderSlot('belt', 'Поножи', 'Поножи')}
-                  {renderSlot('weapon', 'Меч', 'Оружие')}
+                  {renderSlot(
+                    'weapon',
+                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : 'Меч',
+                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : 'Меч'
+                  )}
                 </div>
 
                 {/* Center Portrait */}
@@ -486,10 +521,14 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
                 {/* Right Column: 4 Slots */}
                 <div className="flex flex-col gap-1 items-start">
-                  {renderSlot('shield', 'Щит', 'Щит')}
+                  {renderSlot(
+                    'shield',
+                    player.classType === 'mage' ? 'Книга' : player.classType === 'archer' ? 'Колчан' : 'Щит',
+                    player.classType === 'mage' ? 'Книга заклинаний' : player.classType === 'archer' ? 'Колчан стрел' : 'Щит'
+                  )}
                   {renderSlot('gloves', 'Руки', 'Перчатки')}
                   {renderSlot('boots', 'Ноги', 'Сапоги')}
-                  {renderSlot('spellbook', 'Книга заклинаний', 'Книга заклинаний')}
+                  {renderSlot('spellbook', 'Боевой пояс', 'Боевой пояс')}
                 </div>
 
               </div>

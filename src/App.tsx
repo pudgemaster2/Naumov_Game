@@ -30,7 +30,11 @@ function App() {
     surrenderCombat,
     potionsUsed,
     activeScrolls,
-    combatSummary
+    combatSummary,
+    activeSubLoc,
+    setActiveSubLoc,
+    dungeonState,
+    setDungeonState
   } = useGameState();
 
   const handleSelectChoice = (type: 'attack' | 'defense', zone: any) => {
@@ -65,6 +69,10 @@ function App() {
         {screen === 'hub' && player && (
           <HubScreen 
             player={player} 
+            activeSubLoc={activeSubLoc}
+            setActiveSubLoc={setActiveSubLoc}
+            dungeonState={dungeonState}
+            setDungeonState={setDungeonState}
             onStartCombat={startCombat} 
             onLogout={logout} 
             onUpdatePlayer={updateCharacter}
