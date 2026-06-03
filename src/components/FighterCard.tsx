@@ -4,6 +4,10 @@ import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { ProgressBar } from './ui/ProgressBar';
 import { getPortrait } from '../utils/portraitHelper';
 
+import dungeonMonsterRat from '../assets/dungeon/dungeon_monster_rat.png';
+import dungeonMonsterSkeleton from '../assets/dungeon/dungeon_monster_skeleton.png';
+import dungeonMonsterBoss from '../assets/dungeon/dungeon_monster_boss.png';
+
 interface FighterCardProps {
   fighter: Character;
 }
@@ -31,6 +35,13 @@ export const FighterCard: React.FC<FighterCardProps> = ({
 
   const currentMp = fighter.currentMana === undefined ? fighter.stats.intellect * 10 : fighter.currentMana;
   const maxMp = fighter.maxMana === undefined ? fighter.stats.intellect * 10 : fighter.maxMana;
+
+  const getFighterPortrait = () => {
+    if (fighter.sprite === 'rat') return dungeonMonsterRat;
+    if (fighter.sprite === 'skeleton') return dungeonMonsterSkeleton;
+    if (fighter.sprite === 'boss') return dungeonMonsterBoss;
+    return getPortrait(fighter.race, fighter.classType);
+  };
 
   return (
     <div className={`gothic-panel p-6 relative overflow-hidden transition-all duration-300 ${getPanelClass(fighter.classType)}`}>
@@ -60,8 +71,8 @@ export const FighterCard: React.FC<FighterCardProps> = ({
       <div className="flex justify-center items-center py-6 bg-obsidian-950/60 rounded border border-obsidian-800/50 mb-6 shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)] relative">
         <div className={`p-1 bg-obsidian-900 border shadow-md w-40 h-52 overflow-hidden rounded ${getFighterTheme(fighter.classType)}`}>
           <img 
-            src={getPortrait(fighter.race, fighter.classType)} 
-            alt={`${fighter.race} ${fighter.classType}`} 
+            src={getFighterPortrait()} 
+            alt={fighter.sprite ? `${fighter.sprite} monster` : `${fighter.race} ${fighter.classType}`} 
             className="w-full h-full object-cover rounded" 
           />
         </div>

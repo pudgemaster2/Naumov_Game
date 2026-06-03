@@ -290,7 +290,7 @@ export const useGameState = () => {
     let raceTemplate: any;
     let classTemplate: any;
 
-    if (customEnemy) {
+    if (customEnemy && typeof customEnemy === 'object' && 'name' in customEnemy && typeof (customEnemy as any).name === 'string') {
       generatedBot = { ...customEnemy };
       raceTemplate = RACE_TEMPLATES[customEnemy.race];
       classTemplate = CLASS_TEMPLATES[customEnemy.classType];

@@ -327,7 +327,8 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         currentMana: monsterData.maxMana,
         maxMana: monsterData.maxMana,
         wins: 0,
-        losses: 0
+        losses: 0,
+        sprite: monsterData.sprite
       };
 
       onStartCombat({
