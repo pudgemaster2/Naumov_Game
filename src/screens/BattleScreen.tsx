@@ -119,6 +119,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const scrollDefCount = getInventoryCount('scroll_def');
   const scrollDodgeCount = getInventoryCount('scroll_dodge');
   const scrollCritCount = getInventoryCount('scroll_crit');
+  const hasCombatBelt = !!player.equipment?.spellbook;
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-6 animate-fade-in relative select-none">
@@ -138,96 +139,102 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           <FighterCard fighter={player} />
           
           {/* Боевой пояс (Combat Belt) */}
-          <div className="gothic-panel p-4 bg-obsidian-950/85 border-gold-700/40 rounded-xl shadow-lg space-y-3">
-            <button
-              onClick={() => setIsBeltOpen(!isBeltOpen)}
-              disabled={isGameOver}
-              className="w-full flex items-center justify-between p-2.5 rounded-lg border border-obsidian-700 bg-obsidian-900/60 hover:bg-obsidian-800/80 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-1.5 bg-amber-950/40 rounded border border-amber-600/30 text-amber-500 group-hover:text-amber-400 transition-colors">
-                  🎒
+          {hasCombatBelt ? (
+            <div className="gothic-panel p-4 bg-obsidian-950/85 border-gold-700/40 rounded-xl shadow-lg space-y-3">
+              <button
+                onClick={() => setIsBeltOpen(!isBeltOpen)}
+                disabled={isGameOver}
+                className="w-full flex items-center justify-between p-2.5 rounded-lg border border-obsidian-700 bg-obsidian-900/60 hover:bg-obsidian-800/80 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-amber-950/40 rounded border border-amber-600/30 text-amber-500 group-hover:text-amber-400 transition-colors">
+                    🎒
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold uppercase tracking-wider text-slate-200 group-hover:text-gold-300 font-gothic transition-colors">Боевой пояс</div>
+                    <div className="text-[10px] text-slate-400 font-mono">Зелья за бой: {potionsUsedCount}/3</div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <div className="text-sm font-bold uppercase tracking-wider text-slate-200 group-hover:text-gold-300 font-gothic transition-colors">Боевой пояс</div>
-                  <div className="text-[10px] text-slate-400 font-mono">Зелья за бой: {potionsUsedCount}/3</div>
+                <span className="text-slate-400 group-hover:text-gold-400 transition-colors font-mono text-xs">
+                  {isBeltOpen ? '▼ Свернуть' : '▲ Открыть'}
+                </span>
+              </button>
+
+              {isBeltOpen && (
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-obsidian-800/60 animate-fade-in">
+                  {/* Health Potion */}
+                  <button
+                    onClick={() => onUsePotion('hp')}
+                    disabled={hpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentHp >= player.maxHp}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Восстановить 50 HP (Максимум 3 зелья за бой)"
+                  >
+                    <img src={getItemImage('potion_hp')} alt="HP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <span>Здоровье ({hpPotionsCount})</span>
+                  </button>
+
+                  {/* Mana Potion */}
+                  <button
+                    onClick={() => onUsePotion('mp')}
+                    disabled={mpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentMana >= player.maxMana}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Восстановить 50 MP (Максимум 3 зелья за бой)"
+                  >
+                    <img src={getItemImage('potion_mp')} alt="MP Potion" className="w-4 h-4 object-contain inline-block" />
+                    <span>Мана ({mpPotionsCount})</span>
+                  </button>
+
+                  {/* Scroll Attack */}
+                  <button
+                    onClick={() => onUseScroll('atk')}
+                    disabled={scrollAtkCount === 0 || activeScrollsState.atk}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Свиток Ярости (+10 к урону)"
+                  >
+                    <img src={getItemImage('scroll_atk')} alt="Scroll Atk" className="w-4 h-4 object-contain inline-block" />
+                    <span>Урон ({scrollAtkCount})</span>
+                  </button>
+
+                  {/* Scroll Defense */}
+                  <button
+                    onClick={() => onUseScroll('def')}
+                    disabled={scrollDefCount === 0 || activeScrollsState.def}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Свиток Каменной Кожи (-5 к получаемому урону)"
+                  >
+                    <img src={getItemImage('scroll_def')} alt="Scroll Def" className="w-4 h-4 object-contain inline-block" />
+                    <span>Блок ({scrollDefCount})</span>
+                  </button>
+
+                  {/* Scroll Dodge */}
+                  <button
+                    onClick={() => onUseScroll('dodge')}
+                    disabled={scrollDodgeCount === 0 || activeScrollsState.dodge}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed col-span-2"
+                    title="Свиток Ветра (+15% уклонения)"
+                  >
+                    <img src={getItemImage('scroll_dodge')} alt="Scroll Dodge" className="w-4 h-4 object-contain inline-block" />
+                    <span>Уклонение ({scrollDodgeCount})</span>
+                  </button>
+
+                  {/* Scroll Crit */}
+                  <button
+                    onClick={() => onUseScroll('crit')}
+                    disabled={scrollCritCount === 0 || activeScrollsState.crit}
+                    className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed col-span-2"
+                    title="Свиток Гнева (+15% крита)"
+                  >
+                    <img src={getItemImage('scroll_crit')} alt="Scroll Crit" className="w-4 h-4 object-contain inline-block" />
+                    <span>Крит. удар ({scrollCritCount})</span>
+                  </button>
                 </div>
-              </div>
-              <span className="text-slate-400 group-hover:text-gold-400 transition-colors font-mono text-xs">
-                {isBeltOpen ? '▼ Свернуть' : '▲ Открыть'}
-              </span>
-            </button>
-
-            {isBeltOpen && (
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-obsidian-800/60 animate-fade-in">
-                {/* Health Potion */}
-                <button
-                  onClick={() => onUsePotion('hp')}
-                  disabled={hpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentHp >= player.maxHp}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                  title="Восстановить 50 HP (Максимум 3 зелья за бой)"
-                >
-                  <img src={getItemImage('potion_hp')} alt="HP Potion" className="w-4 h-4 object-contain inline-block" />
-                  <span>Здоровье ({hpPotionsCount})</span>
-                </button>
-
-                {/* Mana Potion */}
-                <button
-                  onClick={() => onUsePotion('mp')}
-                  disabled={mpPotionsCount === 0 || potionsUsedCount >= 3 || player.currentMana >= player.maxMana}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                  title="Восстановить 50 MP (Максимум 3 зелья за бой)"
-                >
-                  <img src={getItemImage('potion_mp')} alt="MP Potion" className="w-4 h-4 object-contain inline-block" />
-                  <span>Мана ({mpPotionsCount})</span>
-                </button>
-
-                {/* Scroll Attack */}
-                <button
-                  onClick={() => onUseScroll('atk')}
-                  disabled={scrollAtkCount === 0 || activeScrollsState.atk}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                  title="Свиток Ярости (+10 к урону)"
-                >
-                  <img src={getItemImage('scroll_atk')} alt="Scroll Atk" className="w-4 h-4 object-contain inline-block" />
-                  <span>Урон ({scrollAtkCount})</span>
-                </button>
-
-                {/* Scroll Defense */}
-                <button
-                  onClick={() => onUseScroll('def')}
-                  disabled={scrollDefCount === 0 || activeScrollsState.def}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                  title="Свиток Каменной Кожи (-5 к получаемому урону)"
-                >
-                  <img src={getItemImage('scroll_def')} alt="Scroll Def" className="w-4 h-4 object-contain inline-block" />
-                  <span>Блок ({scrollDefCount})</span>
-                </button>
-
-                {/* Scroll Dodge */}
-                <button
-                  onClick={() => onUseScroll('dodge')}
-                  disabled={scrollDodgeCount === 0 || activeScrollsState.dodge}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed col-span-2"
-                  title="Свиток Ветра (+15% уклонения)"
-                >
-                  <img src={getItemImage('scroll_dodge')} alt="Scroll Dodge" className="w-4 h-4 object-contain inline-block" />
-                  <span>Уклонение ({scrollDodgeCount})</span>
-                </button>
-
-                {/* Scroll Crit */}
-                <button
-                  onClick={() => onUseScroll('crit')}
-                  disabled={scrollCritCount === 0 || activeScrollsState.crit}
-                  className="p-2.5 rounded border border-obsidian-750 bg-obsidian-900/40 hover:bg-obsidian-800/60 text-xs font-bold text-slate-200 font-mono text-left truncate flex items-center gap-1.5 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed col-span-2"
-                  title="Свиток Гнева (+15% крита)"
-                >
-                  <img src={getItemImage('scroll_crit')} alt="Scroll Crit" className="w-4 h-4 object-contain inline-block" />
-                  <span>Крит. удар ({scrollCritCount})</span>
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div className="gothic-panel p-4 bg-obsidian-950/40 border-rose-950/30 rounded-xl shadow-md text-center text-rose-500/80 text-xs font-mono py-6">
+              🎒 Боевой пояс не надет.<br/>Использование зелий и свитков в бою заблокировано.
+            </div>
+          )}
         </div>
 
         {/* Column 2: Combat Choices, Auto-battle, Strike Button, and raised Combat Log (Center) */}

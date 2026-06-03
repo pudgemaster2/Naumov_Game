@@ -16,6 +16,7 @@ import { db } from '../services/db';
 import { getItemImage } from '../utils/itemHelper';
 
 const defaultStartingItems: Item[] = [
+  { id: 'start_combat_belt', name: 'Боевой пояс', type: 'spellbook', stats: { endurance: 1 }, description: 'Пояс с ячейками для зелий и свитков. Позволяет использовать припасы в бою.', icon: getItemImage('spellbook') },
   { id: 'start_helmet', name: 'Шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой шлем для защиты головы.', icon: getItemImage('helmet') },
   { id: 'start_gloves', name: 'Перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые перчатки, повышающие хватку.', icon: getItemImage('gloves') },
   { id: 'start_armor', name: 'Нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий нагрудник, защищающий грудь.', icon: getItemImage('armor') },
@@ -110,6 +111,18 @@ export const useGameState = () => {
           }
           if (!character.equipment) {
             character.equipment = {};
+          }
+          const hasBeltInInv = character.inventory.some((item: any) => item.type === 'spellbook');
+          const hasBeltInEq = character.equipment.spellbook !== undefined;
+          if (!hasBeltInInv && !hasBeltInEq) {
+            character.inventory.push({
+              id: 'start_combat_belt',
+              name: 'Боевой пояс',
+              type: 'spellbook',
+              stats: { endurance: 1 },
+              description: 'Пояс с ячейками для зелий и свитков. Позволяет использовать припасы в бою.',
+              icon: getItemImage('spellbook')
+            });
           }
 
           // Item icons & names migration for compatibility with custom PNG assets and names
@@ -330,6 +343,23 @@ export const useGameState = () => {
       const adjustedMaxHp = adjustedStats.endurance * 10;
       const adjustedMaxMana = adjustedStats.intellect * 10;
 
+      const botEquipment: any = {
+        helmet: { id: 'bot_helmet', name: 'Шлем гладиатора', type: 'helmet', stats: { endurance: 1 }, description: 'Тяжелый шлем арены.', icon: getItemImage('helmet') },
+        armor: { id: 'bot_armor', name: 'Нагрудник гладиатора', type: 'armor', stats: { endurance: 2 }, description: 'Защитные пластины.', icon: getItemImage('armor') },
+        gloves: { id: 'bot_gloves', name: 'Рукавицы гладиатора', type: 'gloves', stats: { strength: 1 }, description: 'Боевые перчатки.', icon: getItemImage('gloves') },
+        boots: { id: 'bot_boots', name: 'Сапоги гладиатора', type: 'boots', stats: { agility: 1 }, description: 'Поношенные сапоги арены.', icon: getItemImage('boots') }
+      };
+      
+      if (botClass === 'warrior') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Короткий меч', type: 'weapon', stats: { strength: 2 }, description: 'Гладиус ближнего боя.', icon: getItemImage('weapon') };
+        botEquipment.shield = { id: 'bot_shield', name: 'Деревянный щит', type: 'shield', stats: { endurance: 1 }, description: 'Круглый щит.', icon: getItemImage('shield') };
+      } else if (botClass === 'archer') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Простой лук', type: 'weapon', stats: { agility: 2 }, description: 'Охотничий лук.', icon: getItemImage('weapon') };
+      } else if (botClass === 'mage') {
+        botEquipment.weapon = { id: 'bot_weapon', name: 'Магический посох', type: 'weapon', stats: { intellect: 2 }, description: 'Посох послушника.', icon: getItemImage('weapon') };
+        botEquipment.spellbook = { id: 'bot_belt', name: 'Боевой пояс', type: 'spellbook', stats: { intellect: 1 }, description: 'Пояс с ячейками.', icon: getItemImage('spellbook') };
+      }
+
       generatedBot = {
         name: botName,
         race: botRace,
@@ -344,6 +374,7 @@ export const useGameState = () => {
         maxMana: adjustedMaxMana,
         wins: 0,
         losses: 0,
+        equipment: botEquipment,
       };
 
       setCombatDungeonContext(null);
