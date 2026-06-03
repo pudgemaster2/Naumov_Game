@@ -4,6 +4,7 @@ import { DUNGEON_MAPS } from '../utils/dungeonMaps';
 import type { DungeonFloor, DungeonChest } from '../utils/dungeonMaps';
 import { Swords, Compass, LogOut, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, RotateCcw, RotateCw, RefreshCw, Box } from 'lucide-react';
 import { Button } from './ui/Button';
+import { getItemImage } from '../utils/itemHelper';
 
 // Import dungeon viewport backgrounds
 import dungeonStraight from '../assets/dungeon/dungeon_straight.png';
@@ -71,6 +72,13 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
   const [unlockedDoors, setUnlockedDoors] = useState<string[]>(initialDungeonState?.unlockedDoors ?? []);
   const [keysCollected, setKeysCollected] = useState<string[]>(initialDungeonState?.keys ?? []);
   const [dungeonLog, setDungeonLog] = useState<string[]>(initialDungeonState?.log ?? [`Вы вошли в подземелье: ${floor.name}`]);
+  const [chestLootPopup, setChestLootPopup] = useState<{
+    itemName: string;
+    itemIcon?: string;
+    itemDesc?: string;
+    goldAmount?: number;
+    isKey?: boolean;
+  } | null>(null);
 
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -353,6 +361,11 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
       if (chestData.type === 'key' && chestData.keyId) {
         setKeysCollected((prev) => [...prev, chestData.keyId!]);
         addLog(`🎉 Вы нашли: "${chestData.rewardItemName}"! Он пригодится для дверей.`);
+        setChestLootPopup({
+          itemName: chestData.rewardItemName || 'Особый ключ',
+          itemDesc: 'Он пригодится для открытия запертых дверей в этом подземелье.',
+          isKey: true
+        });
       } 
       else if (chestData.type === 'gold' && chestData.rewardAmount) {
         const rewardGold = chestData.rewardAmount;
@@ -362,18 +375,45 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         };
         await onSave(updated);
         addLog(`💰 Золото в сундуке! Найдено: 💰 +${rewardGold} золотых монет.`);
+        setChestLootPopup({
+          itemName: 'Золотые монеты',
+          goldAmount: rewardGold,
+          itemDesc: 'Блестящие золотые монеты приятно звенят в вашем кошельке!'
+        });
       } 
       else if (chestData.type === 'item' && chestData.rewardItemType) {
         // Create an inventory item
         let rewardItem: Item;
-        const isMp = chestData.rewardItemType === 'potion_mp';
+        let description = 'Неизвестный предмет';
+        let icon = 'potion_hp';
+        
+        if (chestData.rewardItemType === 'potion_mp') {
+          description = 'Магический эликсир. Восстанавливает 50 MP в бою.';
+          icon = 'potion_mp';
+        } else if (chestData.rewardItemType === 'potion_hp') {
+          description = 'Магический эликсир. Восстанавливает 50 HP в бою или дома.';
+          icon = 'potion_hp';
+        } else if (chestData.rewardItemType === 'scroll_atk') {
+          description = 'Увеличивает наносимый урон на +10 до конца боя.';
+          icon = 'scroll_atk';
+        } else if (chestData.rewardItemType === 'scroll_def') {
+          description = 'Снижает получаемый урон на 5 до конца боя.';
+          icon = 'scroll_def';
+        } else if (chestData.rewardItemType === 'scroll_dodge') {
+          description = 'Повышает шанс уклонения на +15% до конца боя.';
+          icon = 'scroll_dodge';
+        } else if (chestData.rewardItemType === 'scroll_crit') {
+          description = 'Повышает шанс крита на +15% до конца боя.';
+          icon = 'scroll_crit';
+        }
+        
         rewardItem = {
           id: `dungeon_item_${Date.now()}`,
           name: chestData.rewardItemName || 'Зелье',
           type: chestData.rewardItemType as any,
           stats: {},
-          description: isMp ? 'Полностью восстанавливает ману' : 'Полностью восстанавливает здоровье',
-          icon: isMp ? 'potion_mp' : 'potion_hp'
+          description,
+          icon
         };
 
         const updated = {
@@ -382,6 +422,11 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         };
         await onSave(updated);
         addLog(`🧪 Вы нашли ценный предмет: "${rewardItem.name}" (добавлен в рюкзак).`);
+        setChestLootPopup({
+          itemName: rewardItem.name,
+          itemIcon: rewardItem.type,
+          itemDesc: rewardItem.description
+        });
       }
     }
   };
@@ -568,7 +613,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         <div className="w-full flex flex-col items-center">
           
           {/* 3D Viewport Box */}
-          <div className="relative w-full max-w-[800px] h-[450px] bg-obsidian-950 rounded-lg overflow-hidden border border-gold-600/50 shadow-2xl select-none mx-auto">
+          <div className="relative w-full max-w-[880px] h-[495px] bg-obsidian-950 rounded-lg overflow-hidden border border-gold-600/50 shadow-2xl select-none mx-auto">
             {/* Base Corridor Graphics */}
             <img 
               src={currentBgImage} 
@@ -585,7 +630,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
                 <img 
                   src={dungeonDoor} 
                   alt="Dungeon locked door" 
-                  className="w-56 h-80 object-contain pointer-events-auto"
+                  className="w-[246px] h-[352px] object-contain pointer-events-auto"
                 />
               </div>
             )}
@@ -596,7 +641,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
                 <img 
                   src={dungeonChest} 
                   alt="Treasure Chest" 
-                  className="w-36 h-36 object-contain pointer-events-auto filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+                  className="w-[158px] h-[158px] object-contain pointer-events-auto filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
                 />
               </div>
             )}
@@ -607,14 +652,14 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
                 <img 
                   src={getMonsterSprite(activeMonster.sprite)} 
                   alt={activeMonster.name} 
-                  className={`w-52 h-72 object-contain pointer-events-auto filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)] ${
+                  className={`w-[228px] h-[316px] object-contain pointer-events-auto filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)] ${
                     activeMonster.isBoss ? 'animate-bounce text-red-500 scale-105 filter hue-rotate-15 saturate-150' : ''
                   }`}
                 />
                 
                 {/* Boss status overlay indicator */}
                 {activeMonster.isBoss && (
-                  <div className="absolute top-16 px-3 py-1 bg-red-650/90 border border-red-500 text-[10px] text-white rounded font-mono font-bold tracking-wide uppercase select-none shadow">
+                  <div className="absolute top-20 px-3 py-1 bg-red-650/90 border border-red-500 text-[10px] text-white rounded font-mono font-bold tracking-wide uppercase select-none shadow">
                     Главарь
                   </div>
                 )}
@@ -721,7 +766,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           
           {/* Minimap panel */}
-          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between min-h-[300px]">
+          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between h-[340px]">
             <div className="w-full flex flex-col items-center">
               <h4 className="text-xs font-bold font-gothic text-slate-900 tracking-wider uppercase mb-3 text-center">Карта местности</h4>
               {drawMinimap()}
@@ -736,7 +781,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
           </div>
 
           {/* Controls panel */}
-          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between min-h-[300px]">
+          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between h-[340px]">
             <h4 className="text-xs font-bold font-gothic text-slate-900 tracking-wider uppercase mb-2 text-center">Навигация</h4>
             
             {/* D-Pad Layout */}
@@ -816,7 +861,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
           </div>
 
           {/* Dungeon Console Log */}
-          <div className="gothic-panel p-4 bg-slate-900 border border-slate-750/90 rounded-lg flex flex-col min-h-[300px] shadow-lg relative overflow-hidden">
+          <div className="gothic-panel p-4 bg-slate-900 border border-slate-750/90 rounded-lg flex flex-col h-[340px] shadow-lg relative overflow-hidden">
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-amber-400 font-gothic border-b border-slate-800 pb-1 mb-2">
               Летопись Похода
             </h4>
@@ -833,6 +878,65 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         </div>
 
       </div>
+
+      {/* Loot Popup Modal */}
+      {chestLootPopup && (
+        <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 animate-fade-in backdrop-blur-sm select-none">
+          <div className="gothic-panel-gold max-w-sm w-full p-6 text-center space-y-4 rounded-xl shadow-2xl bg-gradient-to-b from-slate-900 to-obsidian-950 border-gold-500 text-slate-100 flex flex-col items-center">
+            
+            <div className="relative">
+              <span className="text-6xl animate-pulse block">🎁</span>
+              <div className="absolute inset-0 bg-gold-400/20 blur-xl rounded-full" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold font-gothic text-gold-400 tracking-wider">Содержимое сундука</h3>
+              <p className="text-xs text-slate-400 font-mono">Вы нашли сокровище!</p>
+            </div>
+
+            <div className="p-4 bg-obsidian-900/80 border border-obsidian-800 rounded-lg w-full flex flex-col items-center gap-3">
+              {chestLootPopup.goldAmount ? (
+                <>
+                  <div className="text-3xl font-black font-mono text-amber-450">
+                    💰 +{chestLootPopup.goldAmount}
+                  </div>
+                  <div className="text-xs text-slate-450 font-mono">Золотых монет</div>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 bg-obsidian-950 border border-gold-600/30 rounded-xl flex items-center justify-center p-2 shadow-inner">
+                    {chestLootPopup.isKey ? (
+                      <span className="text-4xl">🔑</span>
+                    ) : (
+                      <img 
+                        src={getItemImage(chestLootPopup.itemIcon || '')} 
+                        alt={chestLootPopup.itemName} 
+                        className="w-12 h-12 object-contain"
+                      />
+                    )}
+                  </div>
+                  <div className="text-sm font-bold text-slate-200">{chestLootPopup.itemName}</div>
+                </>
+              )}
+
+              {chestLootPopup.itemDesc && (
+                <p className="text-[11px] text-slate-450 italic text-center border-t border-obsidian-850 pt-2 leading-relaxed">
+                  {chestLootPopup.itemDesc}
+                </p>
+              )}
+            </div>
+
+            <Button 
+              onClick={() => setChestLootPopup(null)} 
+              variant="primary" 
+              fullWidth
+              className="py-2.5 font-bold tracking-wider uppercase text-xs"
+            >
+              Забрать добычу
+            </Button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
