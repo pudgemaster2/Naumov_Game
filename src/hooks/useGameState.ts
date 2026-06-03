@@ -8,7 +8,8 @@ import type {
   CombatLogEntry, 
   ScreenState, 
   LogEntryType,
-  Item
+  Item,
+  Equipment
 } from '../types';
 import { auth } from '../services/auth';
 import type { UserSession } from '../services/auth';
@@ -255,9 +256,33 @@ export const useGameState = () => {
       endurance: baseStats.endurance + modifiers.endurance,
       intellect: baseStats.intellect + modifiers.intellect,
     };
+
+    const startingEquipment: Equipment = {
+      spellbook: defaultStartingItems.find(i => i.id === 'start_combat_belt'),
+      helmet: defaultStartingItems.find(i => i.id === 'start_helmet'),
+      gloves: defaultStartingItems.find(i => i.id === 'start_gloves'),
+      armor: defaultStartingItems.find(i => i.id === 'start_armor'),
+      boots: defaultStartingItems.find(i => i.id === 'start_boots'),
+    };
+
+    const startingInventory = defaultStartingItems.filter(
+      item => !['start_combat_belt', 'start_helmet', 'start_gloves', 'start_armor', 'start_boots'].includes(item.id)
+    );
+
+    let equipEndurance = 0;
+    let equipIntellect = 0;
+    Object.values(startingEquipment).forEach((item) => {
+      if (item && item.stats) {
+        if (item.stats.endurance) equipEndurance += item.stats.endurance;
+        if (item.stats.intellect) equipIntellect += item.stats.intellect;
+      }
+    });
+
+    const totalEndurance = stats.endurance + equipEndurance;
+    const totalIntellect = stats.intellect + equipIntellect;
     
-    const maxHp = stats.endurance * 10;
-    const maxMana = stats.intellect * 10;
+    const maxHp = totalEndurance * 10;
+    const maxMana = totalIntellect * 10;
     
     const newPlayer: Character = {
       name: name.trim() || `Игрок_${Math.floor(Math.random() * 1000)}`,
@@ -273,8 +298,8 @@ export const useGameState = () => {
       maxMana: maxMana,
       wins: 0,
       losses: 0,
-      inventory: [...defaultStartingItems],
-      equipment: {},
+      inventory: startingInventory,
+      equipment: startingEquipment,
     };
     
     setPlayer(newPlayer);
