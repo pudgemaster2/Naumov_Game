@@ -164,9 +164,11 @@ export const FighterCard: React.FC<FighterCardProps> = ({
               Lvl {fighter.level}
             </span>
           </h3>
-          <p className="text-xs font-bold font-gothic tracking-widest text-slate-700 uppercase mt-1">
-            {RACE_TEMPLATES[fighter.race]?.title || fighter.race} • {CLASS_TEMPLATES[fighter.classType]?.title || fighter.classType}
-          </p>
+          {!fighter.sprite && (
+            <p className="text-xs font-bold font-gothic tracking-widest text-slate-700 uppercase mt-1">
+              {RACE_TEMPLATES[fighter.race]?.title || fighter.race} • {CLASS_TEMPLATES[fighter.classType]?.title || fighter.classType}
+            </p>
+          )}
         </div>
         <div className="text-right">
           <span className="text-xs font-mono text-slate-700 font-bold">Победы: {fighter.wins}</span>
@@ -178,16 +180,18 @@ export const FighterCard: React.FC<FighterCardProps> = ({
         <div className="flex flex-row items-center justify-center gap-2.5">
           
           {/* Left Column: 4 Slots */}
-          <div className="flex flex-col gap-2">
-            {renderSlot('helmet', 'Шлем', 'Шлем')}
-            {renderSlot('armor', 'Доспех', 'Нагрудник')}
-            {renderSlot('belt', 'Поножи', 'Поножи')}
-            {renderSlot(
-              'weapon',
-              fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч',
-              fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч'
-            )}
-          </div>
+          {!fighter.sprite && (
+            <div className="flex flex-col gap-2">
+              {renderSlot('helmet', 'Шлем', 'Шлем')}
+              {renderSlot('armor', 'Доспех', 'Нагрудник')}
+              {renderSlot('belt', 'Поножи', 'Поножи')}
+              {renderSlot(
+                'weapon',
+                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч',
+                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч'
+              )}
+            </div>
+          )}
 
           {/* Center Portrait */}
           <div className="flex justify-center items-center bg-obsidian-950/60 p-3 rounded-xl border border-obsidian-800/50 shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
@@ -201,24 +205,28 @@ export const FighterCard: React.FC<FighterCardProps> = ({
           </div>
 
           {/* Right Column: 4 Slots */}
-          <div className="flex flex-col gap-2">
-            {renderSlot(
-              'shield',
-              fighter.classType === 'mage' ? 'Книга' : fighter.classType === 'archer' ? 'Колчан' : 'Щит',
-              fighter.classType === 'mage' ? 'Книга заклинаний' : fighter.classType === 'archer' ? 'Колчан стрел' : 'Щит'
-            )}
-            {renderSlot('gloves', 'Руки', 'Перчатки')}
-            {renderSlot('boots', 'Ноги', 'Сапоги')}
-            {renderSlot('spellbook', 'Пояс', 'Боевой пояс')}
-          </div>
+          {!fighter.sprite && (
+            <div className="flex flex-col gap-2">
+              {renderSlot(
+                'shield',
+                fighter.classType === 'mage' ? 'Книга' : fighter.classType === 'archer' ? 'Колчан' : 'Щит',
+                fighter.classType === 'mage' ? 'Книга заклинаний' : fighter.classType === 'archer' ? 'Колчан стрел' : 'Щит'
+              )}
+              {renderSlot('gloves', 'Руки', 'Перчатки')}
+              {renderSlot('boots', 'Ноги', 'Сапоги')}
+              {renderSlot('spellbook', 'Пояс', 'Боевой пояс')}
+            </div>
+          )}
 
         </div>
 
         {/* Rings Row below */}
-        <div className="flex gap-2">
-          {renderSlot('ring1', 'Кольцо', 'Кольцо 1')}
-          {renderSlot('ring2', 'Кольцо', 'Кольцо 2')}
-        </div>
+        {!fighter.sprite && (
+          <div className="flex gap-2">
+            {renderSlot('ring1', 'Кольцо', 'Кольцо 1')}
+            {renderSlot('ring2', 'Кольцо', 'Кольцо 2')}
+          </div>
+        )}
       </div>
 
       {/* HP Progress Bar */}

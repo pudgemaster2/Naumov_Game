@@ -539,7 +539,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-3 select-none">
+    <div className="max-w-5xl mx-auto px-4 py-3 select-none">
       
       {/* Header and Quit */}
       <div className="gothic-panel-gold p-4 bg-slate-100 flex items-center justify-between rounded-lg shadow-md mb-5 border-amber-500">
@@ -562,13 +562,13 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+      <div className="flex flex-col gap-6 items-center">
         
-        {/* VIEWPORT COLUMN (Left) */}
-        <div className="md:col-span-6 flex flex-col items-center">
+        {/* VIEWPORT COLUMN */}
+        <div className="w-full flex flex-col items-center">
           
           {/* 3D Viewport Box */}
-          <div className="relative w-full max-w-[400px] h-[300px] bg-obsidian-950 rounded-lg overflow-hidden border border-gold-600/50 shadow-2xl relative select-none">
+          <div className="relative w-full max-w-[800px] h-[450px] bg-obsidian-950 rounded-lg overflow-hidden border border-gold-600/50 shadow-2xl select-none mx-auto">
             {/* Base Corridor Graphics */}
             <img 
               src={currentBgImage} 
@@ -585,18 +585,18 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
                 <img 
                   src={dungeonDoor} 
                   alt="Dungeon locked door" 
-                  className="w-40 h-56 object-contain pointer-events-auto"
+                  className="w-56 h-80 object-contain pointer-events-auto"
                 />
               </div>
             )}
 
             {/* Overlay: Chest */}
             {activeChest && (
-              <div className="absolute inset-0 flex items-end justify-center pb-6 pointer-events-none select-none z-10 animate-fade-in">
+              <div className="absolute inset-0 flex items-end justify-center pb-8 pointer-events-none select-none z-10 animate-fade-in">
                 <img 
                   src={dungeonChest} 
                   alt="Treasure Chest" 
-                  className="w-24 h-24 object-contain pointer-events-auto filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+                  className="w-36 h-36 object-contain pointer-events-auto filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
                 />
               </div>
             )}
@@ -607,14 +607,14 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
                 <img 
                   src={getMonsterSprite(activeMonster.sprite)} 
                   alt={activeMonster.name} 
-                  className={`w-36 h-48 object-contain pointer-events-auto filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)] ${
+                  className={`w-52 h-72 object-contain pointer-events-auto filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)] ${
                     activeMonster.isBoss ? 'animate-bounce text-red-500 scale-105 filter hue-rotate-15 saturate-150' : ''
                   }`}
                 />
                 
                 {/* Boss status overlay indicator */}
                 {activeMonster.isBoss && (
-                  <div className="absolute top-12 px-3 py-1 bg-red-650/90 border border-red-500 text-[10px] text-white rounded font-mono font-bold tracking-wide uppercase select-none shadow">
+                  <div className="absolute top-16 px-3 py-1 bg-red-650/90 border border-red-500 text-[10px] text-white rounded font-mono font-bold tracking-wide uppercase select-none shadow">
                     Главарь
                   </div>
                 )}
@@ -630,7 +630,7 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
           </div>
 
           {/* Interactive Trigger Control Cards directly below viewport */}
-          <div className="w-full max-w-[400px] mt-4">
+          <div className="w-full max-w-[500px] mt-4">
             {activeMonster && (
               <div className="gothic-panel-gold p-4 bg-rose-50 border-rose-500 rounded-lg flex flex-col items-center gap-3 animate-fade-in text-center select-none shadow-md">
                 <div>
@@ -717,107 +717,106 @@ export const DungeonCrawler: React.FC<DungeonCrawlerProps> = ({
           </div>
         </div>
 
-        {/* MAP & CONTROLS & LOG (Right) */}
-        <div className="md:col-span-6 space-y-4">
+        {/* MAP & CONTROLS & LOG (Row below Viewport) */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           
-          {/* Map & Controls Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-            {/* Minimap panel */}
-            <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center">
+          {/* Minimap panel */}
+          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between min-h-[300px]">
+            <div className="w-full flex flex-col items-center">
               <h4 className="text-xs font-bold font-gothic text-slate-900 tracking-wider uppercase mb-3 text-center">Карта местности</h4>
               {drawMinimap()}
-              <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-[9px] font-mono text-slate-500 justify-center">
-                <span className="flex items-center gap-1">🟢 Игрок</span>
-                <span className="flex items-center gap-1">🟥 Враг</span>
-                <span className="flex items-center gap-1">🟧 Сундук</span>
-                <span className="flex items-center gap-1">🚪 Дверь</span>
-                <span className="flex items-center gap-1">🏁 Выход</span>
-              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-[9px] font-mono text-slate-500 justify-center">
+              <span className="flex items-center gap-1">🟢 Игрок</span>
+              <span className="flex items-center gap-1">🟥 Враг</span>
+              <span className="flex items-center gap-1">🟧 Сундук</span>
+              <span className="flex items-center gap-1">🚪 Дверь</span>
+              <span className="flex items-center gap-1">🏁 Выход</span>
+            </div>
+          </div>
+
+          {/* Controls panel */}
+          <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between min-h-[300px]">
+            <h4 className="text-xs font-bold font-gothic text-slate-900 tracking-wider uppercase mb-2 text-center">Навигация</h4>
+            
+            {/* D-Pad Layout */}
+            <div className="grid grid-cols-3 gap-2 justify-center items-center w-full max-w-[170px] my-auto">
+              {/* Row 1 */}
+              <button 
+                onClick={() => rotate('left')} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Повернуть налево"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => move(1)} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Шаг вперед"
+              >
+                <ArrowUp className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => rotate('right')} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Повернуть направо"
+              >
+                <RotateCw className="w-5 h-5" />
+              </button>
+
+              {/* Row 2 */}
+              <button 
+                onClick={() => strafe('left')} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Шаг влево (стрейф)"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => rotate('about')} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Развернуться на 180"
+              >
+                <RefreshCw className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => strafe('right')} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Шаг вправо (стрейф)"
+              >
+                <ArrowRight className="w-5 h-5" />
+              </button>
+
+              {/* Row 3 */}
+              <div />
+              <button 
+                onClick={() => move(-1)} 
+                type="button" 
+                className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
+                title="Шаг назад"
+              >
+                <ArrowDown className="w-5 h-5" />
+              </button>
+              <div />
             </div>
 
-            {/* Controls panel */}
-            <div className="gothic-panel p-4 bg-slate-100/90 border-slate-300 rounded-lg shadow flex flex-col items-center justify-between min-h-[220px]">
-              <h4 className="text-xs font-bold font-gothic text-slate-900 tracking-wider uppercase mb-2">Навигация</h4>
-              
-              {/* D-Pad Layout */}
-              <div className="grid grid-cols-3 gap-2 justify-center items-center w-full max-w-[170px]">
-                {/* Row 1 */}
-                <button 
-                  onClick={() => rotate('left')} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Повернуть налево"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => move(1)} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Шаг вперед"
-                >
-                  <ArrowUp className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => rotate('right')} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Повернуть направо"
-                >
-                  <RotateCw className="w-5 h-5" />
-                </button>
-
-                {/* Row 2 */}
-                <button 
-                  onClick={() => strafe('left')} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Шаг влево (стрейф)"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => rotate('about')} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Развернуться на 180"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => strafe('right')} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Шаг вправо (стрейф)"
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-
-                {/* Row 3 */}
-                <div />
-                <button 
-                  onClick={() => move(-1)} 
-                  type="button" 
-                  className="w-11 h-11 bg-slate-800 hover:bg-slate-700 border border-slate-650 rounded flex items-center justify-center text-amber-500 font-bold shadow-sm transition-all cursor-pointer"
-                  title="Шаг назад"
-                >
-                  <ArrowDown className="w-5 h-5" />
-                </button>
-                <div />
-              </div>
-
-              {/* Status Keys Count */}
-              <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-700 font-bold">
-                <span>🔑 Ключи в кармане:</span>
-                <span className="font-mono text-slate-900 bg-slate-200 border border-slate-350 px-2 py-0.5 rounded font-black">
-                  {keysCollected.length}
-                </span>
-              </div>
+            {/* Status Keys Count */}
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-700 font-bold">
+              <span>🔑 Ключи в кармане:</span>
+              <span className="font-mono text-slate-900 bg-slate-200 border border-slate-350 px-2 py-0.5 rounded font-black">
+                {keysCollected.length}
+              </span>
             </div>
           </div>
 
           {/* Dungeon Console Log */}
-          <div className="gothic-panel p-4 bg-slate-900 border border-slate-750/90 rounded-lg flex flex-col h-[140px] shadow-lg relative overflow-hidden">
+          <div className="gothic-panel p-4 bg-slate-900 border border-slate-750/90 rounded-lg flex flex-col min-h-[300px] shadow-lg relative overflow-hidden">
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-amber-400 font-gothic border-b border-slate-800 pb-1 mb-2">
               Летопись Похода
             </h4>
