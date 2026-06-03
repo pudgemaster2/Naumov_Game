@@ -16,6 +16,12 @@ import type { UserSession } from '../services/auth';
 import { db } from '../services/db';
 import { getItemImage } from '../utils/itemHelper';
 
+// Class-specific weapon and off-hand starting images
+import staffImg from '../assets/items/staff.png';
+import bowImg from '../assets/items/bow.png';
+import quiverImg from '../assets/items/quiver.png';
+import spellbookImg from '../assets/items/spellbook.png';
+
 const defaultStartingItems: Item[] = [
   { id: 'start_combat_belt', name: 'Боевой пояс', type: 'spellbook', stats: { endurance: 1 }, description: 'Пояс с ячейками для зелий и свитков. Позволяет использовать припасы в бою.', icon: getItemImage('spellbook') },
   { id: 'start_helmet', name: 'Шлем', type: 'helmet', stats: { endurance: 2 }, description: 'Простой шлем для защиты головы.', icon: getItemImage('helmet') },
@@ -125,6 +131,84 @@ export const useGameState = () => {
               icon: getItemImage('spellbook')
             });
           }
+
+          // Weapon and Shield migration for existing players
+          const classType = character.classType;
+          if (character.equipment.weapon === undefined) {
+            if (classType === 'warrior') {
+              character.equipment.weapon = {
+                id: 'start_weapon_warrior',
+                name: 'Короткий меч',
+                type: 'weapon',
+                stats: { strength: 2 },
+                description: 'Стальной гладиус новобранца.',
+                icon: getItemImage('weapon')
+              };
+            } else if (classType === 'archer') {
+              character.equipment.weapon = {
+                id: 'start_weapon_archer',
+                name: 'Простой лук',
+                type: 'weapon',
+                stats: { agility: 2 },
+                description: 'Упругий тисовый лук.',
+                icon: bowImg
+              };
+            } else if (classType === 'mage') {
+              character.equipment.weapon = {
+                id: 'start_weapon_mage',
+                name: 'Магический посох',
+                type: 'weapon',
+                stats: { intellect: 2 },
+                description: 'Посох послушника, хорошо проводящий ману.',
+                icon: staffImg
+              };
+            }
+          }
+
+          if (character.equipment.shield === undefined) {
+            if (classType === 'warrior') {
+              character.equipment.shield = {
+                id: 'start_shield_warrior',
+                name: 'Деревянный щит',
+                type: 'shield',
+                stats: { endurance: 1 },
+                description: 'Круглый дубовый щит с кованым умбоном.',
+                icon: getItemImage('shield')
+              };
+            } else if (classType === 'archer') {
+              character.equipment.shield = {
+                id: 'start_shield_archer',
+                name: 'Колчан стрел',
+                type: 'shield',
+                stats: { agility: 1 },
+                description: 'Кожаный колчан со стрелами с оперением.',
+                icon: quiverImg
+              };
+            } else if (classType === 'mage') {
+              character.equipment.shield = {
+                id: 'start_shield_mage',
+                name: 'Книга заклинаний',
+                type: 'shield',
+                stats: { intellect: 1 },
+                description: 'Фолиант с базовыми заклинаниями.',
+                icon: spellbookImg
+              };
+            }
+          }
+
+          // Dynamic stats recalculation for gear consistency
+          let equipEndurance = 0;
+          let equipIntellect = 0;
+          Object.values(character.equipment).forEach((item: any) => {
+            if (item && item.stats) {
+              if (item.stats.endurance) equipEndurance += item.stats.endurance;
+              if (item.stats.intellect) equipIntellect += item.stats.intellect;
+            }
+          });
+          character.maxHp = (character.stats.endurance + equipEndurance) * 10;
+          character.maxMana = (character.stats.intellect + equipIntellect) * 10;
+          character.currentHp = Math.min(character.currentHp !== undefined ? character.currentHp : character.maxHp, character.maxHp);
+          character.currentMana = Math.min(character.currentMana !== undefined ? character.currentMana : character.maxMana, character.maxMana);
 
           // Item icons & names migration for compatibility with custom PNG assets and names
           const migrateItems = (items: Item[]) => {
@@ -264,6 +348,59 @@ export const useGameState = () => {
       armor: defaultStartingItems.find(i => i.id === 'start_armor'),
       boots: defaultStartingItems.find(i => i.id === 'start_boots'),
     };
+
+    if (classType === 'warrior') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_warrior',
+        name: 'Короткий меч',
+        type: 'weapon',
+        stats: { strength: 2 },
+        description: 'Стальной гладиус новобранца.',
+        icon: getItemImage('weapon')
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_warrior',
+        name: 'Деревянный щит',
+        type: 'shield',
+        stats: { endurance: 1 },
+        description: 'Круглый дубовый щит с кованым умбоном.',
+        icon: getItemImage('shield')
+      };
+    } else if (classType === 'archer') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_archer',
+        name: 'Простой лук',
+        type: 'weapon',
+        stats: { agility: 2 },
+        description: 'Упругий тисовый лук.',
+        icon: bowImg
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_archer',
+        name: 'Колчан стрел',
+        type: 'shield',
+        stats: { agility: 1 },
+        description: 'Кожаный колчан со стрелами с оперением.',
+        icon: quiverImg
+      };
+    } else if (classType === 'mage') {
+      startingEquipment.weapon = {
+        id: 'start_weapon_mage',
+        name: 'Магический посох',
+        type: 'weapon',
+        stats: { intellect: 2 },
+        description: 'Посох послушника, хорошо проводящий ману.',
+        icon: staffImg
+      };
+      startingEquipment.shield = {
+        id: 'start_shield_mage',
+        name: 'Книга заклинаний',
+        type: 'shield',
+        stats: { intellect: 1 },
+        description: 'Фолиант с базовыми заклинаниями.',
+        icon: spellbookImg
+      };
+    }
 
     const startingInventory = defaultStartingItems.filter(
       item => !['start_combat_belt', 'start_helmet', 'start_gloves', 'start_armor', 'start_boots'].includes(item.id)

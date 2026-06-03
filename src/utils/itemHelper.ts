@@ -15,6 +15,9 @@ import amuletImg from '../assets/items/amulet.png';
 import scrollImg from '../assets/items/scroll.png';
 
 export const getItemImage = (type: string, fallbackIcon?: string): string => {
+  if (fallbackIcon && (fallbackIcon.includes('/') || fallbackIcon.includes('.') || fallbackIcon.startsWith('data:'))) {
+    return fallbackIcon;
+  }
   switch (type) {
     case 'helmet': return helmetImg;
     case 'armor': return armorImg;
