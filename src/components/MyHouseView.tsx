@@ -241,10 +241,10 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
       switch (type) {
         case 'helmet': return 'Шлем';
         case 'armor': return 'Нагрудник';
-        case 'gloves': return 'Перчатки';
+        case 'belt': return 'Поножи';
         case 'boots': return 'Сапоги';
         case 'weapon': return 'Оружие';
-        case 'shield': return 'Вторая рука';
+        case 'shield': return 'Правая рука';
         case 'spellbook': return 'Боевой пояс';
         case 'ring': return 'Кольцо';
         case 'potion_hp': return 'Зелье здоровья';
@@ -499,13 +499,9 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 {/* Left Column: 4 Slots */}
                 <div className="flex flex-col gap-1 items-end">
                   {renderSlot('helmet', 'Шлем', 'Шлем')}
-                  {renderSlot('armor', 'Доспех', 'Нагрудный доспех')}
+                  {renderSlot('armor', 'Нагрудник', 'Нагрудник')}
                   {renderSlot('belt', 'Поножи', 'Поножи')}
-                  {renderSlot(
-                    'weapon',
-                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : 'Меч',
-                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : 'Меч'
-                  )}
+                  {renderSlot('boots', 'Сапоги', 'Сапоги')}
                 </div>
 
                 {/* Center Portrait */}
@@ -522,12 +518,16 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
                 {/* Right Column: 4 Slots */}
                 <div className="flex flex-col gap-1 items-start">
                   {renderSlot(
+                    'weapon',
+                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : (player.race === 'orc' || player.race === 'gnome' ? 'Секира' : 'Меч'),
+                    player.classType === 'mage' ? 'Посох' : player.classType === 'archer' ? 'Лук' : (player.race === 'orc' || player.race === 'gnome' ? 'Секира' : 'Меч')
+                  )}
+                  {renderSlot(
                     'shield',
                     player.classType === 'mage' ? 'Книга' : player.classType === 'archer' ? 'Колчан' : 'Щит',
                     player.classType === 'mage' ? 'Книга заклинаний' : player.classType === 'archer' ? 'Колчан стрел' : 'Щит'
                   )}
-                  {renderSlot('gloves', 'Руки', 'Перчатки')}
-                  {renderSlot('boots', 'Ноги', 'Сапоги')}
+                  {renderSlot('gloves', 'Перчатки', 'Перчатки')}
                   {renderSlot('spellbook', 'Боевой пояс', 'Боевой пояс')}
                 </div>
 

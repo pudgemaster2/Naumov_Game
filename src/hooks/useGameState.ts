@@ -28,6 +28,9 @@ const defaultStartingItems: Item[] = [
   { id: 'start_gloves', name: 'Перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые перчатки, повышающие хватку.', icon: getItemImage('gloves') },
   { id: 'start_armor', name: 'Нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий нагрудник, защищающий грудь.', icon: getItemImage('armor') },
   { id: 'start_boots', name: 'Сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: getItemImage('boots') },
+  { id: 'leggings_level_1_artifact', name: 'Поножи (Артефакт)', type: 'belt', stats: { endurance: 5, agility: 3 }, description: 'Древние поножи первого уровня, обладающие огромной прочностью. Артефакт.', icon: getItemImage('belt') },
+  { id: 'ring_level_1_a', name: 'Медное кольцо', type: 'ring', stats: { strength: 1 }, description: 'Простое медное кольцо первого уровня.', icon: getItemImage('ring') },
+  { id: 'ring_level_1_b', name: 'Серебряное кольцо', type: 'ring', stats: { intellect: 1 }, description: 'Простое серебряное кольцо первого уровня.', icon: getItemImage('ring') },
   { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
   { id: 'potion_hp_2', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
   { id: 'potion_hp_3', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
@@ -132,16 +135,60 @@ export const useGameState = () => {
             });
           }
 
+          // Leggings migration
+          const hasLeggingsInInv = character.inventory.some((item: any) => item.id === 'leggings_level_1_artifact');
+          const hasLeggingsInEq = character.equipment.belt !== undefined && character.equipment.belt.id === 'leggings_level_1_artifact';
+          if (!hasLeggingsInInv && !hasLeggingsInEq && !character.equipment.belt) {
+            character.inventory.push({
+              id: 'leggings_level_1_artifact',
+              name: 'Поножи (Артефакт)',
+              type: 'belt',
+              stats: { endurance: 5, agility: 3 },
+              description: 'Древние поножи первого уровня, обладающие огромной прочностью. Артефакт.',
+              icon: getItemImage('belt')
+            });
+          }
+
+          // Rings migration
+          const hasRingA = character.inventory.some((item: any) => item.id === 'ring_level_1_a') || 
+                           (character.equipment.ring1?.id === 'ring_level_1_a') || 
+                           (character.equipment.ring2?.id === 'ring_level_1_a');
+          if (!hasRingA) {
+            character.inventory.push({
+              id: 'ring_level_1_a',
+              name: 'Медное кольцо',
+              type: 'ring',
+              stats: { strength: 1 },
+              description: 'Простое медное кольцо первого уровня.',
+              icon: getItemImage('ring')
+            });
+          }
+
+          const hasRingB = character.inventory.some((item: any) => item.id === 'ring_level_1_b') || 
+                           (character.equipment.ring1?.id === 'ring_level_1_b') || 
+                           (character.equipment.ring2?.id === 'ring_level_1_b');
+          if (!hasRingB) {
+            character.inventory.push({
+              id: 'ring_level_1_b',
+              name: 'Серебряное кольцо',
+              type: 'ring',
+              stats: { intellect: 1 },
+              description: 'Простое серебряное кольцо первого уровня.',
+              icon: getItemImage('ring')
+            });
+          }
+
           // Weapon and Shield migration for existing players
           const classType = character.classType;
           if (character.equipment.weapon === undefined) {
             if (classType === 'warrior') {
+              const isAxeRace = character.race === 'orc' || character.race === 'gnome';
               character.equipment.weapon = {
                 id: 'start_weapon_warrior',
-                name: 'Короткий меч',
+                name: isAxeRace ? 'Боевая секира' : 'Короткий меч',
                 type: 'weapon',
                 stats: { strength: 2 },
-                description: 'Стальной гладиус новобранца.',
+                description: isAxeRace ? 'Тяжелая боевая секира для сильных ударов.' : 'Стальной гладиус новобранца.',
                 icon: getItemImage('weapon')
               };
             } else if (classType === 'archer') {
@@ -350,12 +397,13 @@ export const useGameState = () => {
     };
 
     if (classType === 'warrior') {
+      const isAxeRace = race === 'orc' || race === 'gnome';
       startingEquipment.weapon = {
         id: 'start_weapon_warrior',
-        name: 'Короткий меч',
+        name: isAxeRace ? 'Боевая секира' : 'Короткий меч',
         type: 'weapon',
         stats: { strength: 2 },
-        description: 'Стальной гладиус новобранца.',
+        description: isAxeRace ? 'Тяжелая боевая секира для сильных ударов.' : 'Стальной гладиус новобранца.',
         icon: getItemImage('weapon')
       };
       startingEquipment.shield = {

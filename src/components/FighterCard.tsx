@@ -65,10 +65,10 @@ export const FighterCard: React.FC<FighterCardProps> = ({
       switch (type) {
         case 'helmet': return 'Шлем';
         case 'armor': return 'Нагрудник';
-        case 'gloves': return 'Перчатки';
+        case 'belt': return 'Поножи';
         case 'boots': return 'Сапоги';
         case 'weapon': return 'Оружие';
-        case 'shield': return 'Вторая рука';
+        case 'shield': return 'Правая рука';
         case 'spellbook': return 'Боевой пояс';
         case 'ring': return 'Кольцо';
         case 'potion_hp': return 'Зелье здоровья';
@@ -183,13 +183,9 @@ export const FighterCard: React.FC<FighterCardProps> = ({
           {!fighter.sprite && (
             <div className="flex flex-col gap-2">
               {renderSlot('helmet', 'Шлем', 'Шлем')}
-              {renderSlot('armor', 'Доспех', 'Нагрудник')}
+              {renderSlot('armor', 'Нагрудник', 'Нагрудник')}
               {renderSlot('belt', 'Поножи', 'Поножи')}
-              {renderSlot(
-                'weapon',
-                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч',
-                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : 'Меч'
-              )}
+              {renderSlot('boots', 'Сапоги', 'Сапоги')}
             </div>
           )}
 
@@ -208,13 +204,17 @@ export const FighterCard: React.FC<FighterCardProps> = ({
           {!fighter.sprite && (
             <div className="flex flex-col gap-2">
               {renderSlot(
+                'weapon',
+                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : (fighter.race === 'orc' || fighter.race === 'gnome' ? 'Секира' : 'Меч'),
+                fighter.classType === 'mage' ? 'Посох' : fighter.classType === 'archer' ? 'Лук' : (fighter.race === 'orc' || fighter.race === 'gnome' ? 'Секира' : 'Меч')
+              )}
+              {renderSlot(
                 'shield',
                 fighter.classType === 'mage' ? 'Книга' : fighter.classType === 'archer' ? 'Колчан' : 'Щит',
                 fighter.classType === 'mage' ? 'Книга заклинаний' : fighter.classType === 'archer' ? 'Колчан стрел' : 'Щит'
               )}
-              {renderSlot('gloves', 'Руки', 'Перчатки')}
-              {renderSlot('boots', 'Ноги', 'Сапоги')}
-              {renderSlot('spellbook', 'Пояс', 'Боевой пояс')}
+              {renderSlot('gloves', 'Перчатки', 'Перчатки')}
+              {renderSlot('spellbook', 'Боевой пояс', 'Боевой пояс')}
             </div>
           )}
 
