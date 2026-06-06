@@ -1243,9 +1243,60 @@ export const useGameState = () => {
   };
 
   const updateCharacter = async (updatedPlayer: Character) => {
-    setPlayer(updatedPlayer);
+    let nextLevel = updatedPlayer.level;
+    let nextExp = updatedPlayer.experience;
+    let gainedStatPoints = 0;
+    let gainedGold = 0;
+    const originalLevel = updatedPlayer.level;
+
+    while (nextExp >= nextLevel * 100) {
+      const currentLvl = nextLevel;
+      nextLevel += 1;
+      nextExp -= currentLvl * 100;
+      
+      const rewards = getLevelUpRewards(nextLevel);
+      gainedStatPoints += rewards.statPoints;
+      gainedGold += rewards.gold;
+    }
+
+    let finalPlayer = { ...updatedPlayer };
+    if (nextLevel > originalLevel) {
+      let equipEndurance = 0;
+      let equipIntellect = 0;
+      if (updatedPlayer.equipment) {
+        Object.values(updatedPlayer.equipment).forEach((item: any) => {
+          if (item && item.stats) {
+            if (item.stats.endurance) equipEndurance += item.stats.endurance;
+            if (item.stats.intellect) equipIntellect += item.stats.intellect;
+          }
+        });
+      }
+      const nextMaxHp = (updatedPlayer.stats.endurance + equipEndurance) * 10;
+      const nextMaxMana = (updatedPlayer.stats.intellect + equipIntellect) * 10;
+
+      finalPlayer = {
+        ...updatedPlayer,
+        level: nextLevel,
+        experience: nextExp,
+        gold: updatedPlayer.gold + gainedGold,
+        statPoints: (updatedPlayer.statPoints || 0) + gainedStatPoints,
+        maxHp: nextMaxHp,
+        currentHp: nextMaxHp,
+        maxMana: nextMaxMana,
+        currentMana: nextMaxMana,
+      };
+
+      setPendingLevelUp({
+        oldLevel: originalLevel,
+        newLevel: nextLevel,
+        statPointsGained: gainedStatPoints,
+        goldGained: gainedGold
+      });
+    }
+
+    setPlayer(finalPlayer);
     if (user) {
-      await db.saveCharacter(user.uid, updatedPlayer);
+      await db.saveCharacter(user.uid, finalPlayer);
     }
   };
 

@@ -62,21 +62,6 @@ export const MarketView: React.FC<MarketViewProps> = ({ player, onSave, onBack }
     } else if (itemKey === 'elixir') {
       updatedExperience += 75;
       setMarketLog('🧪 Вы выпили «Эликсир Мудрости». Магическое варево расширяет сознание! Получено +75 опыта.');
-
-      // Check level ups
-      while (updatedExperience >= updatedLevel * 100) {
-        updatedExperience -= updatedLevel * 100;
-        updatedLevel += 1;
-        updatedStats.strength += 1;
-        updatedStats.agility += 1;
-        updatedStats.endurance += 1;
-        updatedStats.intellect += 1;
-        levelUpNotifications.push(`🎉 Новый уровень: ${updatedLevel}! Все характеристики +1!`);
-      }
-      updatedMaxHp = updatedStats.endurance * 10;
-      updatedMaxMana = updatedStats.intellect * 10;
-      updatedCurrentHp = updatedMaxHp; // heal on level up
-      updatedCurrentMana = updatedMaxMana;
     } else {
       // Consumables purchase
       const consumablesMap: Record<string, { name: string; type: any; desc: string; icon: string }> = {

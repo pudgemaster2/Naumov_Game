@@ -84,40 +84,15 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
         outcome = '💨 Мимо! Камень улетел далеко в лесную чащу, напугав лишь стаю птиц. Попробуйте прицелиться лучше в следующий раз!';
       }
 
-      let updatedLevel = player.level;
-      let updatedExperience = player.experience + rewardXp;
-      let updatedStats = { ...player.stats };
-      let updatedMaxHp = player.maxHp;
-      let updatedCurrentHp = player.currentHp;
-      const levelUpNotifications: string[] = [];
-
-      while (updatedExperience >= updatedLevel * 100) {
-        updatedExperience -= updatedLevel * 100;
-        updatedLevel += 1;
-        updatedStats.strength += 1;
-        updatedStats.agility += 1;
-        updatedStats.endurance += 1;
-        updatedStats.intellect += 1;
-        levelUpNotifications.push(`🎉 Вы получили новый уровень: ${updatedLevel}! Все характеристики +1!`);
-      }
-      updatedMaxHp = updatedStats.endurance * 10;
-      if (rewardXp > 0 && updatedLevel > player.level) {
-        updatedCurrentHp = updatedMaxHp;
-      }
-
       const updatedPlayer: Character = {
         ...player,
         gold: player.gold + rewardGold,
-        experience: updatedExperience,
-        level: updatedLevel,
-        stats: updatedStats,
-        maxHp: updatedMaxHp,
-        currentHp: updatedCurrentHp,
+        experience: player.experience + rewardXp,
       };
 
       await onSave(updatedPlayer);
       setIsCatapultLoading(false);
-      setLog(`☄️ ВЫСТРЕЛ! Снаряд с грохотом летит за стены...\n\n${outcome}${rewardGold > 0 ? ` (+💰 ${rewardGold} золота)` : ''}${rewardXp > 0 ? ` (+⭐ ${rewardXp} опыта)` : ''}\n\n${levelUpNotifications.join('\n')}`);
+      setLog(`☄️ ВЫСТРЕЛ! Снаряд с грохотом летит за стены...\n\n${outcome}${rewardGold > 0 ? ` (+💰 ${rewardGold} золота)` : ''}${rewardXp > 0 ? ` (+⭐ ${rewardXp} опыта)` : ''}`);
     }, 1200);
   };
 
@@ -130,39 +105,14 @@ export const OtherLocationsView: React.FC<OtherLocationsViewProps> = ({
     }
 
     const rewardXp = 25;
-    let updatedLevel = player.level;
-    let updatedExperience = player.experience + rewardXp;
-    let updatedStats = { ...player.stats };
-    let updatedMaxHp = player.maxHp;
-    let updatedCurrentHp = player.currentHp;
-    const levelUpNotifications: string[] = [];
-
-    while (updatedExperience >= updatedLevel * 100) {
-      updatedExperience -= updatedLevel * 100;
-      updatedLevel += 1;
-      updatedStats.strength += 1;
-      updatedStats.agility += 1;
-      updatedStats.endurance += 1;
-      updatedStats.intellect += 1;
-      levelUpNotifications.push(`🎉 Вы получили новый уровень: ${updatedLevel}! Характеристики возросли!`);
-    }
-    updatedMaxHp = updatedStats.endurance * 10;
-    if (updatedLevel > player.level) {
-      updatedCurrentHp = updatedMaxHp;
-    }
-
     const updatedPlayer: Character = {
       ...player,
       gold: player.gold - cost,
-      experience: updatedExperience,
-      level: updatedLevel,
-      stats: updatedStats,
-      maxHp: updatedMaxHp,
-      currentHp: updatedCurrentHp,
+      experience: player.experience + rewardXp,
     };
 
     await onSave(updatedPlayer);
-    setLog(`⚔️ Вы провели часовой спарринг на тренировочных мечах с опытным сержантом. Тело ломит от усталости, но боевые навыки улучшились! Получено +25 XP.\n\n${levelUpNotifications.join('\n')}`);
+    setLog(`⚔️ Вы провели часовой спарринг на тренировочных мечах с опытным сержантом. Тело ломит от усталости, но боевые навыки улучшились! Получено +25 XP.`);
   };
 
   // Render locations
