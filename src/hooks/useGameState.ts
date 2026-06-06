@@ -4,6 +4,7 @@ import type {
   Character, 
   CharacterRace,
   CharacterClass, 
+  CharacterStats,
   CombatZone, 
   CombatLogEntry, 
   ScreenState, 
@@ -42,6 +43,63 @@ const defaultStartingItems: Item[] = [
   { id: 'scroll_dodge_1', name: 'Свиток Ветра', type: 'scroll_dodge', stats: {}, description: 'Повышает шанс уклонения на +15% до конца боя.', icon: getItemImage('scroll_dodge') },
   { id: 'scroll_crit_1', name: 'Свиток Гнева', type: 'scroll_crit', stats: {}, description: 'Повышает шанс крита на +15% до конца боя.', icon: getItemImage('scroll_crit') }
 ];
+
+const getLevelUpRewards = (newLevel: number): { statPoints: number; gold: number } => {
+  if (newLevel <= 10) {
+    return { statPoints: 3, gold: 100 };
+  } else if (newLevel <= 15) {
+    return { statPoints: 4, gold: 125 };
+  } else if (newLevel <= 20) {
+    return { statPoints: 5, gold: 150 };
+  } else if (newLevel <= 30) {
+    return { statPoints: 6, gold: 200 };
+  } else if (newLevel <= 40) {
+    return { statPoints: 7, gold: 250 };
+  } else if (newLevel <= 50) {
+    return { statPoints: 8, gold: 300 };
+  } else if (newLevel <= 60) {
+    return { statPoints: 9, gold: 400 };
+  } else if (newLevel <= 70) {
+    return { statPoints: 10, gold: 500 };
+  } else if (newLevel <= 80) {
+    return { statPoints: 11, gold: 600 };
+  } else if (newLevel <= 90) {
+    return { statPoints: 12, gold: 800 };
+  } else {
+    return { statPoints: 15, gold: 1000 };
+  }
+};
+
+const getAutoDistribution = (classType: CharacterClass, points: number): CharacterStats => {
+  const added = { strength: 0, agility: 0, endurance: 0, intellect: 0 };
+  
+  if (classType === 'warrior') {
+    for (let i = 0; i < points; i++) {
+      if (i % 2 === 0) {
+        added.strength += 1;
+      } else {
+        added.endurance += 1;
+      }
+    }
+  } else if (classType === 'archer') {
+    for (let i = 0; i < points; i++) {
+      if (i % 3 === 0) {
+        added.endurance += 1;
+      } else {
+        added.agility += 1;
+      }
+    }
+  } else if (classType === 'mage') {
+    for (let i = 0; i < points; i++) {
+      if (i % 4 === 0) {
+        added.endurance += 1;
+      } else {
+        added.intellect += 1;
+      }
+    }
+  }
+  return added;
+};
 
 export const useGameState = () => {
   const [screen, setScreen] = useState<ScreenState>('auth');
@@ -83,6 +141,13 @@ export const useGameState = () => {
     dungeonId: string;
     monsterCoord: string;
     isBoss: boolean;
+  } | null>(null);
+
+  const [pendingLevelUp, setPendingLevelUp] = useState<{
+    oldLevel: number;
+    newLevel: number;
+    statPointsGained: number;
+    goldGained: number;
   } | null>(null);
 
   // Subscribe to auth state changes
@@ -1009,19 +1074,30 @@ export const useGameState = () => {
       let nextExp = player.experience + expReward;
       const nextStats = { ...player.stats };
       const levelUpNotifications: string[] = [];
+      let gainedStatPoints = 0;
+      let gainedGold = 0;
+      const originalLevel = player.level;
 
       // Recursive level up check
       while (nextExp >= nextLevel * 100) {
-        nextExp -= nextLevel * 100;
+        const currentLvl = nextLevel;
         nextLevel += 1;
+        nextExp -= currentLvl * 100;
         
-        // Add +1 to all stats
-        nextStats.strength += 1;
-        nextStats.agility += 1;
-        nextStats.endurance += 1;
-        nextStats.intellect += 1;
+        const rewards = getLevelUpRewards(nextLevel);
+        gainedStatPoints += rewards.statPoints;
+        gainedGold += rewards.gold;
 
-        levelUpNotifications.push(`🎉 Вы получили новый уровень: ${nextLevel}! Характеристики возросли на +1!`);
+        levelUpNotifications.push(`🎉 Вы получили новый уровень: ${nextLevel}! Получено +${rewards.statPoints} очков характеристик и +${rewards.gold} золота.`);
+      }
+
+      if (gainedStatPoints > 0) {
+        setPendingLevelUp({
+          oldLevel: originalLevel,
+          newLevel: nextLevel,
+          statPointsGained: gainedStatPoints,
+          goldGained: gainedGold
+        });
       }
 
       const nextMaxHp = nextStats.endurance * 10;
@@ -1047,7 +1123,7 @@ export const useGameState = () => {
         ...player,
         level: nextLevel,
         experience: nextExp,
-        gold: player.gold + goldReward,
+        gold: player.gold + goldReward + gainedGold,
         stats: nextStats,
         maxHp: nextMaxHp,
         currentHp: finalHp,
@@ -1056,6 +1132,7 @@ export const useGameState = () => {
         wins: player.wins + addWin,
         losses: player.losses + addLoss,
         activeBuff: nextBuff,
+        statPoints: (player.statPoints || 0) + gainedStatPoints,
       };
 
       setPlayer(updatedPlayer);
@@ -1123,10 +1200,53 @@ export const useGameState = () => {
     }
   };
 
-  const updateCharacter = async (updatedPlayer: Character) => {
-    if (!user) return;
+  const allocateStatPoints = async (strength: number, agility: number, endurance: number, intellect: number) => {
+    if (!player) return;
+    const totalAllocated = strength + agility + endurance + intellect;
+    if (totalAllocated <= 0 || totalAllocated > (player.statPoints || 0)) return;
+    
+    const nextStats = {
+      strength: player.stats.strength + strength,
+      agility: player.stats.agility + agility,
+      endurance: player.stats.endurance + endurance,
+      intellect: player.stats.intellect + intellect,
+    };
+    
+    let equipEndurance = 0;
+    let equipIntellect = 0;
+    if (player.equipment) {
+      Object.values(player.equipment).forEach((item: any) => {
+        if (item && item.stats) {
+          if (item.stats.endurance) equipEndurance += item.stats.endurance;
+          if (item.stats.intellect) equipIntellect += item.stats.intellect;
+        }
+      });
+    }
+    
+    const nextMaxHp = (nextStats.endurance + equipEndurance) * 10;
+    const nextMaxMana = (nextStats.intellect + equipIntellect) * 10;
+    
+    const updatedPlayer: Character = {
+      ...player,
+      stats: nextStats,
+      maxHp: nextMaxHp,
+      currentHp: Math.min(player.currentHp + (endurance * 10), nextMaxHp),
+      maxMana: nextMaxMana,
+      currentMana: Math.min(player.currentMana + (intellect * 10), nextMaxMana),
+      statPoints: Math.max(0, (player.statPoints || 0) - totalAllocated)
+    };
+    
     setPlayer(updatedPlayer);
-    await db.saveCharacter(user.uid, updatedPlayer);
+    if (user) {
+      await db.saveCharacter(user.uid, updatedPlayer);
+    }
+  };
+
+  const updateCharacter = async (updatedPlayer: Character) => {
+    setPlayer(updatedPlayer);
+    if (user) {
+      await db.saveCharacter(user.uid, updatedPlayer);
+    }
   };
 
   return {
@@ -1158,7 +1278,12 @@ export const useGameState = () => {
     activeSubLoc,
     setActiveSubLoc,
     dungeonState,
-    setDungeonState
+    setDungeonState,
+    pendingLevelUp,
+    setPendingLevelUp,
+    allocateStatPoints,
+    getLevelUpRewards,
+    getAutoDistribution
   };
 };
 

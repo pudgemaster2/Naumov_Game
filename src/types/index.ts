@@ -70,6 +70,7 @@ export interface Character {
   lastDailyClaim?: string;
   inventory?: Item[];
   equipment?: Equipment;
+  statPoints?: number;
   sprite?: string;
 }
 

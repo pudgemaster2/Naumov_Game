@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Character, Item, Equipment, CharacterStats } from '../types';
+import type { Character, Item, Equipment, CharacterStats, CharacterClass } from '../types';
 import { RACE_TEMPLATES, CLASS_TEMPLATES } from '../types';
 import { Button } from './ui/Button';
 import { Package } from 'lucide-react';
@@ -12,6 +12,37 @@ interface MyHouseViewProps {
   onBack: () => void;
 }
 
+const getAutoDistribution = (classType: CharacterClass, points: number): CharacterStats => {
+  const added = { strength: 0, agility: 0, endurance: 0, intellect: 0 };
+  
+  if (classType === 'warrior') {
+    for (let i = 0; i < points; i++) {
+      if (i % 2 === 0) {
+        added.strength += 1;
+      } else {
+        added.endurance += 1;
+      }
+    }
+  } else if (classType === 'archer') {
+    for (let i = 0; i < points; i++) {
+      if (i % 3 === 0) {
+        added.endurance += 1;
+      } else {
+        added.agility += 1;
+      }
+    }
+  } else if (classType === 'mage') {
+    for (let i = 0; i < points; i++) {
+      if (i % 4 === 0) {
+        added.endurance += 1;
+      } else {
+        added.intellect += 1;
+      }
+    }
+  }
+  return added;
+};
+
 export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack }) => {
   const [activeTab, setActiveTab] = useState<'bedroom' | 'inventory'>('inventory');
 
@@ -23,6 +54,150 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
   const todayDateString = new Date().toISOString().split('T')[0];
   const isDailyAvailable = player.lastDailyClaim !== todayDateString;
+
+  // Stat Allocation States
+  const [isAllocating, setIsAllocating] = useState(false);
+  const [localAllocation, setLocalAllocation] = useState<Record<keyof CharacterStats, number>>({
+    strength: 0,
+    agility: 0,
+    endurance: 0,
+    intellect: 0,
+  });
+
+  const unusedPoints = player.statPoints || 0;
+  const allocatedSum = localAllocation.strength + localAllocation.agility + localAllocation.endurance + localAllocation.intellect;
+  const pointsLeft = Math.max(0, unusedPoints - allocatedSum);
+
+  const adjustStat = (stat: keyof CharacterStats, amount: number) => {
+    if (amount > 0 && pointsLeft > 0) {
+      setLocalAllocation(prev => ({
+        ...prev,
+        [stat]: prev[stat] + 1
+      }));
+    } else if (amount < 0 && localAllocation[stat] > 0) {
+      setLocalAllocation(prev => ({
+        ...prev,
+        [stat]: prev[stat] - 1
+      }));
+    }
+  };
+
+  const handleAutoAllocate = () => {
+    const points = player.statPoints || 0;
+    if (points <= 0) return;
+    const autoStats = getAutoDistribution(player.classType, points);
+    setLocalAllocation(autoStats);
+  };
+
+  const handleConfirmAllocation = async () => {
+    const totalAllocated = 
+      localAllocation.strength + 
+      localAllocation.agility + 
+      localAllocation.endurance + 
+      localAllocation.intellect;
+      
+    if (totalAllocated <= 0 || totalAllocated > (player.statPoints || 0)) {
+      setIsAllocating(false);
+      return;
+    }
+    
+    const nextStats = {
+      strength: player.stats.strength + localAllocation.strength,
+      agility: player.stats.agility + localAllocation.agility,
+      endurance: player.stats.endurance + localAllocation.endurance,
+      intellect: player.stats.intellect + localAllocation.intellect,
+    };
+    
+    let equipEndurance = 0;
+    let equipIntellect = 0;
+    if (player.equipment) {
+      Object.values(player.equipment).forEach((item: any) => {
+        if (item && item.stats) {
+          if (item.stats.endurance) equipEndurance += item.stats.endurance;
+          if (item.stats.intellect) equipIntellect += item.stats.intellect;
+        }
+      });
+    }
+    
+    const nextMaxHp = (nextStats.endurance + equipEndurance) * 10;
+    const nextMaxMana = (nextStats.intellect + equipIntellect) * 10;
+    
+    const updatedPlayer: Character = {
+      ...player,
+      stats: nextStats,
+      maxHp: nextMaxHp,
+      currentHp: Math.min(player.currentHp + (localAllocation.endurance * 10), nextMaxHp),
+      maxMana: nextMaxMana,
+      currentMana: Math.min(player.currentMana + (localAllocation.intellect * 10), nextMaxMana),
+      statPoints: Math.max(0, (player.statPoints || 0) - totalAllocated)
+    };
+    
+    await onSave(updatedPlayer);
+    setIsAllocating(false);
+    setLocalAllocation({ strength: 0, agility: 0, endurance: 0, intellect: 0 });
+  };
+
+  const handleCancelAllocation = () => {
+    setIsAllocating(false);
+    setLocalAllocation({ strength: 0, agility: 0, endurance: 0, intellect: 0 });
+  };
+
+  const renderStatBox = (statKey: keyof CharacterStats, label: string, textColor: string) => {
+    const baseVal = player.stats[statKey];
+    const gearVal = gearStats[statKey];
+    const allocVal = localAllocation[statKey];
+    const effectiveVal = baseVal + gearVal;
+
+    return (
+      <div className="p-3.5 bg-slate-50 border border-slate-300 rounded flex flex-col justify-between relative shadow-sm">
+        <div>
+          <div className="text-xs font-semibold text-slate-650 uppercase tracking-wide">{label}</div>
+          <div className="flex items-baseline justify-center gap-1.5 mt-1">
+            <span className={`text-xl font-bold ${textColor}`}>
+              {effectiveVal + (isAllocating ? allocVal : 0)}
+            </span>
+            {isAllocating && allocVal > 0 && (
+              <span className="text-xs font-bold text-emerald-600">
+                (+{allocVal})
+              </span>
+            )}
+          </div>
+          {gearVal > 0 && (
+            <div className="text-[10px] text-emerald-600 font-bold mt-0.5">
+              +{gearVal} от вещ.
+            </div>
+          )}
+        </div>
+
+        {isAllocating && (
+          <div className="flex justify-center gap-3 mt-3 pt-2 border-t border-slate-200">
+            <button
+              onClick={() => adjustStat(statKey, -1)}
+              disabled={allocVal <= 0}
+              className={`w-7 h-7 flex items-center justify-center rounded-full font-bold transition-all select-none border text-base ${
+                allocVal <= 0
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200 active:scale-95'
+              }`}
+            >
+              -
+            </button>
+            <button
+              onClick={() => adjustStat(statKey, 1)}
+              disabled={pointsLeft <= 0}
+              className={`w-7 h-7 flex items-center justify-center rounded-full font-bold transition-all select-none border text-base ${
+                pointsLeft <= 0
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200 active:scale-95'
+              }`}
+            >
+              +
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // getPortrait is now imported from portraitHelper
 
@@ -51,9 +226,6 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
   const gearStats = getEquippedStats();
 
-  const getEffectiveStatValue = (statKey: keyof CharacterStats) => {
-    return player.stats[statKey] + gearStats[statKey];
-  };
 
   // Recalculates stats and Max HP when gear is modified
   const applyGearAdjustment = (newEquipment: Equipment): { currentHp: number; maxHp: number; maxMana: number } => {
@@ -560,27 +732,54 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
               </h3>
               
               <div className="grid grid-cols-2 gap-4 text-center py-2 font-mono">
-                <div className="p-3.5 bg-slate-50 border border-slate-300">
-                  <div className="text-xs font-semibold text-slate-600 uppercase">Сила</div>
-                  <div className="text-xl font-bold text-rose-700 mt-1">{getEffectiveStatValue('strength')}</div>
-                  {gearStats.strength > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.strength} от вещ.</div>}
-                </div>
-                <div className="p-3.5 bg-slate-50 border border-slate-300">
-                  <div className="text-xs font-semibold text-slate-600 uppercase">Ловкость</div>
-                  <div className="text-xl font-bold text-amber-700 mt-1">{getEffectiveStatValue('agility')}</div>
-                  {gearStats.agility > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.agility} от вещ.</div>}
-                </div>
-                <div className="p-3.5 bg-slate-50 border border-slate-300">
-                  <div className="text-xs font-semibold text-slate-600 uppercase">Выносл.</div>
-                  <div className="text-xl font-bold text-emerald-700 mt-1">{getEffectiveStatValue('endurance')}</div>
-                  {gearStats.endurance > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.endurance} от вещ.</div>}
-                </div>
-                <div className="p-3.5 bg-slate-50 border border-slate-300">
-                  <div className="text-xs font-semibold text-slate-600 uppercase">Интеллект</div>
-                  <div className="text-xl font-bold text-sky-700 mt-1">{getEffectiveStatValue('intellect')}</div>
-                  {gearStats.intellect > 0 && <div className="text-xs text-emerald-600 font-bold mt-0.5">+{gearStats.intellect} от вещ.</div>}
-                </div>
+                {renderStatBox('strength', 'Сила', 'text-rose-700')}
+                {renderStatBox('agility', 'Ловкость', 'text-amber-700')}
+                {renderStatBox('endurance', 'Выносл.', 'text-emerald-700')}
+                {renderStatBox('intellect', 'Интеллект', 'text-sky-700')}
               </div>
+
+              {isAllocating ? (
+                <div className="space-y-3 pt-2 font-mono border-t border-slate-250">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-655 uppercase font-semibold">Свободных очков:</span>
+                    <span className="text-lg font-bold text-amber-600 animate-pulse">{pointsLeft}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={handleAutoAllocate}
+                      disabled={pointsLeft <= 0}
+                      className="px-2 py-2 text-xs font-gothic tracking-wider rounded uppercase bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-center select-none font-bold"
+                    >
+                      Авто
+                    </button>
+                    <button
+                      onClick={handleConfirmAllocation}
+                      disabled={allocatedSum <= 0}
+                      className="px-2 py-2 text-xs font-gothic tracking-wider rounded uppercase bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-center select-none font-bold shadow-sm"
+                    >
+                      Принять
+                    </button>
+                    <button
+                      onClick={handleCancelAllocation}
+                      className="px-2 py-2 text-xs font-gothic tracking-wider rounded uppercase bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors text-center select-none font-bold"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                unusedPoints > 0 && (
+                  <div className="pt-2 border-t border-slate-250">
+                    <button
+                      onClick={() => setIsAllocating(true)}
+                      className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-gothic text-xs tracking-wider rounded uppercase font-bold transition-all shadow-md shadow-amber-500/10 active:scale-[0.98] select-none text-center"
+                    >
+                      Распределить очки ({unusedPoints})
+                    </button>
+                  </div>
+                )
+              )}
             </div>
 
             {/* Inventory Backpack */}
