@@ -49,6 +49,7 @@ export interface Character {
   name: string;
   race: CharacterRace;
   classType: CharacterClass;
+  gender?: 'male' | 'female';
   level: number;
   experience: number;
   gold: number;
