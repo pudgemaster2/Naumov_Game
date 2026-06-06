@@ -510,11 +510,11 @@ export const MyHouseView: React.FC<MyHouseViewProps> = ({ player, onSave, onBack
 
                 {/* Center Portrait */}
                 <div className="flex flex-col items-center">
-                  <div className="border border-gold-500/30 rounded-lg overflow-hidden bg-slate-200 p-2 shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+                  <div className="border border-gold-500/30 rounded-lg overflow-hidden bg-obsidian-950 p-2 shadow-[0_0_20px_rgba(0,0,0,0.1)]">
                     <img 
-                      src={getPortrait(player.race, player.classType)} 
+                      src={getPortrait(player.race, player.classType, player.gender)} 
                       alt={`${player.race} ${player.classType}`} 
-                      className="w-[320px] h-[460px] object-cover rounded border border-slate-300" 
+                      className="w-[320px] h-[460px] object-contain rounded border border-slate-700 bg-obsidian-900" 
                     />
                   </div>
                 </div>

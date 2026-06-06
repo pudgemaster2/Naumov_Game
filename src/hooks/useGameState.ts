@@ -325,7 +325,7 @@ export const useGameState = () => {
     setScreen('auth');
   };
 
-  const selectCharacterClass = async (race: CharacterRace, classType: CharacterClass, name: string) => {
+  const selectCharacterClass = async (race: CharacterRace, classType: CharacterClass, name: string, gender: 'male' | 'female' = 'male') => {
     if (!user) return;
 
     const raceTemplate = RACE_TEMPLATES[race];
@@ -425,6 +425,7 @@ export const useGameState = () => {
       name: name.trim() || `Игрок_${Math.floor(Math.random() * 1000)}`,
       race,
       classType,
+      gender,
       level: 1,
       experience: 0,
       gold: 0,

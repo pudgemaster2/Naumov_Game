@@ -41,7 +41,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
     if (fighter.sprite === 'rat') return dungeonMonsterRat;
     if (fighter.sprite === 'skeleton') return dungeonMonsterSkeleton;
     if (fighter.sprite === 'boss') return dungeonMonsterBoss;
-    return getPortrait(fighter.race, fighter.classType);
+    return getPortrait(fighter.race, fighter.classType, fighter.gender);
   };
 
   const renderItemIcon = (icon: string) => {
@@ -199,7 +199,7 @@ export const FighterCard: React.FC<FighterCardProps> = ({
               <img 
                 src={getFighterPortrait()} 
                 alt={fighter.sprite ? `${fighter.sprite} monster` : `${fighter.race} ${fighter.classType}`} 
-                className="w-full h-full object-cover rounded" 
+                className="w-full h-full object-contain rounded bg-obsidian-950" 
               />
             </div>
           </div>

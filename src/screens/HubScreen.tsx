@@ -313,9 +313,9 @@ export const HubScreen: React.FC<HubScreenProps> = ({
           <div className="flex flex-col items-center text-center space-y-3.5">
             <div className="bg-slate-200 border border-slate-350 shadow-md w-48 h-56 overflow-hidden rounded relative flex-shrink-0">
               <img 
-                src={getPortrait(player.race, player.classType)} 
+                src={getPortrait(player.race, player.classType, player.gender)} 
                 alt={`${player.race} ${player.classType}`} 
-                className="w-full h-full object-cover" 
+                className="w-full h-full object-contain bg-slate-900" 
               />
             </div>
             <div className="space-y-1">
