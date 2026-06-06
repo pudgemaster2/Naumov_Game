@@ -28,7 +28,7 @@ const defaultStartingItems: Item[] = [
   { id: 'start_gloves', name: 'Перчатки', type: 'gloves', stats: { agility: 1 }, description: 'Простые перчатки, повышающие хватку.', icon: getItemImage('gloves') },
   { id: 'start_armor', name: 'Нагрудник', type: 'armor', stats: { endurance: 4 }, description: 'Легкий нагрудник, защищающий грудь.', icon: getItemImage('armor') },
   { id: 'start_boots', name: 'Сапоги', type: 'boots', stats: { agility: 1 }, description: 'Прочные сапоги, увеличивающие скорость движений.', icon: getItemImage('boots') },
-  { id: 'leggings_level_1_artifact', name: 'Поножи (Артефакт)', type: 'belt', stats: { endurance: 5, agility: 3 }, description: 'Древние поножи первого уровня, обладающие огромной прочностью. Артефакт.', icon: getItemImage('belt') },
+  { id: 'leggings_level_1', name: 'Поножи', type: 'belt', stats: { endurance: 2 }, description: 'Простые поножи для защиты ног.', icon: getItemImage('belt') },
   { id: 'ring_level_1_a', name: 'Медное кольцо', type: 'ring', stats: { strength: 1 }, description: 'Простое медное кольцо первого уровня.', icon: getItemImage('ring') },
   { id: 'ring_level_1_b', name: 'Серебряное кольцо', type: 'ring', stats: { intellect: 1 }, description: 'Простое серебряное кольцо первого уровня.', icon: getItemImage('ring') },
   { id: 'potion_hp_1', name: 'Зелье здоровья', type: 'potion_hp', stats: {}, description: 'Магический эликсир. Восстанавливает 50 HP в бою или дома.', icon: getItemImage('potion_hp') },
@@ -135,16 +135,38 @@ export const useGameState = () => {
             });
           }
 
-          // Leggings migration
-          const hasLeggingsInInv = character.inventory.some((item: any) => item.id === 'leggings_level_1_artifact');
-          const hasLeggingsInEq = character.equipment.belt !== undefined && character.equipment.belt.id === 'leggings_level_1_artifact';
-          if (!hasLeggingsInInv && !hasLeggingsInEq && !character.equipment.belt) {
+          // Leggings migration & cleanup of the accidental artifact item
+          character.inventory = character.inventory.map((item: any) => {
+            if (item.id === 'leggings_level_1_artifact') {
+              return {
+                ...item,
+                id: 'leggings_level_1',
+                name: 'Поножи',
+                stats: { endurance: 2 },
+                description: 'Простые поножи для защиты ног.'
+              };
+            }
+            return item;
+          });
+          if (character.equipment.belt && character.equipment.belt.id === 'leggings_level_1_artifact') {
+            character.equipment.belt = {
+              ...character.equipment.belt,
+              id: 'leggings_level_1',
+              name: 'Поножи',
+              stats: { endurance: 2 },
+              description: 'Простые поножи для защиты ног.'
+            };
+          }
+
+          const hasLeggings = character.inventory.some((item: any) => item.id === 'leggings_level_1') ||
+                              (character.equipment.belt?.id === 'leggings_level_1');
+          if (!hasLeggings) {
             character.inventory.push({
-              id: 'leggings_level_1_artifact',
-              name: 'Поножи (Артефакт)',
+              id: 'leggings_level_1',
+              name: 'Поножи',
               type: 'belt',
-              stats: { endurance: 5, agility: 3 },
-              description: 'Древние поножи первого уровня, обладающие огромной прочностью. Артефакт.',
+              stats: { endurance: 2 },
+              description: 'Простые поножи для защиты ног.',
               icon: getItemImage('belt')
             });
           }
